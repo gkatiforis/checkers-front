@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "777150420367",
+    "firebase_url": "https://top10-213813.firebaseio.com",
+    "project_id": "top10-213813",
+    "storage_bucket": "top10-213813.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777150420367:android:dcb39d74bd132e9b",
+        "android_client_info": {
+          "package_name": "com.katiforis.top10"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "777150420367-5db6749a0pl5cfbpshf3cgb8g94g448f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmMdNV9K5Z5CJ47WOKjMwD2z6XQml-PHo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
