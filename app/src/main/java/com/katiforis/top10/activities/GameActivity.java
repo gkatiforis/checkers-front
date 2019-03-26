@@ -107,7 +107,7 @@ public class GameActivity extends Activity {
         try {
 
 			// Toast.makeText(getBaseContext(), (jsonObject.toString()), Toast.LENGTH_SHORT).show();
-			Boolean isCorrect = jsonObject.getBoolean("correct");
+			Boolean isCorrect = jsonObject.getBoolean("isCorrect");
 			Boolean hasAlreadyBeenSaid = jsonObject.getBoolean("hasAlreadyBeenSaid");
 			String player = jsonObject.getJSONObject("player").get("username").toString();
 			JSONObject answer = jsonObject.getJSONObject("answer");
