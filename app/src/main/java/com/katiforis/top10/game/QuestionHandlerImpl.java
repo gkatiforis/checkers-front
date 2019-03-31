@@ -50,7 +50,7 @@ public class QuestionHandlerImpl implements QuestionHandler {
 	@Override
 	public AnswerDTO isAnswerValid(PlayerAnswerDTO playerAnswerDTO) {
 
-		String[] answers = WordHandler.convert(playerAnswerDTO.getAnswer()).split("\\|");
+		String[] answers = WordHandler.convert(playerAnswerDTO.getDescription()).split("\\|");
 
 
 		QuestionDTO question = getQuestionById(playerAnswerDTO.getQuestionId());

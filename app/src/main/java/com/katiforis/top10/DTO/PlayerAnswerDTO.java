@@ -1,12 +1,17 @@
 package com.katiforis.top10.DTO;
 
-public class PlayerAnswerDTO {
-    private String answer;
-   private String userId;
-   private long questionId;
 
-    public void setAnswer(String name) {
-        this.answer = name;
+public class PlayerAnswerDTO {
+    private String description;
+    private Integer points;
+    private boolean isCorrect = false;
+    private boolean hasAlreadyBeenSaid = false;
+    private long questionId;
+    private GamePlayerDTO player;
+    private String userId;
+
+    public String getDescription() {
+        return description;
     }
 
     public String getUserId() {
@@ -17,8 +22,32 @@ public class PlayerAnswerDTO {
         this.userId = userId;
     }
 
-    public String getAnswer() {
-        return answer;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
+    public boolean isCorrect() {
+        return isCorrect;
+    }
+
+    public void setCorrect(boolean correct) {
+        isCorrect = correct;
+    }
+
+    public boolean isHasAlreadyBeenSaid() {
+        return hasAlreadyBeenSaid;
+    }
+
+    public void setHasAlreadyBeenSaid(boolean hasAlreadyBeenSaid) {
+        this.hasAlreadyBeenSaid = hasAlreadyBeenSaid;
     }
 
     public long getQuestionId() {
@@ -27,5 +56,13 @@ public class PlayerAnswerDTO {
 
     public void setQuestionId(long questionId) {
         this.questionId = questionId;
+    }
+
+    public GamePlayerDTO getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(GamePlayerDTO player) {
+        this.player = player;
     }
 }

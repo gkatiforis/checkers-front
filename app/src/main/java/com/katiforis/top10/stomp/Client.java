@@ -3,22 +3,32 @@ package com.katiforis.top10.stomp;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.katiforis.top10.DTO.GameStateDTO;
+import com.katiforis.top10.DTO.PlayerAnswerDTO;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
+import com.katiforis.top10.conf.gson.DateTypeAdapter;
 
 import org.json.JSONObject;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 
+import java.util.Date;
+
 import okhttp3.WebSocket;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.client.StompClient;
 
-public class MyStomp {
 
-    public static  StompClient stompClient;
+public class Client {
+
+    public static StompClient stompClient;
 
 
     public static void init(){
@@ -28,8 +38,7 @@ public class MyStomp {
 
     }
 
-    public static void dis() {
-
+    public static void disconnect() {
         if (stompClient != null) {
             stompClient.disconnect();
             stompClient = null;
@@ -38,25 +47,27 @@ public class MyStomp {
 
     public static void initConn(String userId){
         stompClient.topic(Const.chatResponse.replace(Const.placeholder, userId)).subscribe(stompMessage -> {
-            JSONObject jsonObject = new JSONObject(stompMessage.getPayload());
-            Log.i(Const.TAG, "Receive: " + jsonObject.toString());
+            JsonParser jsonParser = new JsonParser();
+            JsonObject jo = (JsonObject)jsonParser.parse(stompMessage.getPayload());
 
-            JSONObject message = jsonObject.getJSONObject("body");
-            String messageStatus = message.getString("status");
+            Log.i(Const.TAG, "Receive: " + jo.toString());
 
+            JsonObject message = jo.getAsJsonObject("body");
+            String messageStatus =  message.get("status").getAsString();
 
+            Log.i(Const.TAG, "Receive: " + messageStatus);
             if(messageStatus.equalsIgnoreCase("start")){
-               // MenuActivity.userId = userId;
                 Intent intent = new Intent();
-
-                MenuActivity.saveGameId(message.getString("gameId"));
-
+                MenuActivity.saveGameId(message.get("gameId").getAsString());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setClass( MenuActivity.getAppContext(), GameActivity.class);
                 MenuActivity.getAppContext().startActivity(intent);
             }else if(messageStatus.equalsIgnoreCase("gamestate")){
-
-                GameActivity.instance.setGameState(message);
+                final Gson gson = new GsonBuilder()
+                        .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
+                        .create();
+                GameStateDTO gameStateDTO = gson.fromJson(message,GameStateDTO.class);
+                GameActivity.instance.setGameState(gameStateDTO);
             }
         });
     }
@@ -67,19 +78,19 @@ public class MyStomp {
 
                 .subscribe(stompMessage -> {
 
-            JSONObject jsonObject = new JSONObject(stompMessage.getPayload());
 
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jo = (JsonObject)jsonParser.parse(stompMessage.getPayload());
 
-
-                    JSONObject message = jsonObject.getJSONObject("body");
-                    String messageStatus = message.getString("status");
+                    JsonObject message = jo.getAsJsonObject("body");
+                    String messageStatus = message.get("status").getAsString();
                     //JSONObject message= messageWrapper.getJSONObject("message");
 
                     if(messageStatus.equalsIgnoreCase("gameover")){
                         // MenuActivity.userId = userId;
                         Intent intent = new Intent();
 
-                        MenuActivity.saveGameId(message.getString("gameId"));
+                        MenuActivity.saveGameId(message.get("gameId").getAsString());
 
 
 
@@ -87,7 +98,10 @@ public class MyStomp {
                         intent.setClass( MenuActivity.getAppContext(), MenuActivity.class);
                         MenuActivity.getAppContext().startActivity(intent);
                     }else if(messageStatus.equalsIgnoreCase("answer")){
-                        GameActivity.instance.showAnswer(message);
+
+                        Gson gson=new Gson();
+                        PlayerAnswerDTO playerAnswerDTO = gson.fromJson(message,PlayerAnswerDTO.class);
+                        GameActivity.instance.showAnswer(playerAnswerDTO);
                     }
                     else if(messageStatus.equalsIgnoreCase("currentTime")){
                         //GameActivity.instance.updateTime(message);
@@ -106,8 +120,11 @@ public class MyStomp {
         });
     }
 
-    public static void sendToGroup(String gameId, JSONObject jsonObject ){
-        stompClient.send( Const.groupWord.replace("placeholder", gameId), jsonObject.toString()).subscribe(new Subscriber<Void>() {
+    public static void sendToGroup(String gameId, Object object ){
+        Gson gson = new Gson();
+
+        String jsonInString = gson.toJson(object);
+        stompClient.send( Const.groupWord.replace("placeholder", gameId), jsonInString).subscribe(new Subscriber<Void>() {
             @Override
             public void onSubscribe(Subscription s) {
                 Log.i(Const.TAG, "");
@@ -120,8 +137,7 @@ public class MyStomp {
 
             @Override
             public void onError(Throwable t) {
-                t.printStackTrace();
-                Log.e(Const.TAG, "发生错误：", t);
+                Log.e(Const.TAG, "Error：", t);
             }
 
             @Override
