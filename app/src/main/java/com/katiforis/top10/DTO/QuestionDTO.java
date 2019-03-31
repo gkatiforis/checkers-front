@@ -11,7 +11,13 @@ public class QuestionDTO implements Serializable {
     private String description;
 
     private List<AnswerDTO> answers;
+    private Set<PlayerAnswerDTO> currentAnswers;
 
+    public QuestionDTO(String description, List<AnswerDTO> answers, Set<PlayerAnswerDTO> currentAnswers) {
+        this.description = description;
+        this.answers = answers;
+        this.currentAnswers = currentAnswers;
+    }
     public QuestionDTO(String description, List<AnswerDTO> answers) {
         this.description = description;
         this.answers = answers;
@@ -22,7 +28,12 @@ public class QuestionDTO implements Serializable {
         this.description = description;
         this.answers = answers;
     }
-
+    public QuestionDTO(long id, String description, List<AnswerDTO> answers,  Set<PlayerAnswerDTO> currentAnswers) {
+        this.id = id;
+        this.description = description;
+        this.answers = answers;
+        this.currentAnswers = currentAnswers;
+    }
     public QuestionDTO() {
     }
 
@@ -49,6 +60,14 @@ public class QuestionDTO implements Serializable {
 
     public void setAnswers(List<AnswerDTO> answers) {
         this.answers = answers;
+    }
+
+    public Set<PlayerAnswerDTO> getCurrentAnswers() {
+        return currentAnswers;
+    }
+
+    public void setCurrentAnswers(Set<PlayerAnswerDTO> currentAnswers) {
+        this.currentAnswers = currentAnswers;
     }
 
     @Override

@@ -11,22 +11,22 @@ import com.katiforis.top10.R;
 
 public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.MyViewHolder> {
 
-    private List<AnswerItem> moviesList;
+    private List<AnswerItem> answerItems;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, year, genre;
+        public TextView description, username, points;
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.title);
-            genre = (TextView) view.findViewById(R.id.username);
-            year = (TextView) view.findViewById(R.id.year);
+            description = (TextView) view.findViewById(R.id.description);
+            username = (TextView) view.findViewById(R.id.username);
+            points = (TextView) view.findViewById(R.id.points);
         }
     }
 
 
     public AnswerAdapter(List<AnswerItem> moviesList) {
-        this.moviesList = moviesList;
+        this.answerItems = moviesList;
     }
 
     @Override
@@ -39,14 +39,14 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        AnswerItem answerItem = moviesList.get(position);
-        holder.title.setText(answerItem.getTitle());
-        holder.genre.setText(answerItem.getGenre());
-        holder.year.setText(answerItem.getYear());
+        AnswerItem answerItem = answerItems.get(position);
+        holder.description.setText(answerItem.getDescription());
+        holder.username.setText(answerItem.getUsername());
+        holder.points.setText(answerItem.getPoints());
     }
 
     @Override
     public int getItemCount() {
-        return moviesList.size();
+        return answerItems.size();
     }
 }

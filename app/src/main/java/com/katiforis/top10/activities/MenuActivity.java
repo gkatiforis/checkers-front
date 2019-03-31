@@ -19,7 +19,7 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.katiforis.top10.R;
-import com.katiforis.top10.stomp.MyStomp;
+import com.katiforis.top10.stomp.Client;
 
 import static android.content.ContentValues.TAG;
 
@@ -69,7 +69,7 @@ public class MenuActivity extends Activity {
 				e.printStackTrace();
 			}
 
-			MyStomp.send(jsonObject);
+			Client.send(jsonObject);
 		});
 
 
@@ -123,8 +123,8 @@ public class MenuActivity extends Activity {
 		userId = account.getId();
 
 
-		MyStomp.init();
-		MyStomp.initConn(userId);
+		Client.init();
+		Client.initConn(userId);
 
 		JSONObject jsonObject = new JSONObject();
 		try {
@@ -136,7 +136,7 @@ public class MenuActivity extends Activity {
 		}
 
 
-		MyStomp.sendLogin(jsonObject);
+		Client.sendLogin(jsonObject);
 	}
 
 	public static Context getAppContext(){

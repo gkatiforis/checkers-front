@@ -3,11 +3,11 @@ package com.katiforis.top10.conf;
 public class Const {
 
 
-	public static final String address = "ws://192.168.1.4:5000/im/websocket";
+	public static final String address = "ws://192.168.1.6:5000/im/websocket";
 
 	//public static final String address = "ws://top10.us-east-2.elasticbeanstalk.com/im/websocket";
 
-	public static final String TAG = "xlui";
+	public static final String TAG = "TOP10";
 	public static final String placeholder = "placeholder";
 	public static final String groupWord = "/game/group/word/" + placeholder;
 	public static final String groupResponse = "/g/" + placeholder;

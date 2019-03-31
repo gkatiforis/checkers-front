@@ -1,48 +1,37 @@
 package com.katiforis.top10.adapter;
 
 public class AnswerItem {
-    private long id;
-    private String title, genre, year;
-
+    private String description, username, points;
     public AnswerItem() {
     }
 
-    public AnswerItem(long id, String title, String genre, String year) {
-        this.id = id;
-        this.title = title;
-        this.genre = genre;
-        this.year = year;
+    public AnswerItem( String description, String username, Integer points) {
+        this.description = description;
+        this.username = username;
+        this.points = points.toString();
     }
 
-    public long getId() {
-        return id;
+    public String getDescription() {
+        return description;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getTitle() {
-        return title;
+    public String getUsername() {
+        return username;
     }
 
-    public void setTitle(String name) {
-        this.title = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getYear() {
-        return year;
+    public String getPoints() {
+        return points;
     }
 
-    public void setYear(String year) {
-        this.year = year;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
+    public void setPoints(String points) {
+        this.points = points;
     }
 }
