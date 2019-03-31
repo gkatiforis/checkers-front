@@ -18,15 +18,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import com.katiforis.top10.DTO.AnswerDTO;
 import com.katiforis.top10.DTO.GamePlayerDTO;
+import com.katiforis.top10.DTO.GameStateDTO;
 import com.katiforis.top10.DTO.PlayerAnswerDTO;
 import com.katiforis.top10.DTO.QuestionDTO;
 import com.katiforis.top10.R;
@@ -35,7 +33,7 @@ import com.katiforis.top10.game.QuestionHandler;
 import com.katiforis.top10.game.QuestionHandlerImpl;
 import com.katiforis.top10.speech.PermissionHandler;
 import com.katiforis.top10.speech.SpeechRecognizerManager;
-import com.katiforis.top10.stomp.MyStomp;
+import com.katiforis.top10.stomp.Client;
 import com.katiforis.top10.adapter.AnswerItem;
 import com.katiforis.top10.adapter.UserAdapter;
 
@@ -54,7 +52,6 @@ public class GameActivity extends Activity {
 	Date currentDat;
 	long dateStarted;
 	long dateCurrent;
-
 
 	private EditText answerText;
 	private TextView questionText;
@@ -77,122 +74,75 @@ public class GameActivity extends Activity {
 	private QuestionHandler questionHandler;
 
 	public void sendAnswer(String answer){
-		JSONObject jsonObject = new JSONObject();
-		try {
-			jsonObject.put("answer", answer);
-			jsonObject.put("userId", MenuActivity.userId);
-			jsonObject.put("questionId",  this.currentQuestionId);
-			jsonObject.put("status",  "answer");
-
-		} catch (JSONException e) {
-			System.out.print("error: " + e);
-		}
-
-		MyStomp.sendToGroup(MenuActivity.getGameId(), jsonObject);
+		PlayerAnswerDTO playerAnswerDTO = new PlayerAnswerDTO();
+		playerAnswerDTO.setDescription(answer);
+		playerAnswerDTO.setUserId(MenuActivity.userId);
+		playerAnswerDTO.setQuestionId(this.currentQuestionId);
+		Client.sendToGroup(MenuActivity.getGameId(), playerAnswerDTO);
 	}
 
-
-	public  void showAnswer(JSONObject jsonObject){
+	public  void showAnswer(PlayerAnswerDTO playerAnswerDTO){
 				runOnUiThread(() -> {
-
-					setAnswer(jsonObject);
-				//	startSpeak();
-
+					setAnswer(playerAnswerDTO);
 	             });
 	}
 
-
-
-	void setAnswer(JSONObject jsonObject){
-        try {
-
-			// Toast.makeText(getBaseContext(), (jsonObject.toString()), Toast.LENGTH_SHORT).show();
-			Boolean isCorrect = jsonObject.getBoolean("correct");
-			Boolean hasAlreadyBeenSaid = jsonObject.getBoolean("hasAlreadyBeenSaid");
-			String player = jsonObject.getJSONObject("player").get("username").toString();
-			JSONObject answer = jsonObject.getJSONObject("answer");
-			long answerId = answer.getLong("id");
-			String description = answer.get("description").toString();
+	void setAnswer(PlayerAnswerDTO answer){
+			Boolean isCorrect = answer.isCorrect();
+			Boolean hasAlreadyBeenSaid = answer.isHasAlreadyBeenSaid();
+			String player = answer.getPlayer().getUsername();
+			String description = answer.getDescription();
 			if(isCorrect){
 				answerText.setText("");
-
-				QuestionDTO questionDTO =questionHandler.getQuestionById(currentQuestionId);
-				List<AnswerDTO> answerDTOS = questionDTO.getAnswers();
-				for(AnswerDTO answerDTO:answerDTOS){
-					if(answerId == answerDTO.getId()){
-						String points = answer.get("points").toString();
-
-						AnswerItem answerItem = new AnswerItem(answerId, description, player, points);
-
+						Integer points = answer.getPoints();
+						AnswerItem answerItem = new AnswerItem(description, player, points);
 						answersList.add(answerItem);
 						//answerAdapter.notifyItemInserted(answersList.size() - 1);
 						answersRecyclerView.smoothScrollToPosition(answersList.size() - 1);
 						answerAdapter.notifyDataSetChanged();
 
-						updatePlayerScore(player, points);
-					}
-				}
-
+						updatePlayerScore(player, points.toString());
 			}else{
 
 				if(hasAlreadyBeenSaid){
 					Toast.makeText(getBaseContext(), "hasAlreadyBeenSaid: " + player + ": " + description, Toast.LENGTH_SHORT).show();
 				}else{
 					answerText.setText("");
-					AnswerItem answerItem = new AnswerItem(answerId, description, player, "0");
+					AnswerItem answerItem = new AnswerItem(description, player, 0);
 					answersList.add(answerItem);
 //					answerAdapter.notifyItemInserted(answersList.size() - 1);
 					answersRecyclerView.smoothScrollToPosition(answersList.size() - 1);
 					answerAdapter.notifyDataSetChanged();
 				}
 			}
-
-			//show.append(jsonObject.getString("response") + "\n");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
-
-	public  void setGameState(JSONObject gamestate){
+	public  void setGameState(GameStateDTO gamestate){
 		runOnUiThread(() -> {
-			try {
+
 
 				Log.i(Const.TAG, "GameState：" + gamestate);
-				setPlayerList(gamestate.getJSONArray("players"));
-				dateStarted = gamestate.getLong("dateStarted");
-				dateCurrent = gamestate.getLong("currentDate");
+				setPlayerList(gamestate.getPlayers());
+				dateStarted = gamestate.getDateStarted().getTime();
+				dateCurrent = gamestate.getCurrentDate().getTime();
 
-//				final Handler someHandler = new Handler(getMainLooper());
-//
-//				someHandler.postDelayed(new Runnable() {
-//					@Override
-//					public void run() {
-////				tvClock.setText(new SimpleDateFormat("HH:mm", Locale.US).format(new Date()));
-//
-//						Date date = new Date(dateCurrent);
-//						date.setTime(date.getTime() + 1000);
-//						dateCurrent = date.getTime();
-//
-//						someHandler.postDelayed(this, 1000);
-//					}
-//				}, 10);
+				final Handler someHandler = new Handler(getMainLooper());
 
-				setQuestionText(gamestate.getJSONArray("questions"), dateStarted , dateCurrent);
-				setAnswers(gamestate.getJSONArray("currentAnswers"));
+				someHandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						Date date = new Date(dateCurrent);
+						date.setTime(date.getTime() + 1000);
+						dateCurrent = date.getTime();
 
-			} catch (JSONException e) {
+						someHandler.postDelayed(this, 1000);
+					}
+				}, 10);
 
-				e.printStackTrace();
-			}catch (Exception e){
-				e.printStackTrace();
-				Log.i(Const.TAG, "error：" + e);
-			}
+				setQuestionText(gamestate.getQuestions(), dateStarted , dateCurrent);
 		});
 	}
 	ExplosionField explosionField;
-
-
 
 	void initComponents(){
 		explosionField = ExplosionField.attach2Window(this);
@@ -236,7 +186,7 @@ public class GameActivity extends Activity {
 									  int before, int count) {
 				if(s != null && s.length() > 0){
 					PlayerAnswerDTO playerAnswerDTO = new PlayerAnswerDTO();
-					playerAnswerDTO.setAnswer(s.toString());
+					playerAnswerDTO.setDescription(s.toString());
 					//playerAnswerDTO.setQuestionId(1);
 					playerAnswerDTO.setQuestionId(currentQuestionId);
 					playerAnswerDTO.setUserId(MenuActivity.userId);
@@ -294,13 +244,8 @@ public class GameActivity extends Activity {
 
 		});
 
-		
-
 		getLetterButton.setOnClickListener(v -> {
 			letterHelp.setVisibility(View.VISIBLE);
-
-
-
 		});
 
     }
@@ -315,49 +260,20 @@ public class GameActivity extends Activity {
 		userAdapter.notifyDataSetChanged();
 	}
 
-	void setPlayerList(JSONArray players){
-
+	void setPlayerList(List<GamePlayerDTO> players){
 		userList.clear();
-
-		try {
-			for (int i = 0; i < players.length(); i++){
-				String playerId = players.getJSONObject(i).getString("playerId");
-				String username = players.getJSONObject(i).getString("username");
-				Integer points = players.getJSONObject(i).getInt("points");
-				userList.add(new GamePlayerDTO(playerId, username, points));
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
+		for (GamePlayerDTO player:players){
+			String playerId = player.getPlayerId();
+			String username = player.getUsername();
+			Integer points = player.getPoints();
+			userList.add(new GamePlayerDTO(playerId, username, points));
 		}
-
-
 		userAdapter.notifyDataSetChanged();
 	}
 
-
-
-	void setQuestionText(JSONArray questions, Long dateStarted, Long currentDate) throws JSONException {
-
-
-		List<QuestionDTO> questionDTOS = new ArrayList<>();
-
-		for(int i = 0; i < questions.length(); i++){
-			JSONObject	question = questions.getJSONObject(i);
-
-			List<AnswerDTO> answerDTOS  = new ArrayList<>();
-			JSONArray answers = question.getJSONArray("answers");
-			for(int j = 0; j < answers.length(); j++){
-				JSONObject answer =	answers.getJSONObject(j);
-				answerDTOS.add(new AnswerDTO(answer.getLong("id"), answer.getString("description"),
-						answer.getInt("points")));
-			}
-			questionDTOS.add(new QuestionDTO(question.getLong("id"), question.getString("description"), answerDTOS));
-		}
-
-		questionHandler.setQuestions(questionDTOS);
-
+	void setQuestionText(List<QuestionDTO> questions, Long dateStarted, Long currentDate)  {
+		questionHandler.setQuestions(questions);
 		move(questionHandler.getQuestions(), dateStarted, currentDate, true);
-
 	}
 
 
@@ -426,10 +342,6 @@ public class GameActivity extends Activity {
 		else{
 			moveToNextQuestion(questions, minutes, secondsPass-5, secondsRemain+5, setQuestion);
 		}
-
-
-
-
 	}
 
 	void moveToNextQuestion(List<QuestionDTO> questions, int currentQuestionIndex, int seconds, int remains, boolean setQuestion){
@@ -484,9 +396,18 @@ public class GameActivity extends Activity {
 	}
 
 	void setCurrentQuestion(List<QuestionDTO> questions, int currentQuestionIndex){
-			setAnswers( new JSONArray());
+			//setAnswers( new JSONArray());
+
 			this.currentQuestionId = questions.get(currentQuestionIndex).getId();
 			setQuestionText(questions.get(currentQuestionIndex).getDescription());
+
+		answersList.clear();
+		answerAdapter = new com.katiforis.top10.adapter.AnswerAdapter(answersList);
+		answerAdapter.notifyDataSetChanged();
+		answersRecyclerView.setAdapter(answerAdapter);
+		for(PlayerAnswerDTO playerAnswerDTO:questions.get(currentQuestionIndex).getCurrentAnswers()){
+			setAnswer(playerAnswerDTO);
+		}
 	}
 
 	void setQuestionText(String question){
@@ -496,36 +417,6 @@ public class GameActivity extends Activity {
 		questionText.clearAnimation();
 		questionText.startAnimation(a);
 	}
-
-
-	void setAnswers(JSONArray answers){
-
-        answersList.clear();
-
-		try {
-			for (int i = 0; i < answers.length(); i++){
-                JSONObject answer = answers.getJSONObject(i);
-                long questionId = answer.getJSONObject("question").getLong("id");
-                if(questionId == currentQuestionId){
-					setAnswer(answer);
-				}
-
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-
-		answerAdapter = new com.katiforis.top10.adapter.AnswerAdapter(answersList);
-		answerAdapter.notifyDataSetChanged();
-		answersRecyclerView.setAdapter(answerAdapter);
-	}
-
-
-
-
-
-
 
 //	@Override
 //	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -606,12 +497,7 @@ public class GameActivity extends Activity {
 	private void init() {
 		initComponents();
 		instance = this;
-		MyStomp.initConnGroup(MenuActivity.getGameId());
-
-
-
-
-
+		Client.initConnGroup(MenuActivity.getGameId());
 	}
 
 	@Override
@@ -644,7 +530,7 @@ public class GameActivity extends Activity {
 			return;
 		}
 
-		MyStomp.sendGetGameState( MenuActivity.userId.trim(), gameId.trim());
+		Client.sendGetGameState( MenuActivity.userId.trim(), gameId.trim());
 
 
 
