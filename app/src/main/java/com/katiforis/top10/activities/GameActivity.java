@@ -29,6 +29,7 @@ import com.katiforis.top10.DTO.PlayerAnswerDTO;
 import com.katiforis.top10.DTO.QuestionDTO;
 import com.katiforis.top10.R;
 import com.katiforis.top10.conf.Const;
+import com.katiforis.top10.controller.GameController;
 import com.katiforis.top10.game.QuestionHandler;
 import com.katiforis.top10.game.QuestionHandlerImpl;
 import com.katiforis.top10.speech.PermissionHandler;
@@ -78,7 +79,7 @@ public class GameActivity extends Activity {
 		playerAnswerDTO.setDescription(answer);
 		playerAnswerDTO.setUserId(MenuActivity.userId);
 		playerAnswerDTO.setQuestionId(this.currentQuestionId);
-		Client.sendToGroup(MenuActivity.getGameId(), playerAnswerDTO);
+		GameController.sendAnswer(MenuActivity.getGameId(), playerAnswerDTO);
 	}
 
 	public  void showAnswer(PlayerAnswerDTO playerAnswerDTO){
@@ -497,7 +498,7 @@ public class GameActivity extends Activity {
 	private void init() {
 		initComponents();
 		instance = this;
-		Client.initConnGroup(MenuActivity.getGameId());
+		GameController.init(MenuActivity.getGameId());
 	}
 
 	@Override
@@ -530,7 +531,7 @@ public class GameActivity extends Activity {
 			return;
 		}
 
-		Client.sendGetGameState( MenuActivity.userId.trim(), gameId.trim());
+		GameController.getGameState(MenuActivity.userId.trim(), gameId.trim());
 
 
 

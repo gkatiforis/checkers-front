@@ -19,7 +19,7 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.katiforis.top10.R;
-import com.katiforis.top10.stomp.Client;
+import com.katiforis.top10.controller.MenuController;
 
 import static android.content.ContentValues.TAG;
 
@@ -69,7 +69,7 @@ public class MenuActivity extends Activity {
 				e.printStackTrace();
 			}
 
-			Client.send(jsonObject);
+			MenuController.sendFindGameRequest(jsonObject);
 		});
 
 
@@ -123,8 +123,7 @@ public class MenuActivity extends Activity {
 		userId = account.getId();
 
 
-		Client.init();
-		Client.initConn(userId);
+		MenuController.init(userId);
 
 		JSONObject jsonObject = new JSONObject();
 		try {
@@ -136,7 +135,7 @@ public class MenuActivity extends Activity {
 		}
 
 
-		Client.sendLogin(jsonObject);
+		MenuController.sendLogin(jsonObject);
 	}
 
 	public static Context getAppContext(){
