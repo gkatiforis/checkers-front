@@ -5,9 +5,7 @@ import com.katiforis.top10.R;
 import java.io.Serializable;
 
 
-public class GamePlayerDTO implements Serializable {
-
-
+public class Player implements Serializable {
     private long id;
     private String playerId;
     private String username;
@@ -15,19 +13,19 @@ public class GamePlayerDTO implements Serializable {
 
     private int img;//TODO image
 
-    public GamePlayerDTO() {
+    public Player() {
     }
 
-    public GamePlayerDTO(String username) {
+    public Player(String username) {
         this.username = username;
     }
 
-    public GamePlayerDTO(String playerId, String username) {
+    public Player(String playerId, String username) {
         this.playerId = playerId;
         this.username = username;
     }
 
-    public GamePlayerDTO(String playerId, String username, int points) {
+    public Player(String playerId, String username, int points) {
         this.playerId = playerId;
         this.username = username;
         this.points = points;

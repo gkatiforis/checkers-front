@@ -6,7 +6,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.katiforis.top10.DTO.PlayerAnswerDTO;
+import com.katiforis.top10.DTO.PlayerAnswer;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
@@ -37,7 +37,7 @@ public class GameController {
                 // MenuActivity.userId = userId;
                 Intent intent = new Intent();
 
-                MenuActivity.saveGameId(message.get("gameId").getAsString());
+                GameActivity.saveGameId(message.get("gameId").getAsString());
 
 
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -46,8 +46,8 @@ public class GameController {
             } else if (messageStatus.equalsIgnoreCase("answer")) {
 
                 Gson gson = new Gson();
-                PlayerAnswerDTO playerAnswerDTO = gson.fromJson(message, PlayerAnswerDTO.class);
-                GameActivity.instance.showAnswer(playerAnswerDTO);
+                PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
+                GameActivity.instance.showAnswer(playerAnswer);
             } else if (messageStatus.equalsIgnoreCase("currentTime")) {
                 //GameActivity.instance.updateTime(message);
             }

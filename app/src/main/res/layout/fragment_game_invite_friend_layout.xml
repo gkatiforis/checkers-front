@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/background">
+
+    <!--<TextView-->
+        <!--android:id="@+id/dialogTitle"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:drawableTop="@drawable/alerter_ic_face"-->
+        <!--android:text="sdfsdfsdf"-->
+        <!--app:layout_constraintTop_toTopOf="parent"/>-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/invitation_friend_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scrollbars="vertical"
+        android:background="@drawable/background"
+
+        app:layout_constraintBottom_toTopOf="@+id/is_private"
+        tools:showIn="@layout/fragment_game_invite_friend_layout"/>
+    <!--app:layout_constraintTop_toBottomOf="@+id/dialogTitle"-->
+    <CheckBox
+        android:id="@+id/is_private"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Private game (strange people can not join in)"
+        app:layout_constraintBottom_toTopOf="@+id/createGame"/>
+
+    <Button
+        android:id="@+id/createGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="create game"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

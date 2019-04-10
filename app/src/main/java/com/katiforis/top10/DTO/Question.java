@@ -4,37 +4,37 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-public class QuestionDTO implements Serializable {
+public class Question implements Serializable {
 
     private long id;
 
     private String description;
 
-    private List<AnswerDTO> answers;
-    private Set<PlayerAnswerDTO> currentAnswers;
+    private List<Answer> answers;
+    private Set<PlayerAnswer> currentAnswers;
 
-    public QuestionDTO(String description, List<AnswerDTO> answers, Set<PlayerAnswerDTO> currentAnswers) {
+    public Question(String description, List<Answer> answers, Set<PlayerAnswer> currentAnswers) {
         this.description = description;
         this.answers = answers;
         this.currentAnswers = currentAnswers;
     }
-    public QuestionDTO(String description, List<AnswerDTO> answers) {
+    public Question(String description, List<Answer> answers) {
         this.description = description;
         this.answers = answers;
     }
 
-    public QuestionDTO(long id, String description, List<AnswerDTO> answers) {
+    public Question(long id, String description, List<Answer> answers) {
         this.id = id;
         this.description = description;
         this.answers = answers;
     }
-    public QuestionDTO(long id, String description, List<AnswerDTO> answers,  Set<PlayerAnswerDTO> currentAnswers) {
+    public Question(long id, String description, List<Answer> answers, Set<PlayerAnswer> currentAnswers) {
         this.id = id;
         this.description = description;
         this.answers = answers;
         this.currentAnswers = currentAnswers;
     }
-    public QuestionDTO() {
+    public Question() {
     }
 
     public long getId() {
@@ -54,19 +54,19 @@ public class QuestionDTO implements Serializable {
     }
 
 
-    public List<AnswerDTO> getAnswers() {
+    public List<Answer> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(List<AnswerDTO> answers) {
+    public void setAnswers(List<Answer> answers) {
         this.answers = answers;
     }
 
-    public Set<PlayerAnswerDTO> getCurrentAnswers() {
+    public Set<PlayerAnswer> getCurrentAnswers() {
         return currentAnswers;
     }
 
-    public void setCurrentAnswers(Set<PlayerAnswerDTO> currentAnswers) {
+    public void setCurrentAnswers(Set<PlayerAnswer> currentAnswers) {
         this.currentAnswers = currentAnswers;
     }
 
@@ -75,7 +75,7 @@ public class QuestionDTO implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        QuestionDTO that = (QuestionDTO) o;
+        Question that = (Question) o;
 
         if (id != that.id) return false;
         if (!description.equals(that.description)) return false;

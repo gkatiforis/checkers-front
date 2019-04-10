@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.katiforis.top10.DTO.GameStateDTO;
+import com.katiforis.top10.DTO.GameState;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
@@ -24,7 +24,6 @@ import ua.naiksoftware.stomp.client.StompMessage;
 
 
 public class MenuController {
-
 
     public static void init(String userId) {
         Client.getInstance().addTopic(Const.chatResponse.replace(Const.placeholder, userId))
@@ -43,7 +42,7 @@ public class MenuController {
         Log.i(Const.TAG, "Receive: " + messageStatus);
         if(messageStatus.equalsIgnoreCase("start")){
             Intent intent = new Intent();
-            MenuActivity.saveGameId(message.get("gameId").getAsString());
+            GameActivity.saveGameId(message.get("gameId").getAsString());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setClass( MenuActivity.getAppContext(), GameActivity.class);
             MenuActivity.getAppContext().startActivity(intent);
@@ -51,8 +50,8 @@ public class MenuController {
             final Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
                     .create();
-            GameStateDTO gameStateDTO = gson.fromJson(message,GameStateDTO.class);
-            GameActivity.instance.setGameState(gameStateDTO);
+            GameState gameState = gson.fromJson(message,GameState.class);
+            GameActivity.instance.setGameState(gameState);
         }
     }
 

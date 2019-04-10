@@ -5,11 +5,11 @@
     android:layout_height="wrap_content"
     android:paddingRight="5dp">
     <ImageView
-        android:id="@+id/statusImage"
+        android:id="@+id/playerImage"
         android:layout_width="30dp"
         android:layout_height="30dp"/>
     <TextView
-        android:id="@+id/idProductName"
+        android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp"/>

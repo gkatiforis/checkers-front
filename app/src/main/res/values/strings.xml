@@ -1,22 +1,8 @@
 <resources>
     <string name="app_name">Top 10</string>
 
-    <string name="broadcast">广播</string>
-    <string name="groups">动态群组</string>
-    <string name="chat">点对点</string>
-
     <string name="broadcast_prompt">word：</string>
     <string name="send">play</string>
-
-    <string name="group_prompt">请输入你要加入的群组：</string>
-    <string name="confirm">确定</string>
-
-    <string name="id_prompt">你的ID是：</string>
-    <string name="chat_user_id">请输入聊天对象的ID：</string>
-    <string name="chat_message">请输入聊天内容：</string>
-    <string name="lorem_ipsum">aaaa：</string>
-
-
 
     <string name="action_settings">Settings</string>
     <string name="record_audio_is_required">We will only use the Record Audio Permission in order to use the Speech to Text Feature</string>
@@ -27,7 +13,5 @@
     <string name="un_mute">unMute</string>
     <string name="destroied">SpeeechRecognizer has been destroyed</string>
     <string name="you_may_speak">You may speak now</string>
-
-
 
 </resources>

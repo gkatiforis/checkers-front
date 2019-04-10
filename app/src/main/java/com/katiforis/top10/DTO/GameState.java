@@ -3,28 +3,28 @@ package com.katiforis.top10.DTO;
 import java.util.Date;
 import java.util.List;
 
-public class GameStateDTO extends GameDTO {
-    private List<GamePlayerDTO> players;
-    private List<QuestionDTO> questions;
+public class GameState extends Game {
+    private List<Player> players;
+    private List<Question> questions;
     private Date dateStarted;
     private Date currentDate;
 
-    public GameStateDTO(){
+    public GameState(){
         super("");
     }
-    public List<GamePlayerDTO> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<GamePlayerDTO> players) {
+    public void setPlayers(List<Player> players) {
         this.players = players;
     }
 
-    public List<QuestionDTO> getQuestions() {
+    public List<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<QuestionDTO> questions) {
+    public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
 

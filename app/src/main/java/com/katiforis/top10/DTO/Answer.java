@@ -2,7 +2,7 @@ package com.katiforis.top10.DTO;
 
 import java.io.Serializable;
 
-public class AnswerDTO implements Serializable {
+public class Answer implements Serializable {
 
     private long id;
 
@@ -10,24 +10,24 @@ public class AnswerDTO implements Serializable {
 
     private Integer points;
 
-    private QuestionDTO question;
+    private Question question;
 
 
-    public AnswerDTO() {
+    public Answer() {
     }
 
-    public AnswerDTO(long id, String description) {
+    public Answer(long id, String description) {
         this.description = description;
     }
 
-    public AnswerDTO(long id, String description, Integer points, QuestionDTO question) {
+    public Answer(long id, String description, Integer points, Question question) {
         this.id = id;
         this.description = description;
         this.points = points;
         this.question = question;
     }
 
-    public AnswerDTO(long id, String description, Integer points) {
+    public Answer(long id, String description, Integer points) {
         this.id = id;
         this.description = description;
         this.points = points;
@@ -58,17 +58,17 @@ public class AnswerDTO implements Serializable {
         this.points = points;
     }
 
-    public QuestionDTO getQuestion() {
+    public Question getQuestion() {
         return question;
     }
 
-    public void setQuestion(QuestionDTO question) {
+    public void setQuestion(Question question) {
         this.question = question;
     }
 
     @Override
     public String toString() {
-        return "AnswerDTO{" +
+        return "Answer{" +
                 "id=" + id +
                 ", description='" + description + '\'' +
                 ", points=" + points +

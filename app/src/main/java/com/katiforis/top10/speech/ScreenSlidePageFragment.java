@@ -1,4 +1,4 @@
-package com.katiforis.top10.activities;
+package com.katiforis.top10.speech;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,7 +14,7 @@ public class ScreenSlidePageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.answer_list_item, container, false);
+                R.layout.item_answer_layout, container, false);
 
         return rootView;
     }

@@ -1,4 +1,4 @@
-package com.katiforis.top10.activities;
+package com.katiforis.top10.speech;
 
 import android.support.v4.view.ViewPager;
 import android.view.View;

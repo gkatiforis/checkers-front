@@ -9,8 +9,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import com.katiforis.top10.R;
-import com.katiforis.top10.activities.ScreenSlidePageFragment;
-import com.katiforis.top10.activities.ZoomOutPageTransformer;
 
 public class ScreenSlidePagerActivity extends FragmentActivity {
 
@@ -23,7 +21,7 @@ public class ScreenSlidePagerActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_screen_slide);
+        setContentView(R.layout.activity_screen_slide_layout);
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);

@@ -1,159 +1,102 @@
 package com.katiforis.top10.activities;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.TextView;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.view.MenuItem;
+
+import com.katiforis.top10.adapter.ViewPagerAdapter;
+import com.katiforis.top10.fragment.FriendListFragment;
 import com.katiforis.top10.R;
-import com.katiforis.top10.controller.MenuController;
+import com.katiforis.top10.fragment.MainFragment;
 
-import static android.content.ContentValues.TAG;
+public class MenuActivity extends AppCompatActivity {
 
-public class MenuActivity extends Activity {
-
-
-
-	private Button play;
-	private TextView hi;
+	private BottomNavigationView bottomNavigationView;
+	private ViewPager viewPager;
+	private MenuItem prevMenuItem;
 
 	private String user_id;
 	private String chat_user_id;
 	private static Context context;
 	public static String userId = null;
 
-	public static GoogleSignInAccount account;
-
-	private void init() {
-		setContentView(R.layout.activity_menu);
-
-		play = findViewById(R.id.send);
-		hi = findViewById(R.id.hi);
-	}
-
+//	private BubblesManager bubblesManager;
 
 	@Override
-	protected void onCreate(@Nullable Bundle savedInstanceState) {
+	protected void onCreate(@Nullable Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		initialize();
+	}
 
+	private void initialize() {
 		context = this.getApplicationContext();
-		init();
+		getSupportActionBar().hide();
+		setContentView(R.layout.activity_menu_layout);
 
-		if(userId == null){
-			startSignInIntent();
-		}else{
-			hi.setText("HI, " + account.getDisplayName());
-		}
+		viewPager = (ViewPager) findViewById(R.id.viewpager);
+		bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
+		bottomNavigationView.setOnNavigationItemSelectedListener(
+				new BottomNavigationView.OnNavigationItemSelectedListener() {
+					@Override
+					public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+						switch (item.getItemId()) {
+							case R.id.action_main_menu:
+								viewPager.setCurrentItem(0);
+								break;
+							case R.id.action_friend_list:
+								viewPager.setCurrentItem(1);
+								break;
+						}
+						return false;
+					}
+				});
 
+		viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-
-		play.setOnClickListener(v -> {
-			JSONObject jsonObject = new JSONObject();
-			try {
-				jsonObject.put("fromUserID", userId);
-				jsonObject.put("gameId", MenuActivity.getGameId());
-			} catch (JSONException e) {
-				e.printStackTrace();
 			}
 
-			MenuController.sendFindGameRequest(jsonObject);
+			@Override
+			public void onPageSelected(int position) {
+				if (prevMenuItem != null) {
+					prevMenuItem.setChecked(false);
+				}
+				else
+				{
+					bottomNavigationView.getMenu().getItem(0).setChecked(false);
+				}
+				Log.d("page", "onPageSelected: "+position);
+				bottomNavigationView.getMenu().getItem(position).setChecked(true);
+				prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state) {
+
+			}
 		});
 
-
-
-	}
-
-	private void startSignInIntent() {
-		// Configure sign-in to request the user's ID, email address, and basic
-       // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-				.requestEmail()
-				.build();
-
-		GoogleSignInClient signInClient =  GoogleSignIn.getClient(this, gso);
-		Intent intent = signInClient.getSignInIntent();
-		startActivityForResult(intent, 0);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-		// Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-		if (requestCode == 0) {
-			// The Task returned from this call is always completed, no need to attach
-			// a listener.
-			Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-			handleSignInResult(task);
-		}
+		initViewPager(viewPager);
 
 	}
-	private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-		try {
-			 account = completedTask.getResult(ApiException.class);
 
-			onLogin(account);
-
-		} catch (ApiException e) {
-			// The ApiException status code indicates the detailed failure reason.
-			// Please refer to the GoogleSignInStatusCodes class reference for more information.
-			Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-			//updateUI(null);
-		}
-	}
-
-	private void onLogin(GoogleSignInAccount account){
-		// Signed in successfully, show authenticated UI.
-		//Toast.makeText(this, ( "Welcome, " + account.getDisplayName()), Toast.LENGTH_SHORT).show();
-
-		hi.setText("HI, " + account.getDisplayName());
-		userId = account.getId();
-
-
-		MenuController.init(userId);
-
-		JSONObject jsonObject = new JSONObject();
-		try {
-			//	jsonObject.put("userID", chatUserId.getText().toString());
-			jsonObject.put("playerId", account.getId());
-			jsonObject.put("username",  account.getDisplayName());
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-
-		MenuController.sendLogin(jsonObject);
+	private void initViewPager(ViewPager viewPager) {
+		ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+		adapter.addFragment(MainFragment.newInstance(4));
+		adapter.addFragment(FriendListFragment.newInstance(4));
+		adapter.addFragment(FriendListFragment.newInstance(4));
+		viewPager.setAdapter(adapter);
 	}
 
 	public static Context getAppContext(){
 		return context;
-	}
-
-
-	public static void saveGameId(String gameId) {
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString("gameId", gameId);
-		editor.commit();
-	}
-
-
-	public static String getGameId() {
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
-		String gamaId = sharedPref.getString("gameId", null);
-		return gamaId;
 	}
 }

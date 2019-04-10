@@ -1,13 +1,13 @@
 package com.katiforis.top10.DTO;
 
 
-public class PlayerAnswerDTO {
+public class PlayerAnswer {
     private String description;
     private Integer points;
     private boolean isCorrect = false;
     private boolean hasAlreadyBeenSaid = false;
     private long questionId;
-    private GamePlayerDTO player;
+    private Player player;
     private String userId;
 
     public String getDescription() {
@@ -58,11 +58,11 @@ public class PlayerAnswerDTO {
         this.questionId = questionId;
     }
 
-    public GamePlayerDTO getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
-    public void setPlayer(GamePlayerDTO player) {
+    public void setPlayer(Player player) {
         this.player = player;
     }
 }

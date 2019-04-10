@@ -2,9 +2,11 @@ package com.katiforis.top10.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -22,28 +24,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import com.katiforis.top10.DTO.AnswerDTO;
-import com.katiforis.top10.DTO.GamePlayerDTO;
-import com.katiforis.top10.DTO.GameStateDTO;
-import com.katiforis.top10.DTO.PlayerAnswerDTO;
-import com.katiforis.top10.DTO.QuestionDTO;
+
+import com.katiforis.top10.DTO.Answer;
+import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.GameState;
+import com.katiforis.top10.DTO.PlayerAnswer;
+import com.katiforis.top10.DTO.Question;
 import com.katiforis.top10.R;
+import com.katiforis.top10.adapter.AnswerAdapter;
 import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.controller.GameController;
 import com.katiforis.top10.game.QuestionHandler;
 import com.katiforis.top10.game.QuestionHandlerImpl;
 import com.katiforis.top10.speech.PermissionHandler;
 import com.katiforis.top10.speech.SpeechRecognizerManager;
-import com.katiforis.top10.stomp.Client;
-import com.katiforis.top10.adapter.AnswerItem;
-import com.katiforis.top10.adapter.UserAdapter;
+import com.katiforis.top10.adapter.PlayerAdapter;
 
 import tyrantgit.explosionfield.ExplosionField;
 
 public class GameActivity extends Activity {
 
     public static GameActivity instance;
-//	public static String gameId;
 	long currentQuestionId;
 
 	ProgressBar mProgressBar;
@@ -62,55 +63,53 @@ public class GameActivity extends Activity {
 	private Button getLetterButton;
 
 	private RecyclerView answersRecyclerView;
-	private com.katiforis.top10.adapter.AnswerAdapter answerAdapter;
+	private AnswerAdapter answerAdapter;
 	private RecyclerView.LayoutManager mLayoutManager;
-	private List<AnswerItem> answersList = new ArrayList<>();
+	private List<PlayerAnswer> answersList = new ArrayList<>();
 
 	private RecyclerView userRecyclerView;
-	private UserAdapter userAdapter;
-	private List<GamePlayerDTO> userList = new ArrayList<>();
+	private PlayerAdapter playerAdapter;
+	private List<Player> userList = new ArrayList<>();
 
 	private SpeechRecognizerManager mSpeechManager;
 
 	private QuestionHandler questionHandler;
 
 	public void sendAnswer(String answer){
-		PlayerAnswerDTO playerAnswerDTO = new PlayerAnswerDTO();
-		playerAnswerDTO.setDescription(answer);
-		playerAnswerDTO.setUserId(MenuActivity.userId);
-		playerAnswerDTO.setQuestionId(this.currentQuestionId);
-		GameController.sendAnswer(MenuActivity.getGameId(), playerAnswerDTO);
+		PlayerAnswer playerAnswer = new PlayerAnswer();
+		playerAnswer.setDescription(answer);
+		playerAnswer.setUserId(MenuActivity.userId);
+		playerAnswer.setQuestionId(this.currentQuestionId);
+		GameController.sendAnswer(getGameId(), playerAnswer);
 	}
 
-	public  void showAnswer(PlayerAnswerDTO playerAnswerDTO){
+	public  void showAnswer(PlayerAnswer playerAnswer){
 				runOnUiThread(() -> {
-					setAnswer(playerAnswerDTO);
+					setAnswer(playerAnswer);
 	             });
 	}
 
-	void setAnswer(PlayerAnswerDTO answer){
+	void setAnswer(PlayerAnswer answer){
 			Boolean isCorrect = answer.isCorrect();
 			Boolean hasAlreadyBeenSaid = answer.isHasAlreadyBeenSaid();
 			String player = answer.getPlayer().getUsername();
 			String description = answer.getDescription();
 			if(isCorrect){
 				answerText.setText("");
-						Integer points = answer.getPoints();
-						AnswerItem answerItem = new AnswerItem(description, player, points);
-						answersList.add(answerItem);
+
+						answersList.add(answer);
 						//answerAdapter.notifyItemInserted(answersList.size() - 1);
 						answersRecyclerView.smoothScrollToPosition(answersList.size() - 1);
 						answerAdapter.notifyDataSetChanged();
 
-						updatePlayerScore(player, points.toString());
+						updatePlayerScore(player, answer.getPoints().toString());
 			}else{
 
 				if(hasAlreadyBeenSaid){
 					Toast.makeText(getBaseContext(), "hasAlreadyBeenSaid: " + player + ": " + description, Toast.LENGTH_SHORT).show();
 				}else{
 					answerText.setText("");
-					AnswerItem answerItem = new AnswerItem(description, player, 0);
-					answersList.add(answerItem);
+					answersList.add(answer);
 //					answerAdapter.notifyItemInserted(answersList.size() - 1);
 					answersRecyclerView.smoothScrollToPosition(answersList.size() - 1);
 					answerAdapter.notifyDataSetChanged();
@@ -118,7 +117,7 @@ public class GameActivity extends Activity {
 			}
     }
 
-	public  void setGameState(GameStateDTO gamestate){
+	public  void setGameState(GameState gamestate){
 		runOnUiThread(() -> {
 
 
@@ -160,10 +159,10 @@ public class GameActivity extends Activity {
 
         userRecyclerView = findViewById(R.id.my_recycler_viewH);
       //  userRecyclerView.addItemDecoration(new DividerItemDecoration(GameActivity.this, LinearLayoutManager.HORIZONTAL));
-        userAdapter = new UserAdapter(userList, getApplicationContext());
+        playerAdapter = new PlayerAdapter(userList, getApplicationContext());
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
         userRecyclerView.setLayoutManager(horizontalLayoutManager);
-        userRecyclerView.setAdapter(userAdapter);
+        userRecyclerView.setAdapter(playerAdapter);
 
 
         answersRecyclerView = findViewById(R.id.my_recycler_view);
@@ -186,16 +185,16 @@ public class GameActivity extends Activity {
 			public void onTextChanged(CharSequence s, int start,
 									  int before, int count) {
 				if(s != null && s.length() > 0){
-					PlayerAnswerDTO playerAnswerDTO = new PlayerAnswerDTO();
-					playerAnswerDTO.setDescription(s.toString());
-					//playerAnswerDTO.setQuestionId(1);
-					playerAnswerDTO.setQuestionId(currentQuestionId);
-					playerAnswerDTO.setUserId(MenuActivity.userId);
-					AnswerDTO answerDTO = questionHandler.isAnswerValid(playerAnswerDTO);
-					if(answerDTO != null){
-						//answerText.setText(answerDTO.getDescription());
+					PlayerAnswer playerAnswer = new PlayerAnswer();
+					playerAnswer.setDescription(s.toString());
+					//playerAnswer.setQuestionId(1);
+					playerAnswer.setQuestionId(currentQuestionId);
+					playerAnswer.setUserId(MenuActivity.userId);
+					Answer answer = questionHandler.isAnswerValid(playerAnswer);
+					if(answer != null){
+						//answerText.setText(answer.getDescription());
 						sendAnswer(s.toString());
-						Toast.makeText(MenuActivity.getAppContext(), answerDTO.getDescription(), Toast.LENGTH_SHORT).show();
+						Toast.makeText(MenuActivity.getAppContext(), answer.getDescription(), Toast.LENGTH_SHORT).show();
 					}
 				}
 
@@ -253,26 +252,26 @@ public class GameActivity extends Activity {
 
 
 	private void updatePlayerScore(String username, String points) {
-		for (GamePlayerDTO gamePlayerDTO:userList){
-			if(gamePlayerDTO.getUsername().equals(username)){
-				gamePlayerDTO.setPoints(gamePlayerDTO.getPoints() + Integer.valueOf(points));
+		for (Player player :userList){
+			if(player.getUsername().equals(username)){
+				player.setPoints(player.getPoints() + Integer.valueOf(points));
 			}
 		}
-		userAdapter.notifyDataSetChanged();
+		playerAdapter.notifyDataSetChanged();
 	}
 
-	void setPlayerList(List<GamePlayerDTO> players){
+	void setPlayerList(List<Player> players){
 		userList.clear();
-		for (GamePlayerDTO player:players){
+		for (Player player:players){
 			String playerId = player.getPlayerId();
 			String username = player.getUsername();
 			Integer points = player.getPoints();
-			userList.add(new GamePlayerDTO(playerId, username, points));
+			userList.add(new Player(playerId, username, points));
 		}
-		userAdapter.notifyDataSetChanged();
+		playerAdapter.notifyDataSetChanged();
 	}
 
-	void setQuestionText(List<QuestionDTO> questions, Long dateStarted, Long currentDate)  {
+	void setQuestionText(List<Question> questions, Long dateStarted, Long currentDate)  {
 		questionHandler.setQuestions(questions);
 		move(questionHandler.getQuestions(), dateStarted, currentDate, true);
 	}
@@ -294,7 +293,7 @@ public class GameActivity extends Activity {
 //
 //		});
 //	}
-	void move(List<QuestionDTO> questions, Long dateStarted, Long currentDate, boolean setQuestion){
+	void move(List<Question> questions, Long dateStarted, Long currentDate, boolean setQuestion){
 		startDate = new Date(dateStarted);
 		currentDat = new Date(currentDate);
 
@@ -345,7 +344,7 @@ public class GameActivity extends Activity {
 		}
 	}
 
-	void moveToNextQuestion(List<QuestionDTO> questions, int currentQuestionIndex, int seconds, int remains, boolean setQuestion){
+	void moveToNextQuestion(List<Question> questions, int currentQuestionIndex, int seconds, int remains, boolean setQuestion){
 
 	    if(currentQuestionIndex == questions.size()){
 
@@ -396,7 +395,7 @@ public class GameActivity extends Activity {
 
 	}
 
-	void setCurrentQuestion(List<QuestionDTO> questions, int currentQuestionIndex){
+	void setCurrentQuestion(List<Question> questions, int currentQuestionIndex){
 			//setAnswers( new JSONArray());
 
 			this.currentQuestionId = questions.get(currentQuestionIndex).getId();
@@ -406,8 +405,8 @@ public class GameActivity extends Activity {
 		answerAdapter = new com.katiforis.top10.adapter.AnswerAdapter(answersList);
 		answerAdapter.notifyDataSetChanged();
 		answersRecyclerView.setAdapter(answerAdapter);
-		for(PlayerAnswerDTO playerAnswerDTO:questions.get(currentQuestionIndex).getCurrentAnswers()){
-			setAnswer(playerAnswerDTO);
+		for(PlayerAnswer playerAnswer :questions.get(currentQuestionIndex).getCurrentAnswers()){
+			setAnswer(playerAnswer);
 		}
 	}
 
@@ -490,7 +489,7 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_game);
+		setContentView(R.layout.activity_game_layout);
 		this.init();
 		answerText.requestFocus();
 	}
@@ -498,7 +497,7 @@ public class GameActivity extends Activity {
 	private void init() {
 		initComponents();
 		instance = this;
-		GameController.init(MenuActivity.getGameId());
+		GameController.init(getGameId());
 	}
 
 	@Override
@@ -526,7 +525,7 @@ public class GameActivity extends Activity {
 		//PermissionHandler.askForPermission(PermissionHandler.RECORD_AUDIO,this);
 		//	}
 
-		String gameId = MenuActivity.getGameId();
+		String gameId = getGameId();
 		if (gameId.length() == 0) {
 			return;
 		}
@@ -539,6 +538,21 @@ public class GameActivity extends Activity {
 		//	setGameState();
 
 	}
+
+    public static void saveGameId(String gameId) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("gameId", gameId);
+        editor.commit();
+    }
+
+
+    public static String getGameId() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
+        String gamaId = sharedPref.getString("gameId", null);
+        return gamaId;
+    }
+
 
 	@Override
 	protected void onStop() {

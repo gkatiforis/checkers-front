@@ -1,14 +1,15 @@
 package com.katiforis.top10.game;
 
-import com.katiforis.top10.DTO.AnswerDTO;
-import com.katiforis.top10.DTO.PlayerAnswerDTO;
-import com.katiforis.top10.DTO.QuestionDTO;
+import com.katiforis.top10.DTO.Answer;
+import com.katiforis.top10.DTO.PlayerAnswer;
+import com.katiforis.top10.DTO.Question;
+
 import java.util.*;
 
 
 public class QuestionHandlerImpl implements QuestionHandler {
 
-	List<QuestionDTO> questions;
+	List<Question> questions;
 
 	private static final int MIN = 3;
 
@@ -20,50 +21,27 @@ public class QuestionHandlerImpl implements QuestionHandler {
 		this.questions = new ArrayList<>();
 	}
 
-	public QuestionHandlerImpl(List<QuestionDTO> questions){
+	public QuestionHandlerImpl(List<Question> questions){
 		this.questions = questions;
 	}
 
-//	public void initTest() {
-//
-//		AnswerDTO answerDTO = new AnswerDTO();
-//		answerDTO.setDescription("υπολογιστις");
-//		answerDTO.setId(1);
-//		AnswerDTO answerDTO2 = new AnswerDTO();
-//		answerDTO2.setDescription("υπολογιζω");
-//		answerDTO2.setId(2);
-//		AnswerDTO answerDTO3 = new AnswerDTO();
-//		answerDTO3.setDescription("λεφτα");
-//		answerDTO3.setId(3);
-//
-//		QuestionDTO questionDTO = new QuestionDTO();
-//		questionDTO.setDescription("σασδ");
-//		questionDTO.setId(1);
-//		questionDTO.setAnswers(Arrays.asList(answerDTO, answerDTO2, answerDTO3));
-//
-//		questions = new ArrayList<>();
-//		questions.add(questionDTO);
-//		//	questions.stream().forEach(question -> question.getAnswers());
-//	}
-
-
 	@Override
-	public AnswerDTO isAnswerValid(PlayerAnswerDTO playerAnswerDTO) {
+	public Answer isAnswerValid(PlayerAnswer playerAnswer) {
 
-		String[] answers = WordHandler.convert(playerAnswerDTO.getDescription()).split("\\|");
+		String[] answers = WordHandler.convert(playerAnswer.getDescription()).split("\\|");
 
 
-		QuestionDTO question = getQuestionById(playerAnswerDTO.getQuestionId());
+		Question question = getQuestionById(playerAnswer.getQuestionId());
 
 		if (question == null) {
 			return null;
 		}
 
-		List<AnswerDTO> correctAnswers = question.getAnswers();
+		List<Answer> correctAnswers = question.getAnswers();
 
 		for (String answer : answers) {
 
-			AnswerDTO correntAnswer = getCorrect(correctAnswers, answer);
+			Answer correntAnswer = getCorrect(correctAnswers, answer);
 
 			return correntAnswer;
 		}
@@ -88,7 +66,7 @@ public class QuestionHandlerImpl implements QuestionHandler {
 		return correct.length() - match;
 	}
 
-	private boolean isItAMatch(String correct, String answer, List<AnswerDTO> correctAnswers) {
+	private boolean isItAMatch(String correct, String answer, List<Answer> correctAnswers) {
 
 		if (correct.equalsIgnoreCase(answer)) {
 			return true;
@@ -115,7 +93,7 @@ public class QuestionHandlerImpl implements QuestionHandler {
 		if (answer.startsWith(mustBeginWith)) {
 			List<String> answers = new ArrayList<>();
 
-			for(AnswerDTO correctAnswer :correctAnswers){
+			for(Answer correctAnswer :correctAnswers){
 
 				String[] descriptionArray = WordHandler.convert(correctAnswer.getDescription().trim()).split("\\|");
 				for (String description : descriptionArray) {
@@ -167,9 +145,9 @@ public class QuestionHandlerImpl implements QuestionHandler {
 		return false;
 	}
 
-	private AnswerDTO getCorrect(List<AnswerDTO> correctAnswers, String answers) {
+	private Answer getCorrect(List<Answer> correctAnswers, String answers) {
 
-		for (AnswerDTO correctAnswer : correctAnswers) {
+		for (Answer correctAnswer : correctAnswers) {
 			String[] descriptionArray = WordHandler.convert(correctAnswer.getDescription().trim()).split("\\|");
 			for (String description : descriptionArray) {
 				description = description.replaceAll("\u200E", "").trim();
@@ -191,9 +169,9 @@ public class QuestionHandlerImpl implements QuestionHandler {
 	}
 
 
-	public QuestionDTO getQuestionById(Long id) {
+	public Question getQuestionById(Long id) {
 
-		for (QuestionDTO question : questions) {
+		for (Question question : questions) {
 			if (question.getId() == id) {
 				return question;
 			}
@@ -202,11 +180,11 @@ public class QuestionHandlerImpl implements QuestionHandler {
 	}
 
 
-	public void setQuestions(List<QuestionDTO> questions) {
+	public void setQuestions(List<Question> questions) {
 		this.questions = questions;
 	}
 
-	public List<QuestionDTO> getQuestions(){
+	public List<Question> getQuestions(){
 		return questions;
 	}
 }

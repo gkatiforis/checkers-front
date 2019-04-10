@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class WordHandler {
-
-
     private static List<String> greekCh = Arrays.asList( "ΑΙ", "ΕΙ", "Η", "ΟΙ", "Υ", "Ω");
 
     public static  String convert(String word){
@@ -60,5 +58,4 @@ public class WordHandler {
         s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
         return s.toUpperCase();
     }
-
 }
