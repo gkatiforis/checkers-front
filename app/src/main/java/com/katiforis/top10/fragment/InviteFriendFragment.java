@@ -1,15 +1,12 @@
 package com.katiforis.top10.fragment;
 
-
-import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.R;
@@ -17,7 +14,7 @@ import com.katiforis.top10.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InviteFriendFragment extends DialogFragment {
+public class InviteFriendFragment extends Fragment {
     private RecyclerView invitationFriendRecyclerView;
     private com.katiforis.top10.adapter.InviteFriendAdapter inviteFriendAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -31,15 +28,15 @@ public class InviteFriendFragment extends DialogFragment {
         return frag;
     }
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_game_invite_friend_layout,  null);
         invitationFriendRecyclerView = (RecyclerView) view.findViewById(R.id.invitation_friend_list);
         invitationFriendRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         inviteFriendAdapter = new com.katiforis.top10.adapter.InviteFriendAdapter(friends);
 
-        Player player = new Player("George");
+        Player player = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
         friends.add(player);
         friends.add(player);
         friends.add(player);
@@ -64,9 +61,6 @@ public class InviteFriendFragment extends DialogFragment {
         invitationFriendRecyclerView.smoothScrollToPosition(0);
         inviteFriendAdapter.notifyDataSetChanged();
         invitationFriendRecyclerView.setAdapter(inviteFriendAdapter);
-        Dialog dialog = new AlertDialog.Builder(getActivity())
-                .setView(view)
-                .create();
-        return dialog;
+        return view;
     }
 }

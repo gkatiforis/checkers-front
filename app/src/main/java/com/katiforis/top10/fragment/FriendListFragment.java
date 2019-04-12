@@ -41,28 +41,10 @@ public class FriendListFragment extends Fragment {
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         friendAdapter = new FriendAdapter(friends);
 
-        Player player = new Player("George");
+        Player player = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
         friends.add(player);
         friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
-        friends.add(player);
+
         friendsRecyclerView.smoothScrollToPosition(0);
         friendAdapter.notifyDataSetChanged();
         friendsRecyclerView.setAdapter(friendAdapter);

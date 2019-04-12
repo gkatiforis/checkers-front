@@ -1,74 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:gravity="center"
-android:orientation="vertical"
-tools:context="com.katiforis.top10.activities.MenuActivity">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fbutton="http://schemas.android.com/tools">
 
+    <ImageView
+        android:id="@+id/playerImage"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:src="@drawable/user"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
 
+        />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="26dp"
+        android:textStyle="bold"
+        android:text="Username"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playerImage"
+
+        />
 
 <LinearLayout
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:gravity="center_vertical|center"
-android:orientation="vertical">
+    android:id="@+id/player_labels"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@+id/username"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    >
 
 
-<com.facebook.shimmer.ShimmerFrameLayout
-android:id="@+id/shimmer_view_container"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-app:shimmer_duration="5000">
+    <ImageView
+        android:id="@+id/lvlImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/alerter_ic_notifications"
+
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintLeft_toRightOf="@+id/playerImage"/>
+
+    <TextView
+        android:id="@+id/lvlTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="111 lvl"
+        app:layout_constraintTop_toBottomOf="@+id/player_labels"
+
+        />
 
 
-<TextView
-android:id="@+id/hi"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:gravity="center"
-android:textSize="38dp"
-android:text="Please wait a sec..." />
-</com.facebook.shimmer.ShimmerFrameLayout>
 
-<Button
-android:id="@+id/send"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="@string/send" />
+    <ImageView
+        android:id="@+id/pointsImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/star"
+
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintLeft_toRightOf="@+id/lvlP"/>
+
+    <TextView
+        android:id="@+id/pointsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="1.0999"
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintLeft_toRightOf="@+id/pointsImage"
+        />
+
+    <ImageView
+        android:id="@+id/coinsImage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/coin"
+
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintLeft_toRightOf="@+id/pointsTitle"/>
+
+    <TextView
+        android:id="@+id/coinsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="99.9999"
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintLeft_toRightOf="@+id/coinsImage"
+        />
+
 
 </LinearLayout>
 
-<TextView
-android:id="@+id/show"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content" />
 
-<!--<com.nightonke.boommenu.BoomMenuButton-->
-<!--android:id="@+id/bmb"-->
-<!--android:layout_width="wrap_content"-->
-<!--android:layout_height="wrap_content"-->
-<!--app:bmb_buttonEnum="textInsideCircle"-->
-<!--app:bmb_piecePlaceEnum="piecePlace_custom"-->
-<!--app:bmb_buttonPlaceEnum="buttonPlace_custom"-->
-<!--/>-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/player_labels">
 
-<com.txusballesteros.bubbles.BubbleLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content">
 
-<ImageView
-android:id="@+id/avatar"
-android:layout_width="70dp"
-android:layout_height="70dp"
-android:layout_gravity="center"
-android:background="@drawable/alerter_ic_face"
-android:src="@drawable/user"
-android:scaleType="centerCrop"/>
+        <!--<com.facebook.shimmer.ShimmerFrameLayout-->
+            <!--android:id="@+id/shimmer_view_container"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:shimmer_duration="5000">-->
 
-</com.txusballesteros.bubbles.BubbleLayout>
 
-</LinearLayout>
+            <!--<TextView-->
+                <!--android:id="@+id/hi"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center"-->
+                <!--android:textSize="38dp"-->
+                <!--android:text="Please wait a sec..." />-->
+        <!--</com.facebook.shimmer.ShimmerFrameLayout>-->
+
+
+
+        <Button
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send" />
+
+        <Button
+            android:id="@+id/play_with_friend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Play with friend" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</android.support.constraint.ConstraintLayout>

@@ -262,12 +262,7 @@ public class GameActivity extends Activity {
 
 	void setPlayerList(List<Player> players){
 		userList.clear();
-		for (Player player:players){
-			String playerId = player.getPlayerId();
-			String username = player.getUsername();
-			Integer points = player.getPoints();
-			userList.add(new Player(playerId, username, points));
-		}
+		userList.addAll(players);
 		playerAdapter.notifyDataSetChanged();
 	}
 

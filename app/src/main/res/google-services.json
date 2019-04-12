@@ -15,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "777150420367-5db6749a0pl5cfbpshf3cgb8g94g448f.apps.googleusercontent.com",
+          "client_id": "777150420367-8e6k71v6ig05mp8nrj38r6ksednfqq2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.katiforis.top10",
+            "certificate_hash": "9d1b74a960a527a12c6a0e8b1b78241a7311fefc"
+          }
+        },
+        {
+          "client_id": "777150420367-l4iis1sp8hj6cja12debfnqvrioe25vu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -25,15 +33,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777150420367-l4iis1sp8hj6cja12debfnqvrioe25vu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

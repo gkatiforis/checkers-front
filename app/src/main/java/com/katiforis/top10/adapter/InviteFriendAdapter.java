@@ -18,11 +18,11 @@ public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapte
     private List<Player> players;
 
     public class InviteFriendViewHolder extends RecyclerView.ViewHolder {
-        public TextView description, username, points;
+        public TextView fullName, username, points;
 
         public InviteFriendViewHolder(View view) {
             super(view);
-            description = (TextView) view.findViewById(R.id.description);
+            fullName = (TextView) view.findViewById(R.id.fullName);
             username = (TextView) view.findViewById(R.id.username);
             points = (TextView) view.findViewById(R.id.points);
 
@@ -48,7 +48,7 @@ public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapte
     @Override
     public InviteFriendViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_answer_layout, parent, false);
+                .inflate(R.layout.item_game_invite_friend_layout, parent, false);
 
         return new InviteFriendViewHolder(itemView);
     }
@@ -60,6 +60,8 @@ public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapte
 
         Player player = players.get(position);
         holder.username.setText(player.getUsername());
+        holder.fullName.setText(player.getFullName());
+        holder.points.setText(player.getPoints().toString());
     }
 
     @Override

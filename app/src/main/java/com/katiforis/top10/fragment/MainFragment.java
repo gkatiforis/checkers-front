@@ -2,8 +2,13 @@ package com.katiforis.top10.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +21,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
+import com.katiforis.top10.adapter.InviteFriendAdapter;
 import com.katiforis.top10.controller.MenuController;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -31,7 +41,12 @@ public class MainFragment extends Fragment {
     public static GoogleSignInAccount account;
 
     private Button play;
-    private TextView hi;
+    private Button playWithFriend;
+    private TextView username;
+
+    private RecyclerView invitationFriendRecyclerView;
+    private com.katiforis.top10.adapter.InviteFriendAdapter inviteFriendAdapter;
+    private List<Player> inviteFriends = new ArrayList<>();
 
     public MainFragment() {}
 
@@ -48,20 +63,18 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout,  null);
 
-        play = v.findViewById(R.id.send);
-		hi = v.findViewById(R.id.hi);
+        play = v.findViewById(R.id.play);
+        playWithFriend = v.findViewById(R.id.play_with_friend);
+        username = v.findViewById(R.id.username);
 
         if(MenuActivity.userId == null){
             startSignInIntent();
         }else{
-            hi.setText("HI, " + account.getDisplayName());
+            username.setText(account.getDisplayName());
 
         }
 
         play.setOnClickListener(p -> {
-//            InviteFriendFragment inviteFriendFragmnet =	InviteFriendFragment.newInstance(4);
-//            inviteFriendFragmnet.show(getFragmentManager(), "dialog");
-
 			JSONObject jsonObject = new JSONObject();
 			try {
 				jsonObject.put("fromUserID", MenuActivity.userId);
@@ -73,7 +86,47 @@ public class MainFragment extends Fragment {
 			MenuController.sendFindGameRequest(jsonObject);
         });
 
+        playWithFriend.setOnClickListener(p -> {
+            openPlayWithFriendDialog();
+        });
+
         return v;
+    }
+
+    private void openPlayWithFriendDialog(){
+
+        DrawerLayout drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.activity_mainn);
+        NavigationView navigationView = getActivity().findViewById(R.id.nv);
+        navigationView.removeAllViews();
+
+        View view = LayoutInflater.from(getActivity())
+                .inflate(R.layout.fragment_game_invite_friend_layout, null, false);
+        navigationView.addView(view);
+
+        invitationFriendRecyclerView = (RecyclerView) drawerLayout.findViewById(R.id.invitation_friend_list);
+        invitationFriendRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        inviteFriendAdapter = new InviteFriendAdapter(inviteFriends);
+
+        Player player2 = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+        inviteFriends.add(player2);
+
+        invitationFriendRecyclerView.smoothScrollToPosition(0);
+        inviteFriendAdapter.notifyDataSetChanged();
+        invitationFriendRecyclerView.setAdapter(inviteFriendAdapter);
+        drawerLayout.openDrawer(Gravity.LEFT);
     }
 
     private void startSignInIntent() {
@@ -116,7 +169,7 @@ public class MainFragment extends Fragment {
 
     private void onLogin(GoogleSignInAccount account){
         // Signed in successfully, show authenticated UI.
-		hi.setText("HI, " + account.getDisplayName());
+        username.setText(account.getDisplayName());
         MenuActivity.userId = account.getId();
 
 

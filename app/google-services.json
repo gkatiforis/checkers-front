@@ -15,31 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "777150420367-0ficgm1v65b5dp8e3dr4jil3rdm9pkb0.apps.googleusercontent.com",
+          "client_id": "777150420367-8e6k71v6ig05mp8nrj38r6ksednfqq2t.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.katiforis.top10",
-            "certificate_hash": "c2ac06a39b7a1a747ccd54c8c4a882e26ac0353e"
+            "certificate_hash": "9d1b74a960a527a12c6a0e8b1b78241a7311fefc"
           }
         },
         {
-          "client_id": "777150420367-t66hakvfnmcv23uul02g088h8v04co6l.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.katiforis.top10",
-            "certificate_hash": "4ef2222045a950159b105bdd1ab15180156ff69f"
-          }
-        },
-        {
-          "client_id": "777150420367-g81kglr35l12ik4eq2vqo853ks8t1ojc.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.katiforis.top10",
-            "certificate_hash": "1b1eff1d65d2af3ed25c5b2d1be2304233ccec7e"
-          }
-        },
-        {
-          "client_id": "777150420367-5db6749a0pl5cfbpshf3cgb8g94g448f.apps.googleusercontent.com",
+          "client_id": "777150420367-l4iis1sp8hj6cja12debfnqvrioe25vu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -49,20 +33,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "777150420367-l4iis1sp8hj6cja12debfnqvrioe25vu.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

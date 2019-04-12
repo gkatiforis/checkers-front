@@ -16,11 +16,11 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     private List<Player> players;
 
     public class FriendViewHolder extends RecyclerView.ViewHolder {
-        public TextView description, username, points;
+        public TextView fullName, username, points;
 
         public FriendViewHolder(View view) {
             super(view);
-            description = (TextView) view.findViewById(R.id.description);
+            fullName = (TextView) view.findViewById(R.id.fullName);
             username = (TextView) view.findViewById(R.id.username);
             points = (TextView) view.findViewById(R.id.points);
 
@@ -34,7 +34,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     @Override
     public FriendViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_answer_layout, parent, false);
+                .inflate(R.layout.item_friend_layout, parent, false);
 
         return new FriendViewHolder(itemView);
     }
@@ -43,7 +43,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     public void onBindViewHolder(FriendViewHolder holder, int position) {
 
         Player player = players.get(position);
+        holder.fullName.setText(player.getFullName());
         holder.username.setText(player.getUsername());
+        holder.points.setText(player.getPoints().toString());
     }
 
     @Override

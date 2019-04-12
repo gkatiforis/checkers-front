@@ -9,27 +9,20 @@ public class Player implements Serializable {
     private long id;
     private String playerId;
     private String username;
-    private int points;
-
+    private String fullName;
+    private Integer points;
     private int img;//TODO image
 
     public Player() {
     }
 
-    public Player(String username) {
-        this.username = username;
-    }
-
-    public Player(String playerId, String username) {
+    public Player(long id, String playerId, String username, String fullName, Integer points, int img) {
+        this.id = id;
         this.playerId = playerId;
         this.username = username;
-    }
-
-    public Player(String playerId, String username, int points) {
-        this.playerId = playerId;
-        this.username = username;
+        this.fullName = fullName;
         this.points = points;
-        this.img = R.drawable.user;
+        this.img = img;
     }
 
     public int getImg() {
@@ -64,11 +57,19 @@ public class Player implements Serializable {
         this.username = username;
     }
 
-    public int getPoints() {
+    public Integer getPoints() {
         return points;
     }
 
-    public void setPoints(int points) {
+    public void setPoints(Integer points) {
         this.points = points;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

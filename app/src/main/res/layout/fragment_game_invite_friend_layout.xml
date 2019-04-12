@@ -6,21 +6,62 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/background">
 
-    <!--<TextView-->
-        <!--android:id="@+id/dialogTitle"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center"-->
-        <!--android:drawableTop="@drawable/alerter_ic_face"-->
-        <!--android:text="sdfsdfsdf"-->
-        <!--app:layout_constraintTop_toTopOf="parent"/>-->
+    <ImageView
+        android:id="@+id/dialogImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/user"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create game"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/dialogImage"
+        />
+
+    <LinearLayout
+        android:id="@+id/add_friend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/dialogTitle">
+
+        <EditText
+            android:layout_margin="8dp"
+            android:id="@+id/etSearch"
+            android:hint="Search friend by username"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/ivSearch"
+            android:background="@color/alerter_default_success_background"
+            android:padding="2dp"
+            android:layout_width="wrap_content"
+            android:layout_margin="8dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:layout_height="wrap_content"
+            tools:ignore="contentDescription" />
+
+    </LinearLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/invitation_friend_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        android:background="@drawable/background"
 
+        app:layout_constraintTop_toBottomOf="@+id/add_friend"
         app:layout_constraintBottom_toTopOf="@+id/is_private"
         tools:showIn="@layout/fragment_game_invite_friend_layout"/>
     <!--app:layout_constraintTop_toBottomOf="@+id/dialogTitle"-->

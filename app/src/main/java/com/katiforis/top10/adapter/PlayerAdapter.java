@@ -17,8 +17,8 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     private List<Player> players;
     Context context;
 
-    public PlayerAdapter(List<Player> horizontalGrocderyList, Context context){
-        this.players = horizontalGrocderyList;
+    public PlayerAdapter(List<Player> players, Context context){
+        this.players = players;
         this.context = context;
     }
 
