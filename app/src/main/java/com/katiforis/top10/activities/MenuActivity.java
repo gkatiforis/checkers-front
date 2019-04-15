@@ -21,6 +21,7 @@ import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.adapter.FriendAdapter;
 import com.katiforis.top10.adapter.ViewPagerAdapter;
 import com.katiforis.top10.R;
+import com.katiforis.top10.fragment.LobbyFragment;
 import com.katiforis.top10.fragment.MainFragment;
 import com.katiforis.top10.fragment.NotificationFragment;
 
@@ -101,7 +102,7 @@ public class MenuActivity extends AppCompatActivity {
 								viewPager.setCurrentItem(2);
 								break;
 							case R.id.action_friend_list:
-								drawerLayout.openDrawer(Gravity.LEFT);
+								drawerLayout.openDrawer(Gravity.RIGHT);
 								instance.openFriendListDialog();
 								break;
 						}
@@ -145,7 +146,7 @@ public class MenuActivity extends AppCompatActivity {
 		adapter.addFragment(new android.support.v4.app.Fragment());
 		adapter.addFragment(new android.support.v4.app.Fragment());
 		adapter.addFragment(MainFragment.newInstance(4));
-		adapter.addFragment(new android.support.v4.app.Fragment());
+		adapter.addFragment(LobbyFragment.newInstance(4));
 		adapter.addFragment(new android.support.v4.app.Fragment());
 		viewPager.setAdapter(adapter);
 		viewPager.setCurrentItem(2);

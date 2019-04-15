@@ -1,6 +1,5 @@
 package com.katiforis.top10.adapter;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,7 @@ import com.katiforis.top10.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapter.InviteFriendViewHolder> {
+public class InvitedFriendAdapter extends RecyclerView.Adapter<InvitedFriendAdapter.InviteFriendViewHolder> {
     List<Integer> selectedPositions = new ArrayList<>();
     private List<Player> players;
 
@@ -41,14 +40,14 @@ public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapte
         }
     }
 
-    public InviteFriendAdapter(List<Player> players) {
+    public InvitedFriendAdapter(List<Player> players) {
         this.players = players;
     }
 
     @Override
     public InviteFriendViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_game_invite_friend_layout, parent, false);
+                .inflate(R.layout.item_game_invited_friend_layout, parent, false);
 
         return new InviteFriendViewHolder(itemView);
     }

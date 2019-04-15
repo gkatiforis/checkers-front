@@ -37,7 +37,7 @@ import java.util.List;
 import static android.content.ContentValues.TAG;
 
 public class MainFragment extends Fragment {
-
+    public static MainFragment instance;
     public static GoogleSignInAccount account;
 
     private Button play;
@@ -45,10 +45,10 @@ public class MainFragment extends Fragment {
     private TextView username;
 
     private RecyclerView invitationFriendRecyclerView;
-    private com.katiforis.top10.adapter.InviteFriendAdapter inviteFriendAdapter;
+    private InviteFriendAdapter inviteFriendAdapter;
     private List<Player> inviteFriends = new ArrayList<>();
 
-    public MainFragment() {}
+    public MainFragment() { instance = this;}
 
 
     public static MainFragment newInstance(int title) {
@@ -93,14 +93,14 @@ public class MainFragment extends Fragment {
         return v;
     }
 
-    private void openPlayWithFriendDialog(){
+    public void openPlayWithFriendDialog(){
 
         DrawerLayout drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.activity_mainn);
         NavigationView navigationView = getActivity().findViewById(R.id.nv);
         navigationView.removeAllViews();
 
         View view = LayoutInflater.from(getActivity())
-                .inflate(R.layout.fragment_game_invite_friend_layout, null, false);
+                .inflate(R.layout.fragment_invite_friend_layout, null, false);
         navigationView.addView(view);
 
         invitationFriendRecyclerView = (RecyclerView) drawerLayout.findViewById(R.id.invitation_friend_list);
@@ -126,7 +126,7 @@ public class MainFragment extends Fragment {
         invitationFriendRecyclerView.smoothScrollToPosition(0);
         inviteFriendAdapter.notifyDataSetChanged();
         invitationFriendRecyclerView.setAdapter(inviteFriendAdapter);
-        drawerLayout.openDrawer(Gravity.LEFT);
+        drawerLayout.openDrawer(Gravity.RIGHT);
     }
 
     private void startSignInIntent() {

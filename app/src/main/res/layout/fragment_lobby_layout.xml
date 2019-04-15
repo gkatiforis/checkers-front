@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fbutton="http://schemas.android.com/tools">
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/exit"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+
+        <ImageView
+            android:id="@+id/dialogImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/lobby"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lobby"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/dialogImage"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+        <TextView
+            android:id="@+id/dialogDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please wait other people to join in"
+            android:textSize="20dp"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar1"
+            app:layout_constraintBottom_toTopOf="@+id/player_lobby"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
+        app:layout_constraintBottom_toTopOf="@+id/player_lobby"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        >
+        <Button
+            android:id="@+id/invite_friend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="invite friend"
+
+            />
+
+        <Button
+            android:id="@+id/start_game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="start game"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+        <CheckBox
+            android:id="@+id/chkIos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Private"
+            android:layout_marginRight="10dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
+            app:layout_constraintLeft_toRightOf="@+id/start_game"
+            />
+
+    </LinearLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/player_lobby"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/dialogDesc"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+
+</android.support.constraint.ConstraintLayout>

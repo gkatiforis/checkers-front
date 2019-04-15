@@ -1,6 +1,7 @@
 package com.katiforis.top10.fragment;
 
 import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -8,8 +9,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 
 import com.katiforis.top10.DTO.Notification;
 import com.katiforis.top10.R;
@@ -21,9 +26,8 @@ import java.util.List;
 public class NotificationFragment extends DialogFragment {
     private RecyclerView notificationsRecyclerView;
     private NotificationAdapter notificationAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
     private List<Notification> notifications = new ArrayList<>();
-
+    private Button btnClose;
 
     public NotificationFragment() {}
 
@@ -47,6 +51,12 @@ public class NotificationFragment extends DialogFragment {
         notificationsRecyclerView.addItemDecoration(new DividerItemDecoration(notificationsRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         notificationAdapter = new NotificationAdapter(notifications);
 
+
+        btnClose = (Button) view.findViewById(R.id.btnClose);
+
+        btnClose.setOnClickListener(c ->{
+
+        });
         Notification notification = new Notification("Game Game Game invitation from George Katiforis Katiforis Katiforis Katiforis", "22/02/2019");
         notifications.add(notification);
         notifications.add(notification);
