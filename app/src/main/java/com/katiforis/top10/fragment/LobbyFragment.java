@@ -15,16 +15,22 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.katiforis.top10.DTO.Lobby;
 import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.R;
+import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.adapter.InviteFriendAdapter;
 import com.katiforis.top10.adapter.PlayerLobbyAdapter;
+import com.katiforis.top10.controller.LobbyController;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyFragment extends Fragment {
-    public static LobbyFragment instance;
+    public static LobbyFragment INSTANCE;
     public static GoogleSignInAccount account;
 
     private Button startGame;
@@ -36,48 +42,46 @@ public class LobbyFragment extends Fragment {
     private InviteFriendAdapter inviteFriendAdapter;
     private List<Player> inviteFriends = new ArrayList<>();
 
+    private RecyclerView lobbyRecyclerView;
+    private PlayerLobbyAdapter playerLobbyAdapter;
+    private List<Player> lobbyPlayers = new ArrayList<>();
 
-    public LobbyFragment() { instance = this;}
+    private LobbyController lobbyController;
 
+    public static LobbyFragment getInstance() {
+        if (INSTANCE == null) {
+            synchronized(LobbyFragment.class) {
+                INSTANCE = new LobbyFragment();
+            }
+        }
+        return INSTANCE;
+    }
 
-    public static LobbyFragment newInstance(int title) {
-
-        LobbyFragment frag = new LobbyFragment();
-//        Bundle args = new Bundle();
-//        args.putInt("title", title);
-//        frag.setArguments(args);
-        return frag;
+    public LobbyFragment() {
+        lobbyController = LobbyController.getInstance();
+        lobbyController.init(MenuActivity.userId);
+        lobbyController.setLobbyFragment(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_lobby_layout,  null);
-        DrawerLayout drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.activity_mainn);
-        startGame = v.findViewById(R.id.start_game);
-        invitePlayer  = v.findViewById(R.id.invite_friend);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_lobby_layout,  null);
+        DrawerLayout drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        startGame = view.findViewById(R.id.start_game);
+        invitePlayer  = view.findViewById(R.id.invite_friend);
 
         invitePlayer.setOnClickListener(p -> {
-            NavigationView navigationView = getActivity().findViewById(R.id.nv);
+            NavigationView navigationView = getActivity().findViewById(R.id.navigation_view);
             navigationView.removeAllViews();
 
-            View view = LayoutInflater.from(getActivity())
+            View v = LayoutInflater.from(getActivity())
                     .inflate(R.layout.fragment_invite_friend_layout, null, false);
-            navigationView.addView(view);
+            navigationView.addView(v);
 
             invitationFriendRecyclerView = (RecyclerView) drawerLayout.findViewById(R.id.invitation_friend_list);
             invitationFriendRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             inviteFriendAdapter = new InviteFriendAdapter(inviteFriends);
-
-            Player player2 = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
-            inviteFriends.add(player2);
-            inviteFriends.add(player2);
-            inviteFriends.add(player2);
-
-
-            invitationFriendRecyclerView.smoothScrollToPosition(0);
-            inviteFriendAdapter.notifyDataSetChanged();
             invitationFriendRecyclerView.setAdapter(inviteFriendAdapter);
-
 
             drawerLayout.openDrawer(Gravity.RIGHT);
         });
@@ -87,21 +91,32 @@ public class LobbyFragment extends Fragment {
         });
 
 
-        RecyclerView carRecyclerView = (RecyclerView)v.findViewById(R.id.player_lobby);
+        lobbyRecyclerView = (RecyclerView)view.findViewById(R.id.player_lobby);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this.getActivity(), 3);
-        carRecyclerView.setLayoutManager(gridLayoutManager);
-        Player player2 = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        PlayerLobbyAdapter playerLobbyAdapter = new PlayerLobbyAdapter(inviteFriends);
-        carRecyclerView.setAdapter(playerLobbyAdapter);
-        return v;
+        lobbyRecyclerView.setLayoutManager(gridLayoutManager);
+         playerLobbyAdapter = new PlayerLobbyAdapter(lobbyPlayers);
+        lobbyRecyclerView.setAdapter(playerLobbyAdapter);
+
+
+        return view;
+    }
+
+    public void getLobby(){
+        LobbyController.getInstance().init(MenuActivity.userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("playerId", MenuActivity.userId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        lobbyController.getLobby(jsonObject);
+    }
+
+    public void populateLobby(Lobby lobby){
+        getActivity().runOnUiThread(() -> {
+            lobbyPlayers.clear();
+            lobbyPlayers.addAll(lobby.getPlayers());
+            playerLobbyAdapter.notifyDataSetChanged();
+        });
     }
 }

@@ -3,6 +3,10 @@ package com.katiforis.top10.stomp;
 import android.util.Log;
 
 import com.katiforis.top10.conf.Const;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import io.reactivex.Flowable;
 import okhttp3.WebSocket;
 import ua.naiksoftware.stomp.Stomp;
@@ -14,7 +18,11 @@ public class Client {
     private static Client CLIENT_INSTANCE = null;
     private static StompClient stompClient;
 
-    private Client() {}
+    private static final Map<String, Flowable<StompMessage>> subscriptionsByTopic = new HashMap<>();
+
+    private Client() {
+    }
+
     public static Client getInstance() {
         if (CLIENT_INSTANCE == null) {
             synchronized(Client.class) {
@@ -52,7 +60,12 @@ public class Client {
     }
 
     public static Flowable<StompMessage> addTopic(String topicId){
-        return stompClient.topic(topicId);
+        Flowable<StompMessage> messageFlowable = subscriptionsByTopic.get(topicId);
+        if(messageFlowable == null){
+             messageFlowable = stompClient.topic(topicId);
+             subscriptionsByTopic.put(topicId, messageFlowable);
+        }
+        return messageFlowable;
     }
 
     public static Flowable<Void> send(String destination, String data){

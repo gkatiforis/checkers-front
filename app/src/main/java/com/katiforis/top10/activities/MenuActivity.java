@@ -17,26 +17,33 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.katiforis.top10.DTO.FriendList;
 import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.adapter.FriendAdapter;
 import com.katiforis.top10.adapter.ViewPagerAdapter;
 import com.katiforis.top10.R;
+import com.katiforis.top10.controller.HomeController;
 import com.katiforis.top10.fragment.LobbyFragment;
-import com.katiforis.top10.fragment.MainFragment;
+import com.katiforis.top10.fragment.HomeFragment;
 import com.katiforis.top10.fragment.NotificationFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
 	public MenuActivity instance;
+	private static Context context;
+
+	public static String userId = null;
+
+	private HomeController homeController;
 
 	private BottomNavigationView bottomNavigationView;
 	private ViewPager viewPager;
 	private MenuItem prevMenuItem;
-
-	private static Context context;
-	public static String userId = null;
 
 	public DrawerLayout drawerLayout;
 	public NavigationView navigationView;
@@ -51,43 +58,16 @@ public class MenuActivity extends AppCompatActivity {
 		initialize();
 	}
 
-	private void openFriendListDialog(){
-		navigationView.removeAllViews();
-
-		View v = LayoutInflater.from(this)
-				.inflate(R.layout.fragment_friend_list_layout, null, false);
-		navigationView.addView(v);
-
-		friendsRecyclerView = (RecyclerView) drawerLayout.findViewById(R.id.friend_list);
-		friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-		friendAdapter = new FriendAdapter(friends);
-
-		Player player = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friends.add(player);
-		friendsRecyclerView.smoothScrollToPosition(0);
-		friendAdapter.notifyDataSetChanged();
-		friendsRecyclerView.setAdapter(friendAdapter);
-
-	}
 	private void initialize() {
+		homeController = HomeController.getInstance();
+		homeController.setMenuActivity(this);
 		instance = this;
 		context = this.getApplicationContext();
 		getSupportActionBar().hide();
 		setContentView(R.layout.activity_menu_layout);
 
-		drawerLayout = (DrawerLayout) findViewById(R.id.activity_mainn);
-		navigationView = findViewById(R.id.nv);
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		navigationView = findViewById(R.id.navigation_view);
 		viewPager = (ViewPager) findViewById(R.id.viewpager);
 		bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
 		bottomNavigationView.setOnNavigationItemSelectedListener(
@@ -96,7 +76,7 @@ public class MenuActivity extends AppCompatActivity {
 					public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 						switch (item.getItemId()) {
 							case R.id.action_notification:
-								NotificationFragment notificationFragment =	NotificationFragment.newInstance(4);
+								NotificationFragment notificationFragment =	NotificationFragment.getInstance();
 								notificationFragment.show(getSupportFragmentManager(), "dialog");
 							case R.id.action_main_menu:
 								viewPager.setCurrentItem(2);
@@ -105,6 +85,10 @@ public class MenuActivity extends AppCompatActivity {
 								drawerLayout.openDrawer(Gravity.RIGHT);
 								instance.openFriendListDialog();
 								break;
+							case R.id.action_shop:
+								viewPager.setCurrentItem(3);
+							LobbyFragment.getInstance().getLobby();
+							    break;
 						}
 						return false;
 					}
@@ -145,12 +129,48 @@ public class MenuActivity extends AppCompatActivity {
 		ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 		adapter.addFragment(new android.support.v4.app.Fragment());
 		adapter.addFragment(new android.support.v4.app.Fragment());
-		adapter.addFragment(MainFragment.newInstance(4));
-		adapter.addFragment(LobbyFragment.newInstance(4));
+		adapter.addFragment(HomeFragment.getInstance());
+		adapter.addFragment(LobbyFragment.getInstance());
 		adapter.addFragment(new android.support.v4.app.Fragment());
 		viewPager.setAdapter(adapter);
 		viewPager.setCurrentItem(2);
 	}
+
+    private void openFriendListDialog(){
+
+        View view = LayoutInflater.from(this)
+                .inflate(R.layout.fragment_friend_list_layout, null, false);
+        navigationView.removeAllViews();
+        navigationView.addView(view);
+
+        friendsRecyclerView = (RecyclerView) drawerLayout.findViewById(R.id.friend_list);
+        friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        friendAdapter = new FriendAdapter(friends);
+        friendsRecyclerView.setAdapter(friendAdapter);
+        drawerLayout.openDrawer(Gravity.RIGHT);
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("playerId", userId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        homeController.getFriendList(jsonObject);
+    }
+
+    public void populateFriendListDialog(FriendList friendList){
+        runOnUiThread(()->{
+            friends.clear();
+            friends.addAll(friendList.getPlayers());
+            friendsRecyclerView.smoothScrollToPosition(0);
+            friendAdapter.notifyDataSetChanged();
+        });
+    }
+
+	public void findGame(JSONObject jsonObject) {
+		homeController.findGame(jsonObject);
+	}
+
 	public static Context getAppContext(){
 		return context;
 	}

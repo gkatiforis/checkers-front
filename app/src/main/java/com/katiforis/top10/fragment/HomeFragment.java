@@ -21,42 +21,40 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.PlayerDetails;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
-import com.katiforis.top10.adapter.InviteFriendAdapter;
-import com.katiforis.top10.controller.MenuController;
+import com.katiforis.top10.controller.HomeController;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static android.content.ContentValues.TAG;
 
-public class MainFragment extends Fragment {
-    public static MainFragment instance;
+public class HomeFragment extends Fragment {
+    public static HomeFragment INSTANCE;
+
+    private HomeController homeController;
     public static GoogleSignInAccount account;
 
     private Button play;
     private Button playWithFriend;
     private TextView username;
 
-    private RecyclerView invitationFriendRecyclerView;
-    private InviteFriendAdapter inviteFriendAdapter;
-    private List<Player> inviteFriends = new ArrayList<>();
+    public static HomeFragment getInstance() {
+        if (INSTANCE == null) {
+            synchronized(HomeFragment.class) {
+                INSTANCE = new HomeFragment();
+            }
+        }
+        return INSTANCE;
+    }
 
-    public MainFragment() { instance = this;}
-
-
-    public static MainFragment newInstance(int title) {
-        MainFragment frag = new MainFragment();
-//        Bundle args = new Bundle();
-//        args.putInt("title", title);
-//        frag.setArguments(args);
-        return frag;
+    public HomeFragment() {
+        homeController = HomeController.getInstance();
+        homeController.init(MenuActivity.userId);
+        homeController.setHomeFragment(this);
     }
 
     @Override
@@ -83,50 +81,12 @@ public class MainFragment extends Fragment {
 				e.printStackTrace();
 			}
 
-			MenuController.sendFindGameRequest(jsonObject);
-        });
+			MenuActivity menuActivity = (MenuActivity)getActivity();
 
-        playWithFriend.setOnClickListener(p -> {
-            openPlayWithFriendDialog();
+            menuActivity.findGame(jsonObject);
         });
 
         return v;
-    }
-
-    public void openPlayWithFriendDialog(){
-
-        DrawerLayout drawerLayout = (DrawerLayout) getActivity().findViewById(R.id.activity_mainn);
-        NavigationView navigationView = getActivity().findViewById(R.id.nv);
-        navigationView.removeAllViews();
-
-        View view = LayoutInflater.from(getActivity())
-                .inflate(R.layout.fragment_invite_friend_layout, null, false);
-        navigationView.addView(view);
-
-        invitationFriendRecyclerView = (RecyclerView) drawerLayout.findViewById(R.id.invitation_friend_list);
-        invitationFriendRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        inviteFriendAdapter = new InviteFriendAdapter(inviteFriends);
-
-        Player player2 = new Player(1l, "id","gkatiforis", "George Katiforis", 100, 1);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-        inviteFriends.add(player2);
-
-        invitationFriendRecyclerView.smoothScrollToPosition(0);
-        inviteFriendAdapter.notifyDataSetChanged();
-        invitationFriendRecyclerView.setAdapter(inviteFriendAdapter);
-        drawerLayout.openDrawer(Gravity.RIGHT);
     }
 
     private void startSignInIntent() {
@@ -173,7 +133,7 @@ public class MainFragment extends Fragment {
         MenuActivity.userId = account.getId();
 
 
-        MenuController.init(MenuActivity.userId);
+        HomeController.getInstance().init(MenuActivity.userId);
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -183,6 +143,12 @@ public class MainFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        MenuController.sendLogin(jsonObject);
+        homeController.login(jsonObject);
+    }
+
+    public void populatePlayerDetails(PlayerDetails playerDetails){
+        getActivity().runOnUiThread(() -> {
+            username.setText(playerDetails.getUsername() + " ddd");
+        });
     }
 }

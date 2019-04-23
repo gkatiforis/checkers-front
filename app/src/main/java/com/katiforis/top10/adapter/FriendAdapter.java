@@ -43,9 +43,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     public void onBindViewHolder(FriendViewHolder holder, int position) {
 
         Player player = players.get(position);
-        holder.fullName.setText(player.getFullName());
+    //    holder.fullName.setText(player.getFullName());
         holder.username.setText(player.getUsername());
-        holder.points.setText(player.getPoints().toString());
+      //  holder.points.setText(player.getPoints().toString());
     }
 
     @Override
