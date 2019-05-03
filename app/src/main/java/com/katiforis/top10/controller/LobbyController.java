@@ -8,18 +8,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.katiforis.top10.DTO.Lobby;
 import com.katiforis.top10.DTO.ResponseState;
+import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.conf.gson.DateTypeAdapter;
 import com.katiforis.top10.fragment.LobbyFragment;
 import com.katiforis.top10.stomp.Client;
 
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.util.Date;
 
-import ua.naiksoftware.stomp.client.StompMessage;
+import ua.naiksoftware.stomp.dto.StompMessage;
 
 
 public class LobbyController extends MenuController{
@@ -68,27 +68,14 @@ public class LobbyController extends MenuController{
         }
     }
 
-    public void getLobby(JSONObject jsonObject){
-        Client.getInstance().send(Const.GET_LOBBY, jsonObject.toString()).subscribe(new Subscriber<Void>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                Log.i(Const.TAG, "");
-            }
-
-            @Override
-            public void onNext(Void aVoid) {
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.e(Const.TAG, "", t);
-            }
-
-            @Override
-            public void onComplete() {
-                Log.i(Const.TAG, "" + jsonObject.toString());
-            }
-        });
+    public void getLobby(){
+        addTopic(MenuActivity.userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("playerId", MenuActivity.userId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Client.getInstance().send(Const.GET_LOBBY, jsonObject.toString());
     }
 }

@@ -1,8 +1,8 @@
 package com.katiforis.top10.conf;
 
 public class Const {
-//	public static final String address = "ws://192.168.16.116:5000/im/websocket";
-	public static final String address = "ws://192.168.56.1:5000/im/websocket";
+//	public static final String address = "ws://192.168.1.2:5000/im/websocket";
+	public static final String address = "ws://192.168.252.90:5000/im/websocket";
 	//public static final String address = "ws://top10.us-east-2.elasticbeanstalk.com/im/websocket";
 
 	public static final String TAG = "TOP10";

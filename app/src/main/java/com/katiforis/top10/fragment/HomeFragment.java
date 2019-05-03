@@ -2,13 +2,8 @@ package com.katiforis.top10.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,14 +43,12 @@ public class HomeFragment extends Fragment {
                 INSTANCE = new HomeFragment();
             }
         }
+        INSTANCE.homeController = HomeController.getInstance();
+        INSTANCE.homeController.setHomeFragment(INSTANCE);
         return INSTANCE;
     }
 
-    public HomeFragment() {
-        homeController = HomeController.getInstance();
-        homeController.init(MenuActivity.userId);
-        homeController.setHomeFragment(this);
-    }
+    public HomeFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,9 +74,7 @@ public class HomeFragment extends Fragment {
 				e.printStackTrace();
 			}
 
-			MenuActivity menuActivity = (MenuActivity)getActivity();
-
-            menuActivity.findGame(jsonObject);
+		   homeController.findGame(jsonObject);
         });
 
         return v;
@@ -132,9 +123,6 @@ public class HomeFragment extends Fragment {
         username.setText(account.getDisplayName());
         MenuActivity.userId = account.getId();
 
-
-        HomeController.getInstance().init(MenuActivity.userId);
-
         JSONObject jsonObject = new JSONObject();
         try {
             //	jsonObject.put("userID", chatUserId.getText().toString());
@@ -143,12 +131,12 @@ public class HomeFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        homeController.login(jsonObject);
+        HomeController.getInstance().login(jsonObject);
     }
 
     public void populatePlayerDetails(PlayerDetails playerDetails){
         getActivity().runOnUiThread(() -> {
-            username.setText(playerDetails.getUsername() + " ddd");
+            username.setText(playerDetails.getUsername());
         });
     }
 }

@@ -1,7 +1,6 @@
 package com.katiforis.top10.controller;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -13,20 +12,27 @@ import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.stomp.Client;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import ua.naiksoftware.stomp.client.StompMessage;
+import ua.naiksoftware.stomp.dto.StompMessage;
 
 
-public class GameController {
+public class GameController extends AbstractController{
 
-    public static void init(String gameId) {
-        Client.getInstance().addTopic(Const.GAME_RESPONSE.replace("placeholder", gameId))
-                .subscribe(message-> onReceive(message));
+    private static GameController INSTANCE = null;
+
+    private GameActivity gameActivity;
+
+    private GameController(){ }
+
+    public static GameController getInstance() {
+        if (INSTANCE == null) {
+            synchronized (NotificationController.class) {
+                INSTANCE = new GameController();
+            }
+        }
+        return INSTANCE;
     }
 
-    public static void onReceive(StompMessage stompMessage){
+    public void onReceive(StompMessage stompMessage){
             JsonParser jsonParser = new JsonParser();
             JsonObject jo = (JsonObject) jsonParser.parse(stompMessage.getPayload());
 
@@ -39,66 +45,38 @@ public class GameController {
                 Intent intent = new Intent();
 
                 GameActivity.saveGameId(message.get("gameId").getAsString());
-
-
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setClass(MenuActivity.getAppContext(), MenuActivity.class);
                 MenuActivity.getAppContext().startActivity(intent);
             } else if (messageStatus.equalsIgnoreCase(ResponseState.ANSWER.getState())) {
-
                 Gson gson = new Gson();
                 PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
-                GameActivity.instance.showAnswer(playerAnswer);
+                gameActivity.showAnswer(playerAnswer);
             }
     }
 
-    public static void sendAnswer(String gameId, Object object ){
+    public void sendAnswer(String gameId, Object object ){
+        addTopic(GameActivity.getGameId());
         Gson gson = new Gson();
         String jsonInString = gson.toJson(object);
-        Client.getInstance().send( Const.SEND_WORD.replace("placeholder", gameId), jsonInString).subscribe(new Subscriber<Void>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                Log.i(Const.TAG, "");
-            }
-
-            @Override
-            public void onNext(Void aVoid) {
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.e(Const.TAG, "Error：", t);
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
+        Client.getInstance().send( Const.SEND_WORD.replace("placeholder", gameId), jsonInString);
     }
 
-    public static void getGameState(String userId, String gameId){
-        Client.getInstance().send(Const.GET_GAME_STATE, userId + "|" + gameId).subscribe(new Subscriber<Void>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                Log.i(Const.TAG, "");
-            }
+    public void getGameState(String userId, String gameId){
+        addTopic(GameActivity.getGameId());
+        Client.getInstance().send(Const.GET_GAME_STATE, userId + "|" + gameId);
+    }
 
-            @Override
-            public void onNext(Void aVoid) {
+    public GameActivity getGameActivity() {
+        return gameActivity;
+    }
 
-            }
+    public void setGameActivity(GameActivity gameActivity) {
+        this.gameActivity = gameActivity;
+    }
 
-            @Override
-            public void onError(Throwable t) {
-                Log.e(Const.TAG, "Error：", t);
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
+    public void addTopic(String gameId) {
+        if(gameId == null)return;
+        super.addTopic(Const.GAME_RESPONSE.replace("placeholder", gameId));
     }
 }

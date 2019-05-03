@@ -19,12 +19,10 @@ import com.katiforis.top10.fragment.HomeFragment;
 import com.katiforis.top10.stomp.Client;
 
 import org.json.JSONObject;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.util.Date;
 
-import ua.naiksoftware.stomp.client.StompMessage;
+import ua.naiksoftware.stomp.dto.StompMessage;
 
 
 public class HomeController extends MenuController{
@@ -33,8 +31,9 @@ public class HomeController extends MenuController{
 
     private HomeFragment homeFragment;
 
-    private HomeController(){
-    }
+    private MenuActivity menuActivity;
+
+    private HomeController(){}
 
     public static HomeController getInstance() {
         if (INSTANCE == null) {
@@ -45,8 +44,12 @@ public class HomeController extends MenuController{
         return INSTANCE;
     }
 
-    public HomeFragment getHomeFragment() {
-        return homeFragment;
+     public MenuActivity getMenuActivity() {
+        return menuActivity;
+    }
+
+    public void setMenuActivity(MenuActivity menuActivity) {
+        this.menuActivity = menuActivity;
     }
 
     public void setHomeFragment(HomeFragment homeFragment) {
@@ -75,7 +78,7 @@ public class HomeController extends MenuController{
                     .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
                     .create();
             GameState gameState = gson.fromJson(message, GameState.class);
-            GameActivity.instance.setGameState(gameState);
+            GameActivity.INSTANCE.setGameState(gameState);
         }else if(messageStatus.equalsIgnoreCase(ResponseState.PLAYER_DETAILS.getState())){
             final Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
@@ -96,74 +99,17 @@ public class HomeController extends MenuController{
     }
 
     public void findGame(JSONObject jsonObject){
-        Client.getInstance().send(Const.FIND_GAME, jsonObject.toString()).subscribe(new Subscriber<Void>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                Log.i(Const.TAG, "");
-            }
-
-            @Override
-            public void onNext(Void aVoid) {
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.e(Const.TAG, "", t);
-            }
-
-            @Override
-            public void onComplete() {
-                Log.i(Const.TAG, "" + jsonObject.toString());
-            }
-        });
+        addTopic(MenuActivity.userId);
+        Client.getInstance().send(Const.FIND_GAME, jsonObject.toString());
     }
 
     public void login(JSONObject jsonObject){
-        Client.getInstance().send(Const.LOGIN, jsonObject.toString()).subscribe(new Subscriber<Void>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                Log.i(Const.TAG, "");
-            }
-
-            @Override
-            public void onNext(Void aVoid) {
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.e(Const.TAG, "", t);
-            }
-
-            @Override
-            public void onComplete() {
-                Log.i(Const.TAG, "" + jsonObject.toString());
-            }
-        });
+        addTopic(MenuActivity.userId);
+        Client.getInstance().send(Const.LOGIN, jsonObject.toString());
     }
 
-    public void getFriendList(JSONObject jsonObject){
-        Client.getInstance().send(Const.GET_FRIEND_LIST, jsonObject.toString()).subscribe(new Subscriber<Void>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                Log.i(Const.TAG, "");
-            }
-
-            @Override
-            public void onNext(Void aVoid) {
-
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Log.e(Const.TAG, "", t);
-            }
-
-            @Override
-            public void onComplete() {
-                Log.i(Const.TAG, "" + jsonObject.toString());
-            }
-        });
+    public void getFriendList(JSONObject jsonObject) {
+        addTopic(MenuActivity.userId);
+        Client.getInstance().send(Const.GET_FRIEND_LIST, jsonObject.toString());
     }
 }

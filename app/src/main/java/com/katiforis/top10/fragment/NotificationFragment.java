@@ -1,5 +1,6 @@
 package com.katiforis.top10.fragment;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +31,8 @@ public class NotificationFragment extends DialogFragment {
     private static NotificationFragment INSTANCE = null;
     NotificationController notificationController;
 
+    public static boolean populated;
+
     private RecyclerView notificationsRecyclerView;
     private NotificationAdapter notificationAdapter;
     private List<Notification> notifications = new ArrayList<>();
@@ -41,13 +44,13 @@ public class NotificationFragment extends DialogFragment {
                 INSTANCE = new NotificationFragment();
             }
         }
+        INSTANCE.notificationController = NotificationController.getInstance();
+        INSTANCE.notificationController.setNotificationFragment(INSTANCE);
         return INSTANCE;
     }
 
     public NotificationFragment() {
-        notificationController = NotificationController.getInstance();
-        notificationController.init(MenuActivity.userId);
-        notificationController.setNotificationFragment(this);
+        populated = false;
     }
 
     @NonNull
@@ -79,19 +82,20 @@ public class NotificationFragment extends DialogFragment {
     @Override
     public void show(FragmentManager manager, String tag) {
         super.show(manager, tag);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("playerId", MenuActivity.userId);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(!populated){
+            notificationController.getNotificationList();
         }
-        notificationController.getNotificationList(jsonObject);
     }
+
     public void populateNotifications(NotificationList notificationList){
-        getActivity().runOnUiThread(() -> {
-            notifications.clear();
-            notifications.addAll(notificationList.getNotifications());
-            notificationAdapter.notifyDataSetChanged();
-        });
+        Activity activity = getActivity();
+        if(activity != null){
+            activity.runOnUiThread(() -> {
+                notifications.clear();
+                notifications.addAll(notificationList.getNotifications());
+                notificationAdapter.notifyDataSetChanged();
+            });
+            populated = true;
+        }
     }
 }

@@ -44,7 +44,7 @@ import tyrantgit.explosionfield.ExplosionField;
 
 public class GameActivity extends Activity {
 
-    public static GameActivity instance;
+    public static GameActivity INSTANCE;
 	long currentQuestionId;
 
 	ProgressBar mProgressBar;
@@ -75,12 +75,18 @@ public class GameActivity extends Activity {
 
 	private QuestionHandler questionHandler;
 
+	private GameController gameController;
+
+
+	public static boolean populated;
+
+
 	public void sendAnswer(String answer){
 		PlayerAnswer playerAnswer = new PlayerAnswer();
 		playerAnswer.setDescription(answer);
 		playerAnswer.setUserId(MenuActivity.userId);
 		playerAnswer.setQuestionId(this.currentQuestionId);
-		GameController.sendAnswer(getGameId(), playerAnswer);
+		gameController.sendAnswer(getGameId(), playerAnswer);
 	}
 
 	public  void showAnswer(PlayerAnswer playerAnswer){
@@ -485,53 +491,32 @@ public class GameActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game_layout);
-		this.init();
-		answerText.requestFocus();
-	}
-
-	private void init() {
 		initComponents();
-		instance = this;
-		GameController.init(getGameId());
+		INSTANCE = this;
+		populated = false;
+		gameController = GameController.getInstance();
+		gameController.setGameActivity(this);
+		answerText.requestFocus();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-
-
-	//	MyStomp.dis();
 		if(mCountDownTimer != null){
 			mCountDownTimer.cancel();
 			mCountDownTimer = null;
 			timerStep=0;
 		}
-
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		PermissionHandler.askForPermission(PermissionHandler.RECORD_AUDIO,this);
-
-		//	start();
-
-		//	if(!PermissionHandler.checkPermission(this,PermissionHandler.RECORD_AUDIO)) {
-		//PermissionHandler.askForPermission(PermissionHandler.RECORD_AUDIO,this);
-		//	}
-
 		String gameId = getGameId();
 		if (gameId.length() == 0) {
 			return;
 		}
-
-		GameController.getGameState(MenuActivity.userId.trim(), gameId.trim());
-
-
-
-
-		//	setGameState();
-
+		gameController.getGameState(MenuActivity.userId.trim(), gameId.trim());
 	}
 
     public static void saveGameId(String gameId) {
@@ -552,14 +537,5 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-
-
-		//		if(mSpeechManager!=null) {
-//			mSpeechManager.destroy();
-//			mSpeechManager=null;
-//		}
-
 	}
-
-
 }

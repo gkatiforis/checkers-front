@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.katiforis.top10.DTO.FriendList;
 import com.katiforis.top10.DTO.Player;
@@ -34,10 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
-	public MenuActivity instance;
+	public static MenuActivity INSTANCE;
 	private static Context context;
 
 	public static String userId = null;
+	public static boolean populated;
 
 	private HomeController homeController;
 
@@ -52,6 +55,8 @@ public class MenuActivity extends AppCompatActivity {
     private FriendAdapter friendAdapter;
     private List<Player> friends = new ArrayList<>();
 
+	Snackbar snack;
+
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -59,9 +64,10 @@ public class MenuActivity extends AppCompatActivity {
 	}
 
 	private void initialize() {
+		populated = false;
+		INSTANCE = this;
 		homeController = HomeController.getInstance();
 		homeController.setMenuActivity(this);
-		instance = this;
 		context = this.getApplicationContext();
 		getSupportActionBar().hide();
 		setContentView(R.layout.activity_menu_layout);
@@ -83,7 +89,7 @@ public class MenuActivity extends AppCompatActivity {
 								break;
 							case R.id.action_friend_list:
 								drawerLayout.openDrawer(Gravity.RIGHT);
-								instance.openFriendListDialog();
+								INSTANCE.openFriendListDialog();
 								break;
 							case R.id.action_shop:
 								viewPager.setCurrentItem(3);
@@ -123,6 +129,12 @@ public class MenuActivity extends AppCompatActivity {
 
 		initViewPager(viewPager);
 
+		snack = Snackbar.make(findViewById(R.id.drawer_layout), "No internet connetion. ", Snackbar.LENGTH_INDEFINITE);
+		View view = snack.getView();
+		FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
+		params.gravity = Gravity.TOP;
+		view.setLayoutParams(params);
+
 	}
 
 	private void initViewPager(ViewPager viewPager) {
@@ -149,13 +161,15 @@ public class MenuActivity extends AppCompatActivity {
         friendsRecyclerView.setAdapter(friendAdapter);
         drawerLayout.openDrawer(Gravity.RIGHT);
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("playerId", userId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        homeController.getFriendList(jsonObject);
+        if(!populated){
+			JSONObject jsonObject = new JSONObject();
+			try {
+				jsonObject.put("playerId", userId);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			homeController.getFriendList(jsonObject);
+		}
     }
 
     public void populateFriendListDialog(FriendList friendList){
@@ -165,12 +179,17 @@ public class MenuActivity extends AppCompatActivity {
             friendsRecyclerView.smoothScrollToPosition(0);
             friendAdapter.notifyDataSetChanged();
         });
+		populated = true;
     }
 
-	public void findGame(JSONObject jsonObject) {
-		homeController.findGame(jsonObject);
+    public void showNoInternetDialog(boolean show){
+		if(!show){
+			snack.dismiss();
+		}
+		if(show && !snack.isShown()){
+			snack.show();
+		}
 	}
-
 	public static Context getAppContext(){
 		return context;
 	}

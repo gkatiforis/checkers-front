@@ -54,14 +54,12 @@ public class LobbyFragment extends Fragment {
                 INSTANCE = new LobbyFragment();
             }
         }
+        INSTANCE.lobbyController = LobbyController.getInstance();
+        INSTANCE.lobbyController.setLobbyFragment(INSTANCE);
         return INSTANCE;
     }
 
-    public LobbyFragment() {
-        lobbyController = LobbyController.getInstance();
-        lobbyController.init(MenuActivity.userId);
-        lobbyController.setLobbyFragment(this);
-    }
+    public LobbyFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -102,14 +100,7 @@ public class LobbyFragment extends Fragment {
     }
 
     public void getLobby(){
-        LobbyController.getInstance().init(MenuActivity.userId);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("playerId", MenuActivity.userId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        lobbyController.getLobby(jsonObject);
+        lobbyController.getLobby();
     }
 
     public void populateLobby(Lobby lobby){
