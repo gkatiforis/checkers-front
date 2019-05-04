@@ -7,6 +7,7 @@ public class Notification implements Serializable {
     private long id;
     private String message;
     private String date;
+    private boolean isNew;
 
     public Notification() {
     }
@@ -38,5 +39,13 @@ public class Notification implements Serializable {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 }

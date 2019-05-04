@@ -84,18 +84,17 @@ public class NotificationFragment extends DialogFragment {
         super.show(manager, tag);
         if(!populated){
             notificationController.getNotificationList();
+            populated = true;
         }
     }
 
-    public void populateNotifications(NotificationList notificationList){
+    public void appendNotifications(List<Notification> notifications){
         Activity activity = getActivity();
         if(activity != null){
             activity.runOnUiThread(() -> {
-                notifications.clear();
-                notifications.addAll(notificationList.getNotifications());
+                this.notifications.addAll(0, notifications);
                 notificationAdapter.notifyDataSetChanged();
             });
-            populated = true;
         }
     }
 }

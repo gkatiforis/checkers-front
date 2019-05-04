@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -21,6 +22,8 @@ import com.katiforis.top10.R;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.controller.HomeController;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,9 +36,13 @@ public class HomeFragment extends Fragment {
     private HomeController homeController;
     public static GoogleSignInAccount account;
 
+    private Button logout;
     private Button play;
     private Button playWithFriend;
     private TextView username;
+    private ImageView playerImage;
+
+    GoogleSignInClient signInClient;
 
     public static HomeFragment getInstance() {
         if (INSTANCE == null) {
@@ -54,10 +61,11 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout,  null);
 
+        logout = v.findViewById(R.id.logout);
         play = v.findViewById(R.id.play);
         playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
-
+        playerImage =  v.findViewById(R.id.playerImage);
         if(MenuActivity.userId == null){
             startSignInIntent();
         }else{
@@ -65,6 +73,12 @@ public class HomeFragment extends Fragment {
 
         }
 
+        logout.setOnClickListener(p -> {
+            signInClient.signOut();
+        });
+
+       // LocalCache.getInstance().save(this.getActivity());
+        //LocalCache.getInstance().load(this.getActivity());
         play.setOnClickListener(p -> {
 			JSONObject jsonObject = new JSONObject();
 			try {
@@ -87,7 +101,7 @@ public class HomeFragment extends Fragment {
                 .requestEmail()
                 .build();
 
-        GoogleSignInClient signInClient =  GoogleSignIn.getClient(this.getActivity(), gso);
+        signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(intent, 0);
     }
@@ -111,16 +125,25 @@ public class HomeFragment extends Fragment {
             onLogin(account);
 
         } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            //updateUI(null);
         }
     }
 
     private void onLogin(GoogleSignInAccount account){
-        // Signed in successfully, show authenticated UI.
         username.setText(account.getDisplayName());
+
+        Picasso.with(this.getActivity())
+                .load(account.getPhotoUrl().toString()).error(R.mipmap.ic_launcher)
+                .into(playerImage, new Callback() {
+            @Override
+            public void onSuccess() {     }
+
+            @Override
+            public void onError() {
+               //TODO
+            }
+        });
+
         MenuActivity.userId = account.getId();
 
         JSONObject jsonObject = new JSONObject();

@@ -6,18 +6,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.katiforis.top10.DTO.Notification;
 import com.katiforis.top10.DTO.NotificationList;
 import com.katiforis.top10.DTO.ResponseState;
+import com.katiforis.top10.DTO.request.GetNotificationsRequest;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.conf.gson.DateTypeAdapter;
 import com.katiforis.top10.fragment.NotificationFragment;
 import com.katiforis.top10.stomp.Client;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.katiforis.top10.util.LocalCache;
 
 import java.util.Date;
+import java.util.List;
 
 import ua.naiksoftware.stomp.dto.StompMessage;
 
@@ -61,18 +62,24 @@ public class NotificationController extends MenuController {
                     .create();
 
             NotificationList notificationList = gson.fromJson(message, NotificationList.class);
-            notificationFragment.populateNotifications(notificationList);
+
+           List<Notification> notifications =
+                   LocalCache.getInstance().save(LocalCache.NOTIFICATIONS,
+                           notificationList.getNotifications(),
+                           notificationFragment.getActivity());
+
+            notificationFragment.appendNotifications(notifications);
         }
     }
 
     public void getNotificationList(){
         addTopic(MenuActivity.userId);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("playerId", MenuActivity.userId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Client.getInstance().send(Const.GET_NOTIFICATION_LIST, jsonObject.toString());
+
+        GetNotificationsRequest get = new GetNotificationsRequest(MenuActivity.userId, new Date().getTime());
+
+        final Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
+                .create();
+        Client.getInstance().send(Const.GET_NOTIFICATION_LIST, gson.toJson(get));
     }
 }
