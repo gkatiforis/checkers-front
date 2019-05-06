@@ -2,15 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_notification"
-        android:checked="false"
-        android:icon="@drawable/notification"
-        android:title=""
-        app:showAsAction="ifRoom" />
+    <!--<item-->
+        <!--android:id="@+id/action_notification"-->
+        <!--android:checked="false"-->
+        <!--android:icon="@drawable/notification"-->
+        <!--android:title=""-->
+        <!--app:showAsAction="ifRoom" />-->
+
+    <!--<item-->
+        <!--android:id="@+id/action_friend_list"-->
+        <!--android:checked="false"-->
+        <!--android:icon="@drawable/ic_contact"-->
+        <!--android:title=""-->
+        <!--app:showAsAction="ifRoom" />-->
+
 
     <item
-        android:id="@+id/action_friend_list"
+        android:id="@+id/action_rank"
         android:checked="false"
         android:icon="@drawable/ic_contact"
         android:title=""
@@ -20,13 +28,6 @@
         android:id="@+id/action_main_menu"
         android:checked="true"
         android:icon="@drawable/home"
-        android:title=""
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_rank"
-        android:checked="false"
-        android:icon="@drawable/ic_contact"
         android:title=""
         app:showAsAction="ifRoom" />
 

@@ -2,7 +2,7 @@ package com.katiforis.top10.conf;
 
 public class Const {
 //	public static final String address = "ws://192.168.1.2:5000/im/websocket";
-	public static final String address = "ws://192.168.252.90:5000/im/websocket";
+	public static final String address = "ws://192.168.1.2:5000/im/websocket";
 	//public static final String address = "ws://top10.us-east-2.elasticbeanstalk.com/im/websocket";
 
 	public static final String TAG = "TOP10";
@@ -13,6 +13,7 @@ public class Const {
 	public static final String LOGIN = MENU + "/login";
 	public static final String GET_FRIEND_LIST = MENU + "/friend";
 	public static final String GET_NOTIFICATION_LIST = MENU + "/notification";
+	public static final String GET_RANK = MENU + "/rank";
 	public static final String GET_LOBBY = MENU + "/lobby";
 	public static final String MAIN_TOPIC_RESPONSE = "/user/" + placeholder + "/main";
 

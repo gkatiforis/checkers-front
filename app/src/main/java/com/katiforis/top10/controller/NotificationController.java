@@ -2,23 +2,17 @@ package com.katiforis.top10.controller;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.katiforis.top10.DTO.Notification;
-import com.katiforis.top10.DTO.NotificationList;
-import com.katiforis.top10.DTO.ResponseState;
-import com.katiforis.top10.DTO.request.GetNotificationsRequest;
+import com.katiforis.top10.DTO.request.GetNotifications;
+import com.katiforis.top10.DTO.response.NotificationList;
+import com.katiforis.top10.DTO.response.ResponseState;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
-import com.katiforis.top10.conf.gson.DateTypeAdapter;
 import com.katiforis.top10.fragment.NotificationFragment;
 import com.katiforis.top10.stomp.Client;
-import com.katiforis.top10.util.LocalCache;
 
 import java.util.Date;
-import java.util.List;
 
 import ua.naiksoftware.stomp.dto.StompMessage;
 
@@ -57,29 +51,20 @@ public class NotificationController extends MenuController {
 
         Log.i(Const.TAG, "Receive: " + messageStatus);
          if(messageStatus.equalsIgnoreCase(ResponseState.NOTIFICATION_LIST.getState())){
-            final Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
-                    .create();
-
             NotificationList notificationList = gson.fromJson(message, NotificationList.class);
 
-           List<Notification> notifications =
-                   LocalCache.getInstance().save(LocalCache.NOTIFICATIONS,
-                           notificationList.getNotifications(),
-                           notificationFragment.getActivity());
+//           List<Notification> notifications =
+//                   LocalCache.getInstance().save(LocalCache.NOTIFICATIONS,
+//                           notificationList.getNotifications(),
+//                           notificationFragment.getActivity());
 
-            notificationFragment.appendNotifications(notifications);
+            notificationFragment.appendNotifications(notificationList.getNotifications());
         }
     }
 
     public void getNotificationList(){
         addTopic(MenuActivity.userId);
-
-        GetNotificationsRequest get = new GetNotificationsRequest(MenuActivity.userId, new Date().getTime());
-
-        final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
-                .create();
+        GetNotifications get = new GetNotifications(MenuActivity.userId, new Date().getTime());
         Client.getInstance().send(Const.GET_NOTIFICATION_LIST, gson.toJson(get));
     }
 }

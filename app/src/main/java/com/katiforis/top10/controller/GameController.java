@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.katiforis.top10.DTO.PlayerAnswer;
-import com.katiforis.top10.DTO.ResponseState;
+import com.katiforis.top10.DTO.response.ResponseState;
 import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;

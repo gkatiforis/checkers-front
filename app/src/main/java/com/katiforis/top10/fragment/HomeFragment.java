@@ -17,16 +17,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.katiforis.top10.DTO.PlayerDetails;
+import com.katiforis.top10.DTO.response.PlayerDetails;
 import com.katiforis.top10.R;
-import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.controller.HomeController;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import static android.content.ContentValues.TAG;
 
@@ -38,7 +34,7 @@ public class HomeFragment extends Fragment {
 
     private Button logout;
     private Button play;
-    private Button playWithFriend;
+    //private Button playWithFriend;
     private TextView username;
     private ImageView playerImage;
 
@@ -63,7 +59,7 @@ public class HomeFragment extends Fragment {
 
         logout = v.findViewById(R.id.logout);
         play = v.findViewById(R.id.play);
-        playWithFriend = v.findViewById(R.id.play_with_friend);
+        //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
         playerImage =  v.findViewById(R.id.playerImage);
         if(MenuActivity.userId == null){
@@ -77,18 +73,8 @@ public class HomeFragment extends Fragment {
             signInClient.signOut();
         });
 
-       // LocalCache.getInstance().save(this.getActivity());
-        //LocalCache.getInstance().load(this.getActivity());
         play.setOnClickListener(p -> {
-			JSONObject jsonObject = new JSONObject();
-			try {
-				jsonObject.put("fromUserID", MenuActivity.userId);
-				jsonObject.put("gameId", GameActivity.getGameId());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-
-		   homeController.findGame(jsonObject);
+		   homeController.findGame();
         });
 
         return v;
@@ -146,15 +132,7 @@ public class HomeFragment extends Fragment {
 
         MenuActivity.userId = account.getId();
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            //	jsonObject.put("userID", chatUserId.getText().toString());
-            jsonObject.put("playerId", account.getId());
-            jsonObject.put("username",  account.getDisplayName());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        HomeController.getInstance().login(jsonObject);
+        HomeController.getInstance().login(account);
     }
 
     public void populatePlayerDetails(PlayerDetails playerDetails){

@@ -2,11 +2,15 @@ package com.katiforis.top10.util;
 
 import android.content.Context;
 
+import com.katiforis.top10.DTO.response.RankList;
+
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class LocalCache {
@@ -14,6 +18,7 @@ public class LocalCache {
 
     private static final String filename = "top10";
     public static final String NOTIFICATIONS = "notifications";
+    public static final String RANK = "rank";
 
     public static LocalCache getInstance() {
         if (INSTANCE == null) {
@@ -24,42 +29,47 @@ public class LocalCache {
         return INSTANCE;
     }
 
-    public <T> List<T> save(String key, List<T> values, Context context) {
-        List<T> objects;
-        try {
-            Map<String, List<T>> map = load(context);
-            objects = map.get(key);
-            if(objects == null){
-                map.put(key, values);
+    public RankList saveRank(RankList rankList, Context context) {
+            Map<String, Object> map = load(context);
+            RankList cached = (RankList)map.get(RANK);
+            if(cached == null){
+                map.put(RANK, rankList);
             }else{
-                objects.addAll(0, values);
-                map.put(key, objects);
+                cached.getPlayers().addAll(0, rankList.getPlayers());
+                map.put(RANK, cached);
             }
+            save(map, context);
+        return rankList;
+    }
 
-            FileOutputStream outputStream;
-            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            ObjectOutputStream s = new ObjectOutputStream(outputStream);
-            s.writeObject(map);
-            s.close();
-            outputStream.close();
-        } catch (Exception e) {
-            return null;
-        }
-        return values;
+    private Map save(Map map, Context context) {
+       try (FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+           ObjectOutputStream s = new ObjectOutputStream(outputStream)){
+           s.writeObject(map);
+           return map;
+       } catch (FileNotFoundException e) {
+           e.printStackTrace();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+        return null;
     }
 
     private Map load(Context context) {
-        Map map;
-        try {
-            FileInputStream fileInputStream;
-            fileInputStream = context.openFileInput(filename);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            map = (Map) objectInputStream.readObject();
-            fileInputStream.close();
-            objectInputStream.close();
-        } catch (Exception e) {
-           return null;
+        try ( FileInputStream fileInputStream = context.openFileInput(filename);
+              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+            Map map = (Map) objectInputStream.readObject();
+            if(map == null){
+                map = new HashMap<>();
+            }
+            return map;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return map;
+        return new HashMap<>();
     }
 }

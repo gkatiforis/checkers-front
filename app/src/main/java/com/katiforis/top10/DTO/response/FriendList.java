@@ -1,10 +1,13 @@
-package com.katiforis.top10.DTO;
+package com.katiforis.top10.DTO.response;
 
+
+import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.response.BaseResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendList extends Game {
+public class FriendList extends BaseResponse {
     List<Player> players = new ArrayList<>();
     public FriendList(String status) {
         super(status);
@@ -12,10 +15,6 @@ public class FriendList extends Game {
 
     public FriendList(String gameId, String status) {
         super(gameId, status);
-    }
-
-    public FriendList(String status, String gameId, String userId) {
-        super(status, gameId, userId);
     }
 
     public List<Player> getPlayers() {

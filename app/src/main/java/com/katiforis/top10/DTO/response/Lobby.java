@@ -1,10 +1,12 @@
-package com.katiforis.top10.DTO;
+package com.katiforis.top10.DTO.response;
 
+
+import com.katiforis.top10.DTO.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lobby extends Game {
+public class Lobby extends BaseResponse {
     List<Player> players = new ArrayList<>();
     public Lobby(String status) {
         super(status);
@@ -12,10 +14,6 @@ public class Lobby extends Game {
 
     public Lobby(String gameId, String status) {
         super(gameId, status);
-    }
-
-    public Lobby(String status, String gameId, String userId) {
-        super(status, gameId, userId);
     }
 
     public List<Player> getPlayers() {

@@ -7,9 +7,7 @@ import java.util.Set;
 public class Question implements Serializable {
 
     private long id;
-
     private String description;
-
     private List<Answer> answers;
     private Set<PlayerAnswer> currentAnswers;
 

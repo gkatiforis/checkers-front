@@ -2,22 +2,17 @@ package com.katiforis.top10.controller;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.katiforis.top10.DTO.Lobby;
-import com.katiforis.top10.DTO.ResponseState;
+import com.katiforis.top10.DTO.response.Lobby;
+import com.katiforis.top10.DTO.response.ResponseState;
 import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
-import com.katiforis.top10.conf.gson.DateTypeAdapter;
 import com.katiforis.top10.fragment.LobbyFragment;
 import com.katiforis.top10.stomp.Client;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Date;
 
 import ua.naiksoftware.stomp.dto.StompMessage;
 
@@ -59,10 +54,6 @@ public class LobbyController extends MenuController{
 
         Log.i(Const.TAG, "Receive: " + messageStatus);
          if(messageStatus.equalsIgnoreCase(ResponseState.LOBBY.getState())){
-            final Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
-                    .create();
-
             Lobby lobby = gson.fromJson(message, Lobby.class);
             lobbyFragment.populateLobby(lobby);
         }

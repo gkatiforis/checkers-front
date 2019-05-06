@@ -12,6 +12,9 @@ import java.util.List;
 
 import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.R;
+import com.katiforis.top10.activities.MenuActivity;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder>{
     private List<Player> players;
@@ -32,7 +35,20 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
 
     @Override
     public void onBindViewHolder(PlayerViewHolder holder, final int position) {
-        holder.imageView.setImageResource(players.get(position).getImg());
+        Picasso.with(MenuActivity.getAppContext())
+                .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                .error(R.mipmap.ic_launcher)
+                .into(holder.imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {     }
+
+                    @Override
+                    public void onError() {
+                        //TODO
+                    }
+                });
+
+        //holder.imageView.setImageResource(players.get(position).getImageUrl());
         holder.textView.setText(players.get(position).getUsername() + "(" + players.get(position).getPoints() + ")");
 //        holder.imageView.setOnClickListener(new View.OnClickListener() {
 //            @Override

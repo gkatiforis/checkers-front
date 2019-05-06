@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.katiforis.top10.DTO.Answer;
 import com.katiforis.top10.DTO.Player;
-import com.katiforis.top10.DTO.GameState;
+import com.katiforis.top10.DTO.response.GameState;
 import com.katiforis.top10.DTO.PlayerAnswer;
 import com.katiforis.top10.DTO.Question;
 import com.katiforis.top10.R;
@@ -36,7 +36,6 @@ import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.controller.GameController;
 import com.katiforis.top10.game.QuestionHandler;
 import com.katiforis.top10.game.QuestionHandlerImpl;
-import com.katiforis.top10.speech.PermissionHandler;
 import com.katiforis.top10.speech.SpeechRecognizerManager;
 import com.katiforis.top10.adapter.PlayerAdapter;
 

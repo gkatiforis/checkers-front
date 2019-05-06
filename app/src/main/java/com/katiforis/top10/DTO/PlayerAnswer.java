@@ -1,25 +1,20 @@
 package com.katiforis.top10.DTO;
 
 
-public class PlayerAnswer {
+import com.katiforis.top10.DTO.response.GameResponse;
+import com.katiforis.top10.DTO.response.ResponseState;
+
+public class PlayerAnswer extends GameResponse {
     private String description;
     private Integer points;
     private boolean isCorrect = false;
     private boolean hasAlreadyBeenSaid = false;
     private long questionId;
     private Player player;
-    private String userId;
 
+    public PlayerAnswer(){this.status = ResponseState.ANSWER.getState();}
     public String getDescription() {
         return description;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public void setDescription(String description) {

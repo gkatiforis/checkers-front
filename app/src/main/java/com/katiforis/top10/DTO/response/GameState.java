@@ -1,16 +1,21 @@
-package com.katiforis.top10.DTO;
+package com.katiforis.top10.DTO.response;
+
+import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.Question;
+import com.katiforis.top10.DTO.response.BaseResponse;
+import com.katiforis.top10.DTO.response.GameResponse;
 
 import java.util.Date;
 import java.util.List;
 
-public class GameState extends Game {
+public class GameState extends GameResponse {
     private List<Player> players;
     private List<Question> questions;
     private Date dateStarted;
     private Date currentDate;
 
     public GameState(){
-        super("");
+        super();
     }
     public List<Player> getPlayers() {
         return players;

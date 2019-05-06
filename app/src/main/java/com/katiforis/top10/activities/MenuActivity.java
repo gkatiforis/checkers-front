@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.katiforis.top10.DTO.FriendList;
+import com.katiforis.top10.DTO.response.FriendList;
 import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.adapter.FriendAdapter;
 import com.katiforis.top10.adapter.ViewPagerAdapter;
@@ -27,17 +27,17 @@ import com.katiforis.top10.R;
 import com.katiforis.top10.controller.HomeController;
 import com.katiforis.top10.fragment.LobbyFragment;
 import com.katiforis.top10.fragment.HomeFragment;
-import com.katiforis.top10.fragment.NotificationFragment;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.katiforis.top10.fragment.RankFragment;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
 	public static MenuActivity INSTANCE;
 	private static Context context;
+
+	private static final int MAIN_MENU_TAB_INDEX = 1;
+	private static final int RANK_TAB_INDEX = 0;
+	private static final int SHOP_TAB_INDEX = 2;
 
 	public static String userId = null;
 	public static boolean populated;
@@ -81,20 +81,23 @@ public class MenuActivity extends AppCompatActivity {
 					@Override
 					public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 						switch (item.getItemId()) {
-							case R.id.action_notification:
-								NotificationFragment notificationFragment =	NotificationFragment.getInstance();
-								notificationFragment.show(getSupportFragmentManager(), "dialog");
+//							case R.id.action_notification:
+//								NotificationFragment notificationFragment =	NotificationFragment.getInstance();
+//								notificationFragment.show(getSupportFragmentManager(), "dialog");
 							case R.id.action_main_menu:
-								viewPager.setCurrentItem(2);
+								viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
 								break;
-							case R.id.action_friend_list:
-								drawerLayout.openDrawer(Gravity.RIGHT);
-								INSTANCE.openFriendListDialog();
-								break;
+//							case R.id.action_friend_list:
+//								drawerLayout.openDrawer(Gravity.RIGHT);
+//								INSTANCE.openFriendListDialog();
+//								break;
 							case R.id.action_shop:
-								viewPager.setCurrentItem(3);
-							LobbyFragment.getInstance().getLobby();
+								viewPager.setCurrentItem(SHOP_TAB_INDEX);
 							    break;
+							case R.id.action_rank:
+								viewPager.setCurrentItem(RANK_TAB_INDEX);
+								RankFragment.getInstance().getRankList();
+								break;
 						}
 						return false;
 					}
@@ -139,13 +142,12 @@ public class MenuActivity extends AppCompatActivity {
 
 	private void initViewPager(ViewPager viewPager) {
 		ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-		adapter.addFragment(new android.support.v4.app.Fragment());
-		adapter.addFragment(new android.support.v4.app.Fragment());
+		adapter.addFragment(RankFragment.getInstance());
 		adapter.addFragment(HomeFragment.getInstance());
-		adapter.addFragment(LobbyFragment.getInstance());
 		adapter.addFragment(new android.support.v4.app.Fragment());
+		adapter.addFragment(LobbyFragment.getInstance());
 		viewPager.setAdapter(adapter);
-		viewPager.setCurrentItem(2);
+		viewPager.setCurrentItem(1);
 	}
 
     private void openFriendListDialog(){
@@ -162,13 +164,7 @@ public class MenuActivity extends AppCompatActivity {
         drawerLayout.openDrawer(Gravity.RIGHT);
 
         if(!populated){
-			JSONObject jsonObject = new JSONObject();
-			try {
-				jsonObject.put("playerId", userId);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			homeController.getFriendList(jsonObject);
+			homeController.getFriendList();
 		}
     }
 

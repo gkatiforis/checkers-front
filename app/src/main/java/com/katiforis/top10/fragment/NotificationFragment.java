@@ -15,14 +15,9 @@ import android.view.View;
 import android.widget.Button;
 
 import com.katiforis.top10.DTO.Notification;
-import com.katiforis.top10.DTO.NotificationList;
 import com.katiforis.top10.R;
-import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.adapter.NotificationAdapter;
 import com.katiforis.top10.controller.NotificationController;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;

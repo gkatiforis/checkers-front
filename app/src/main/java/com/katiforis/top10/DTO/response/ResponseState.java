@@ -1,4 +1,4 @@
-package com.katiforis.top10.DTO;
+package com.katiforis.top10.DTO.response;
 
 public enum ResponseState {
 
@@ -9,6 +9,7 @@ public enum ResponseState {
     FRIEND_LIST("friend_list"),
     LOBBY("lobby"),
     NOTIFICATION_LIST("notification_list"),
+    RANK_LIST("rank_list"),
     PLAYER_DETAILS("player_details");
 
     public String state;

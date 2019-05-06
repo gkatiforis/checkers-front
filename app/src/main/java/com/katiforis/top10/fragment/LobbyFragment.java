@@ -15,16 +15,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.katiforis.top10.DTO.Lobby;
+import com.katiforis.top10.DTO.response.Lobby;
 import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.R;
-import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.adapter.InviteFriendAdapter;
 import com.katiforis.top10.adapter.PlayerLobbyAdapter;
 import com.katiforis.top10.controller.LobbyController;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;

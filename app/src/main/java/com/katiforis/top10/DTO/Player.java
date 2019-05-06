@@ -1,7 +1,5 @@
 package com.katiforis.top10.DTO;
 
-import com.katiforis.top10.R;
-
 import java.io.Serializable;
 
 
@@ -11,26 +9,26 @@ public class Player implements Serializable {
     private String username;
     private String fullName;
     private Integer points;
-    private int img;//TODO image
+    private String imageUrl;
 
     public Player() {
     }
 
-    public Player(long id, String playerId, String username, String fullName, Integer points, int img) {
+    public Player(long id, String playerId, String username, String fullName, Integer points, String imageUrl) {
         this.id = id;
         this.playerId = playerId;
         this.username = username;
         this.fullName = fullName;
         this.points = points;
-        this.img = img;
+        this.imageUrl = imageUrl;
     }
 
-    public int getImg() {
-        return img;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImg(int img) {
-        this.img = img;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public long getId() {

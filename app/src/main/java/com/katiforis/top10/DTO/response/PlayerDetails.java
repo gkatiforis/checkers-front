@@ -1,7 +1,6 @@
-package com.katiforis.top10.DTO;
+package com.katiforis.top10.DTO.response;
 
-
-public class PlayerDetails extends Game{
+public class PlayerDetails extends BaseResponse {
     private String username;
     public PlayerDetails(String status) {
         super(status);
@@ -14,11 +13,6 @@ public class PlayerDetails extends Game{
 
     public PlayerDetails(String gameId, String status, String username) {
         super(gameId, status);
-        this.username = username;
-    }
-
-    public PlayerDetails(String status, String gameId, String userId, String username) {
-        super(status, gameId, userId);
         this.username = username;
     }
 
