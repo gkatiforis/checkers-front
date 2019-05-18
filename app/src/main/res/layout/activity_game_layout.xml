@@ -94,34 +94,11 @@
         app:layout_constraintLeft_toRightOf="@+id/editText"></Button>
 
     <Button
-        android:id="@+id/voice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="voice"
-        app:layout_constraintBottom_toTopOf="@+id/getLetter"
-        app:layout_constraintLeft_toRightOf="@+id/send"></Button>
-
-    <Button
         android:id="@+id/getLetter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="get letter"
         app:layout_constraintBottom_toBottomOf="parent"></Button>
 
-    <Button
-        android:id="@+id/getTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="get time"
-        app:layout_constraintLeft_toRightOf="@+id/getLetter"
-        app:layout_constraintBottom_toBottomOf="parent"></Button>
-
-    <Button
-        android:id="@+id/stun"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="stun"
-        app:layout_constraintLeft_toRightOf="@+id/getTime"
-        app:layout_constraintBottom_toBottomOf="parent"></Button>
 
 </android.support.constraint.ConstraintLayout>

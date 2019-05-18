@@ -1,15 +1,13 @@
 package com.katiforis.top10.DTO.response;
 
-import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.PlayerDto;
 import com.katiforis.top10.DTO.Question;
-import com.katiforis.top10.DTO.response.BaseResponse;
-import com.katiforis.top10.DTO.response.GameResponse;
 
 import java.util.Date;
 import java.util.List;
 
 public class GameState extends GameResponse {
-    private List<Player> players;
+    private List<PlayerDto> players;
     private List<Question> questions;
     private Date dateStarted;
     private Date currentDate;
@@ -17,11 +15,11 @@ public class GameState extends GameResponse {
     public GameState(){
         super();
     }
-    public List<Player> getPlayers() {
+    public List<PlayerDto> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<Player> players) {
+    public void setPlayers(List<PlayerDto> players) {
         this.players = players;
     }
 

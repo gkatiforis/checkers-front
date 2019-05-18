@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.PlayerDto;
 import com.katiforis.top10.DTO.response.RankList;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.MenuActivity;
@@ -31,7 +31,7 @@ public class RankFragment extends Fragment {
 
     private RecyclerView rankRecyclerView;
     private RankAdapter rankAdapter;
-    private List<Player> rankList = new ArrayList<>();
+    private List<PlayerDto> rankList = new ArrayList<>();
 
     private TextView rank, username, level, points;
     private ImageView playerImage;
@@ -102,10 +102,10 @@ public class RankFragment extends Fragment {
         Activity activity = getActivity();
         if(activity != null){
             activity.runOnUiThread(() -> {
-               List<Player> players = rankList.getPlayers();
-                Player first = players.get(0);
-                Player second = players.get(1);
-                Player third = players.get(2);
+               List<PlayerDto> players = rankList.getPlayers();
+                PlayerDto first = players.get(0);
+                PlayerDto second = players.get(1);
+                PlayerDto third = players.get(2);
                 players.remove(0);
                 players.remove(1);
                 players.remove(2);

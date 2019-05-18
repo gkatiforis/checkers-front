@@ -1,15 +1,14 @@
 package com.katiforis.top10.controller;
 
-import android.content.Intent;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.katiforis.top10.DTO.PlayerAnswer;
+import com.katiforis.top10.DTO.response.GameStats;
 import com.katiforis.top10.DTO.response.ResponseState;
 import com.katiforis.top10.activities.GameActivity;
-import com.katiforis.top10.activities.MenuActivity;
 import com.katiforis.top10.conf.Const;
+import com.katiforis.top10.fragment.GameStatsFragment;
 import com.katiforis.top10.stomp.Client;
 
 import ua.naiksoftware.stomp.dto.StompMessage;
@@ -21,11 +20,13 @@ public class GameController extends AbstractController{
 
     private GameActivity gameActivity;
 
+    private GameStatsFragment gameStatsFragment;
+
     private GameController(){ }
 
     public static GameController getInstance() {
         if (INSTANCE == null) {
-            synchronized (NotificationController.class) {
+            synchronized (GameController.class) {
                 INSTANCE = new GameController();
             }
         }
@@ -41,13 +42,11 @@ public class GameController extends AbstractController{
             //JSONObject message= messageWrapper.getJSONObject("message");
 
             if (messageStatus.equalsIgnoreCase(ResponseState.END_GAME.getState())) {
-                // MenuActivity.userId = userId;
-                Intent intent = new Intent();
-
-                GameActivity.saveGameId(message.get("gameId").getAsString());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setClass(MenuActivity.getAppContext(), MenuActivity.class);
-                MenuActivity.getAppContext().startActivity(intent);
+                Gson gson = new Gson();
+                GameStats gameStats = gson.fromJson(message, GameStats.class);
+                gameStatsFragment = GameStatsFragment.getInstance();
+                gameStatsFragment.show(gameActivity.getSupportFragmentManager(), "");
+                gameStatsFragment.setGameStats(gameStats);
             } else if (messageStatus.equalsIgnoreCase(ResponseState.ANSWER.getState())) {
                 Gson gson = new Gson();
                 PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
@@ -73,6 +72,10 @@ public class GameController extends AbstractController{
 
     public void setGameActivity(GameActivity gameActivity) {
         this.gameActivity = gameActivity;
+    }
+
+    public void setGameStatsFragment(GameStatsFragment gameStatsFragment) {
+        this.gameStatsFragment = gameStatsFragment;
     }
 
     public void addTopic(String gameId) {

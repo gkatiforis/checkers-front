@@ -15,8 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.katiforis.top10.DTO.PlayerDto;
 import com.katiforis.top10.DTO.response.Lobby;
-import com.katiforis.top10.DTO.Player;
 import com.katiforis.top10.R;
 import com.katiforis.top10.adapter.InviteFriendAdapter;
 import com.katiforis.top10.adapter.PlayerLobbyAdapter;
@@ -36,11 +36,11 @@ public class LobbyFragment extends Fragment {
 
     private RecyclerView invitationFriendRecyclerView;
     private InviteFriendAdapter inviteFriendAdapter;
-    private List<Player> inviteFriends = new ArrayList<>();
+    private List<PlayerDto> inviteFriends = new ArrayList<>();
 
     private RecyclerView lobbyRecyclerView;
     private PlayerLobbyAdapter playerLobbyAdapter;
-    private List<Player> lobbyPlayers = new ArrayList<>();
+    private List<PlayerDto> lobbyPlayers = new ArrayList<>();
 
     private LobbyController lobbyController;
 

@@ -9,18 +9,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
-
-import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.PlayerDto;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.MenuActivity;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder>{
-    private List<Player> players;
+    private List<PlayerDto> players;
     Context context;
 
-    public PlayerAdapter(List<Player> players, Context context){
+    public PlayerAdapter(List<PlayerDto> players, Context context){
         this.players = players;
         this.context = context;
     }
@@ -49,7 +48,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
                 });
 
         //holder.imageView.setImageResource(players.get(position).getImageUrl());
-        holder.textView.setText(players.get(position).getUsername() + "(" + players.get(position).getPoints() + ")");
+        holder.textView.setText(players.get(position).getUsername() + "(" + players.get(position).getPlayerDetails().getElo() + ")");
 //        holder.imageView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {

@@ -1,12 +1,12 @@
 package com.katiforis.top10.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.katiforis.top10.DTO.Answer;
-import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.PlayerDto;
 import com.katiforis.top10.DTO.response.GameState;
 import com.katiforis.top10.DTO.PlayerAnswer;
 import com.katiforis.top10.DTO.Question;
@@ -41,7 +41,7 @@ import com.katiforis.top10.adapter.PlayerAdapter;
 
 import tyrantgit.explosionfield.ExplosionField;
 
-public class GameActivity extends Activity {
+public class GameActivity extends AppCompatActivity {
 
     public static GameActivity INSTANCE;
 	long currentQuestionId;
@@ -68,7 +68,7 @@ public class GameActivity extends Activity {
 
 	private RecyclerView userRecyclerView;
 	private PlayerAdapter playerAdapter;
-	private List<Player> userList = new ArrayList<>();
+	private List<PlayerDto> userList = new ArrayList<>();
 
 	private SpeechRecognizerManager mSpeechManager;
 
@@ -150,9 +150,9 @@ public class GameActivity extends Activity {
 	ExplosionField explosionField;
 
 	void initComponents(){
+		getSupportActionBar().hide();
 		explosionField = ExplosionField.attach2Window(this);
 		questionHandler = new QuestionHandlerImpl();
-		//questionHandler.initTest();
 
 		answerText = findViewById(R.id.editText);
 		questionText = findViewById(R.id.textView);
@@ -257,15 +257,15 @@ public class GameActivity extends Activity {
 
 
 	private void updatePlayerScore(String username, String points) {
-		for (Player player :userList){
+		for (PlayerDto player :userList){
 			if(player.getUsername().equals(username)){
-				player.setPoints(player.getPoints() + Integer.valueOf(points));
+				player.getPlayerDetails().setElo(player.getPlayerDetails().getElo() + Integer.valueOf(points));
 			}
 		}
 		playerAdapter.notifyDataSetChanged();
 	}
 
-	void setPlayerList(List<Player> players){
+	void setPlayerList(List<PlayerDto> players){
 		userList.clear();
 		userList.addAll(players);
 		playerAdapter.notifyDataSetChanged();

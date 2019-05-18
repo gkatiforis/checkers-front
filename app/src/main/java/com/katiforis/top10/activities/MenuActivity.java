@@ -19,16 +19,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.katiforis.top10.DTO.PlayerDto;
 import com.katiforis.top10.DTO.response.FriendList;
-import com.katiforis.top10.DTO.Player;
+import com.katiforis.top10.DTO.response.GameStats;
 import com.katiforis.top10.adapter.FriendAdapter;
 import com.katiforis.top10.adapter.ViewPagerAdapter;
 import com.katiforis.top10.R;
 import com.katiforis.top10.controller.HomeController;
+import com.katiforis.top10.fragment.GameStatsFragment;
 import com.katiforis.top10.fragment.LobbyFragment;
 import com.katiforis.top10.fragment.HomeFragment;
 import com.katiforis.top10.fragment.RankFragment;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
@@ -53,7 +56,7 @@ public class MenuActivity extends AppCompatActivity {
 
     private RecyclerView friendsRecyclerView;
     private FriendAdapter friendAdapter;
-    private List<Player> friends = new ArrayList<>();
+    private List<PlayerDto> friends = new ArrayList<>();
 
 	Snackbar snack;
 
@@ -132,7 +135,7 @@ public class MenuActivity extends AppCompatActivity {
 
 		initViewPager(viewPager);
 
-		snack = Snackbar.make(findViewById(R.id.drawer_layout), "No internet connetion. ", Snackbar.LENGTH_INDEFINITE);
+		snack = Snackbar.make(findViewById(R.id.drawer_layout), "No internet connection. ", Snackbar.LENGTH_INDEFINITE);
 		View view = snack.getView();
 		FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
 		params.gravity = Gravity.TOP;
@@ -147,7 +150,7 @@ public class MenuActivity extends AppCompatActivity {
 		adapter.addFragment(new android.support.v4.app.Fragment());
 		adapter.addFragment(LobbyFragment.getInstance());
 		viewPager.setAdapter(adapter);
-		viewPager.setCurrentItem(1);
+		viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
 	}
 
     private void openFriendListDialog(){
