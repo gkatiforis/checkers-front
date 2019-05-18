@@ -3,6 +3,7 @@ package com.katiforis.top10.DTO.response;
 import java.io.Serializable;
 
 public abstract class BaseResponse implements Serializable {
+    static final long serialVersionUID =-1396596853487889445L;
     protected String status;
     protected String userId;
 

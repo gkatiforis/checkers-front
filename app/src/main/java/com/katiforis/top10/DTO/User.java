@@ -3,6 +3,7 @@ package com.katiforis.top10.DTO;
 import java.io.Serializable;
 
 public class User implements Serializable {
+    static final long serialVersionUID =-4596596853482889445L;
     private long id;
     private String username;
     private String imageUrl;

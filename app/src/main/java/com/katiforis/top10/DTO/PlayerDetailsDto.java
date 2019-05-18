@@ -3,7 +3,7 @@ package com.katiforis.top10.DTO;
 import java.io.Serializable;
 
 public class PlayerDetailsDto implements Serializable {
-
+    static final long serialVersionUID =-1396596853902889445L;
     private int elo;
     private int level;
     private int levelPoints;

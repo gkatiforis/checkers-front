@@ -95,6 +95,8 @@ public class RankFragment extends Fragment {
         if(!populated){
             rankController.getRankList(MenuActivity.userId);
             populated = true;
+        }else{
+            rankController.getRankListIfExpired(MenuActivity.userId);
         }
     }
 
@@ -103,30 +105,32 @@ public class RankFragment extends Fragment {
         if(activity != null){
             activity.runOnUiThread(() -> {
                List<PlayerDto> players = rankList.getPlayers();
-                PlayerDto first = players.get(0);
-                PlayerDto second = players.get(1);
-                PlayerDto third = players.get(2);
-                players.remove(0);
-                players.remove(1);
-                players.remove(2);
+               if(players.size() >=3){
+                   PlayerDto first = players.get(0);
+                   PlayerDto second = players.get(1);
+                   PlayerDto third = players.get(2);
+                   players.remove(0);
+                   players.remove(1);
+                   players.remove(2);
 
-                Picasso.with(MenuActivity.getAppContext())
-                        .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
-                        .error(R.mipmap.ic_launcher)
-                        .into(playerImage);
-                username.setText(first.getUsername());
+                   Picasso.with(MenuActivity.getAppContext())
+                           .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                           .error(R.mipmap.ic_launcher)
+                           .into(playerImage);
+                   username.setText(first.getUsername());
 
-                Picasso.with(MenuActivity.getAppContext())
-                        .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
-                        .error(R.mipmap.ic_launcher)
-                        .into(playerImage2);
-                username2.setText(second.getUsername());
+                   Picasso.with(MenuActivity.getAppContext())
+                           .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                           .error(R.mipmap.ic_launcher)
+                           .into(playerImage2);
+                   username2.setText(second.getUsername());
 
-                Picasso.with(MenuActivity.getAppContext())
-                        .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
-                        .error(R.mipmap.ic_launcher)
-                        .into(playerImage3);
-                username3.setText(third.getUsername());
+                   Picasso.with(MenuActivity.getAppContext())
+                           .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                           .error(R.mipmap.ic_launcher)
+                           .into(playerImage3);
+                   username3.setText(third.getUsername());
+               }
 
                 this.rankList.clear();
                 this.rankList.addAll(players);

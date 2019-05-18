@@ -14,6 +14,8 @@ import com.katiforis.top10.util.LocalCache;
 
 import ua.naiksoftware.stomp.dto.StompMessage;
 
+import static com.katiforis.top10.util.CachedObjectProperties.RANK_LIST;
+
 
 public class RankController extends MenuController {
     private static RankController INSTANCE = null;
@@ -48,7 +50,7 @@ public class RankController extends MenuController {
         Log.i(Const.TAG, "Receive: " + messageStatus);
          if(messageStatus.equalsIgnoreCase(ResponseState.RANK_LIST.getState())){
             RankList rankList = gson.fromJson(message, RankList.class);
-            rankList = LocalCache.getInstance().saveRank(rankList, rankFragment.getActivity());
+            rankList = LocalCache.getInstance().save(rankList, RANK_LIST, rankFragment.getActivity());
             rankFragment.setRankList(rankList);
         }
     }
@@ -57,8 +59,25 @@ public class RankController extends MenuController {
         if(playerId == null)
             return;
 
-        addTopic(playerId);
-        GetRank get = new GetRank(playerId);
-        Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
+        RankList rankList = LocalCache.getInstance().get(RANK_LIST, rankFragment.getActivity());
+        if(rankList != null){
+            rankFragment.setRankList(rankList);
+        }
+        else{
+            addTopic(playerId);
+            GetRank get = new GetRank(playerId);
+            Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
+        }
+    }
+
+    public void getRankListIfExpired(String playerId){
+        if(playerId == null)
+            return;
+        RankList rankList = LocalCache.getInstance().get(RANK_LIST, rankFragment.getActivity());
+        if(rankList == null){
+            addTopic(playerId);
+            GetRank get = new GetRank(playerId);
+            Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
+        }
     }
 }

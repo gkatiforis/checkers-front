@@ -2,7 +2,8 @@ package com.katiforis.top10.DTO;
 
 import java.io.Serializable;
 
-public class PlayerDto extends User implements Serializable {
+public class PlayerDto extends User  implements Serializable{
+    static final long serialVersionUID =-1396596853482889445L;
     private String playerId;
     private PlayerDetailsDto playerDetails;
 
