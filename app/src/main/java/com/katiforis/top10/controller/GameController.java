@@ -42,6 +42,7 @@ public class GameController extends AbstractController{
             //JSONObject message= messageWrapper.getJSONObject("message");
 
             if (messageStatus.equalsIgnoreCase(ResponseState.END_GAME.getState())) {
+                Client.clearTopics(this.getClass().getName());
                 Gson gson = new Gson();
                 GameStats gameStats = gson.fromJson(message, GameStats.class);
                 gameStatsFragment = GameStatsFragment.getInstance();

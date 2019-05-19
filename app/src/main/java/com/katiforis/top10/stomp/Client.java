@@ -109,6 +109,10 @@ public class Client {
         }
     }
 
+    public static void clearTopics(final String controllerId){
+        topicsByControllers.remove(controllerId);
+    }
+
     public static void send(String destination, String data){
          stompClient.send(destination, data).subscribe(
                  ()->  Log.d(TAG, "Data sent"),

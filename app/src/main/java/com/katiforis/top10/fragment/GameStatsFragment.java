@@ -74,7 +74,7 @@ public class GameStatsFragment extends DialogFragment {
     }
 
     public void setGameStats(GameStats gameStats){
-        this.players.addAll(0, gameStats.getPlayers());
+        this.players = gameStats.getPlayers();
         Activity activity = getActivity();
         if(activity != null){
             activity.runOnUiThread(() -> {
