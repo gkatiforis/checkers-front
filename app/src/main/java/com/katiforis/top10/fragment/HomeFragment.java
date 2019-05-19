@@ -118,17 +118,20 @@ public class HomeFragment extends Fragment {
     private void onLogin(GoogleSignInAccount account){
         username.setText(account.getDisplayName());
 
-        Picasso.with(this.getActivity())
-                .load(account.getPhotoUrl().toString()).error(R.mipmap.ic_launcher)
-                .into(playerImage, new Callback() {
-            @Override
-            public void onSuccess() {     }
+        if(account.getPhotoUrl() != null){
+            Picasso.with(this.getActivity())
+                    .load(account.getPhotoUrl().toString()).error(R.mipmap.ic_launcher)
+                    .into(playerImage, new Callback() {
+                        @Override
+                        public void onSuccess() {     }
 
-            @Override
-            public void onError() {
-               //TODO
-            }
-        });
+                        @Override
+                        public void onError() {
+                            //TODO
+                        }
+                    });
+        }
+
 
         MenuActivity.userId = account.getId();
 
