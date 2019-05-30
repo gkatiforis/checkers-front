@@ -60,13 +60,7 @@ public class LobbyController extends MenuController{
     }
 
     public void getLobby(){
-        addTopic(MenuActivity.userId);
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("playerId", MenuActivity.userId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Client.getInstance().send(Const.GET_LOBBY, jsonObject.toString());
+        addTopic();
+        Client.getInstance().send(Const.GET_LOBBY);
     }
 }

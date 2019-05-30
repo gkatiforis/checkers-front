@@ -11,10 +11,6 @@ public class FindGame extends BaseRequest {
 		this.gameId = gameId;
 	}
 
-	public FindGame(String playerId, String gameId) {
-		super(playerId);
-		this.gameId = gameId;
-	}
 
 	public String getGameId() {
 		return gameId;

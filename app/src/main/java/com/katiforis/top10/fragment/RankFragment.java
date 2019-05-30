@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.DTO.response.RankList;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.MenuActivity;
@@ -31,7 +31,7 @@ public class RankFragment extends Fragment {
 
     private RecyclerView rankRecyclerView;
     private RankAdapter rankAdapter;
-    private List<PlayerDto> rankList = new ArrayList<>();
+    private List<UserDto> rankList = new ArrayList<>();
 
     private TextView rank, username, level, points;
     private ImageView playerImage;
@@ -93,10 +93,10 @@ public class RankFragment extends Fragment {
 
     public void getRankList(){
         if(!populated){
-            rankController.getRankList(MenuActivity.userId);
+            rankController.getRankList();
             populated = true;
         }else{
-            rankController.getRankListIfExpired(MenuActivity.userId);
+            rankController.getRankListIfExpired();
         }
     }
 
@@ -104,14 +104,14 @@ public class RankFragment extends Fragment {
         Activity activity = getActivity();
         if(activity != null){
             activity.runOnUiThread(() -> {
-               List<PlayerDto> players = rankList.getPlayers();
+               List<UserDto> players = rankList.getPlayers();
                if(players.size() >=3){
-                   PlayerDto first = players.get(0);
-                   PlayerDto second = players.get(1);
-                   PlayerDto third = players.get(2);
+                   UserDto first = players.get(0);
+                   UserDto second = players.get(1);
+                   UserDto third = players.get(2);
                    players.remove(0);
-                   players.remove(1);
-                   players.remove(2);
+                   players.remove(0);
+                   players.remove(0);
 
                    Picasso.with(MenuActivity.getAppContext())
                            .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")

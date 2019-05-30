@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.DTO.response.GameStats;
 import com.katiforis.top10.R;
 import com.katiforis.top10.adapter.PlayersStatsAdapter;
@@ -30,7 +30,7 @@ public class GameStatsFragment extends DialogFragment {
 
     private RecyclerView playersStatsRecyclerView;
     private PlayersStatsAdapter playersStatsAdapter;
-    private List<PlayerDto> players = new ArrayList<>();
+    private List<UserDto> players = new ArrayList<>();
     private Button returnToMenu;
 
     public static GameStatsFragment getInstance() {

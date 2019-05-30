@@ -63,8 +63,8 @@ public class NotificationController extends MenuController {
     }
 
     public void getNotificationList(){
-        addTopic(MenuActivity.userId);
-        GetNotifications get = new GetNotifications(MenuActivity.userId, new Date().getTime());
+        addTopic();
+        GetNotifications get = new GetNotifications(new Date().getTime());
         Client.getInstance().send(Const.GET_NOTIFICATION_LIST, gson.toJson(get));
     }
 }

@@ -9,7 +9,7 @@ public class PlayerAnswer extends GameResponse {
     private boolean isCorrect = false;
     private boolean hasAlreadyBeenSaid = false;
     private long questionId;
-    private PlayerDto player;
+    private UserDto player;
 
     public PlayerAnswer(String status, String gameId) {
         super(status, gameId);
@@ -55,11 +55,11 @@ public class PlayerAnswer extends GameResponse {
         this.questionId = questionId;
     }
 
-    public PlayerDto getPlayer() {
+    public UserDto getPlayer() {
         return player;
     }
 
-    public void setPlayer(PlayerDto player) {
+    public void setPlayer(UserDto player) {
         this.player = player;
     }
 }

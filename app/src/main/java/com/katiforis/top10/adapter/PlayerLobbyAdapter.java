@@ -8,16 +8,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 
 import java.util.List;
 
 public class PlayerLobbyAdapter extends RecyclerView.Adapter<PlayerLobbyAdapter.PlayerLobbyViewItemHolder> {
 
-    private List<PlayerDto> players;
+    private List<UserDto> players;
 
-    public PlayerLobbyAdapter(List<PlayerDto> players) {
+    public PlayerLobbyAdapter(List<UserDto> players) {
         this.players = players;
     }
 
@@ -43,7 +43,7 @@ public class PlayerLobbyAdapter extends RecyclerView.Adapter<PlayerLobbyAdapter.
     @Override
     public void onBindViewHolder(PlayerLobbyViewItemHolder holder, int position) {
         if(players!=null) {
-            PlayerDto player = players.get(position);
+            UserDto player = players.get(position);
 
             if(player != null) {
                 holder.getTitleView().setText("empty slot");

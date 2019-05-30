@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapter.InviteFriendViewHolder> {
     List<Integer> selectedPositions = new ArrayList<>();
-    private List<PlayerDto> players;
+    private List<UserDto> players;
 
     public class InviteFriendViewHolder extends RecyclerView.ViewHolder {
         public TextView username, points;
@@ -39,7 +39,7 @@ public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapte
         }
     }
 
-    public InviteFriendAdapter(List<PlayerDto> players) {
+    public InviteFriendAdapter(List<UserDto> players) {
         this.players = players;
     }
 
@@ -53,7 +53,7 @@ public class InviteFriendAdapter extends RecyclerView.Adapter<InviteFriendAdapte
 
     @Override
     public void onBindViewHolder(InviteFriendViewHolder holder, int position) {
-        PlayerDto player = players.get(position);
+        UserDto player = players.get(position);
         holder.username.setText(player.getUsername());
         holder.points.setText(String.valueOf(player.getPlayerDetails().getElo()));
     }

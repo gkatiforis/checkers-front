@@ -10,7 +10,7 @@ public enum ResponseState {
     LOBBY("lobby"),
     NOTIFICATION_LIST("notification_list"),
     RANK_LIST("rank_list"),
-    PLAYER_DETAILS("player_details");
+    USER_STATS("user_stats");
 
     public String state;
 

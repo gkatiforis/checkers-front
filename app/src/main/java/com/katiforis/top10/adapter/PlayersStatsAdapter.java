@@ -7,14 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 
 import java.util.List;
 
 public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapter.PlayersStatsViewHolder> {
 
-    private List<PlayerDto> players;
+    private List<UserDto> players;
 
     public class PlayersStatsViewHolder extends RecyclerView.ViewHolder {
         public TextView username, points, pointsExtra;
@@ -29,7 +29,7 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
         }
     }
 
-    public PlayersStatsAdapter(List<PlayerDto> players) {
+    public PlayersStatsAdapter(List<UserDto> players) {
         this.players = players;
     }
 
@@ -43,7 +43,7 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
 
     @Override
     public void onBindViewHolder(PlayersStatsViewHolder holder, int position) {
-        PlayerDto playerDto = players.get(position);
+        UserDto playerDto = players.get(position);
         holder.username.setText(playerDto.getUsername());
         holder.points.setText(String.valueOf(playerDto.getPlayerDetails().getElo()));
         holder.pointsExtra.setText(" + " + String.valueOf(playerDto.getPlayerDetails().getEloExtra()));

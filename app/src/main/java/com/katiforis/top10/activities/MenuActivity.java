@@ -1,6 +1,7 @@
 package com.katiforis.top10.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.DTO.response.FriendList;
 import com.katiforis.top10.DTO.response.GameStats;
 import com.katiforis.top10.adapter.FriendAdapter;
@@ -42,7 +43,6 @@ public class MenuActivity extends AppCompatActivity {
 	private static final int RANK_TAB_INDEX = 0;
 	private static final int SHOP_TAB_INDEX = 2;
 
-	public static String userId = null;
 	public static boolean populated;
 
 	private HomeController homeController;
@@ -56,8 +56,7 @@ public class MenuActivity extends AppCompatActivity {
 
     private RecyclerView friendsRecyclerView;
     private FriendAdapter friendAdapter;
-    private List<PlayerDto> friends = new ArrayList<>();
-
+    private List<UserDto> friends = new ArrayList<>();
 	Snackbar snack;
 
 	@Override
@@ -65,7 +64,12 @@ public class MenuActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		initialize();
 	}
-
+	public void intentToStartPage(){
+		Intent intent = new Intent();
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.setClass(this, StartActivity.class);
+		startActivity(intent);
+	}
 	private void initialize() {
 		populated = false;
 		INSTANCE = this;
@@ -89,6 +93,7 @@ public class MenuActivity extends AppCompatActivity {
 //								notificationFragment.show(getSupportFragmentManager(), "dialog");
 							case R.id.action_main_menu:
 								viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
+								HomeFragment.getInstance().getPlayerDetails();
 								break;
 //							case R.id.action_friend_list:
 //								drawerLayout.openDrawer(Gravity.RIGHT);
@@ -140,7 +145,7 @@ public class MenuActivity extends AppCompatActivity {
 		FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
 		params.gravity = Gravity.TOP;
 		view.setLayoutParams(params);
-
+		HomeFragment.getInstance().getPlayerDetails();
 	}
 
 	private void initViewPager(ViewPager viewPager) {

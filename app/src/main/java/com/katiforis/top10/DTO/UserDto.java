@@ -2,19 +2,22 @@ package com.katiforis.top10.DTO;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
+public class UserDto implements Serializable {
     static final long serialVersionUID =-4596596853482889445L;
     private long id;
+    private String userId;
     private String username;
+    private String email;
     private String imageUrl;
+    private PlayerDetailsDto playerDetails;
 
-    public User(){}
-    public User(String username) {
+    public UserDto(){}
+    public UserDto(String username) {
         this.username = username;
     }
 
 
-    public User(long id, String username, String imageUrl) {
+    public UserDto(long id, String username, String imageUrl) {
         this.id = id;
         this.username = username;
         this.imageUrl = imageUrl;
@@ -26,6 +29,14 @@ public class User implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -42,5 +53,21 @@ public class User implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public PlayerDetailsDto getPlayerDetails() {
+        return playerDetails;
+    }
+
+    public void setPlayerDetails(PlayerDetailsDto playerDetails) {
+        this.playerDetails = playerDetails;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

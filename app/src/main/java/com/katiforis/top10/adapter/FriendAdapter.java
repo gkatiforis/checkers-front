@@ -6,14 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 
 import java.util.List;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
-    private List<PlayerDto> players;
+    private List<UserDto> players;
 
     public class FriendViewHolder extends RecyclerView.ViewHolder {
         public TextView fullName, username, points;
@@ -27,7 +27,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         }
     }
 
-    public FriendAdapter(List<PlayerDto> players) {
+    public FriendAdapter(List<UserDto> players) {
         this.players = players;
     }
 
@@ -42,7 +42,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     @Override
     public void onBindViewHolder(FriendViewHolder holder, int position) {
 
-        PlayerDto player = players.get(position);
+        UserDto player = players.get(position);
     //    holder.fullName.setText(player.getFullName());
         holder.username.setText(player.getUsername());
       //  holder.points.setText(player.getPoints().toString());

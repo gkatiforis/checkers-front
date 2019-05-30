@@ -23,6 +23,7 @@ android {
     packagingOptions {
         exclude 'META-INF/proguard/androidx-annotations.pro'
     }
+    useLibrary  'org.apache.http.legacy'
 }
 repositories {
     maven { url 'https://jitpack.io' }

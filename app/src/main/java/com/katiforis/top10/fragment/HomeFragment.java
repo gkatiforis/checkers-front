@@ -17,28 +17,33 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.katiforis.top10.DTO.response.PlayerDetails;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.MenuActivity;
+import com.katiforis.top10.activities.StartActivity;
+import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.controller.HomeController;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+import com.katiforis.top10.stomp.Client;
+import com.katiforis.top10.util.LocalCache;
 
 import static android.content.ContentValues.TAG;
+import static com.katiforis.top10.util.CachedObjectProperties.TOKEN;
+import static com.katiforis.top10.util.CachedObjectProperties.USER_ID;
 
 public class HomeFragment extends Fragment {
     public static HomeFragment INSTANCE;
-
+    public static GoogleSignInClient signInClient;
+    public static boolean populated;
     private HomeController homeController;
-    public static GoogleSignInAccount account;
 
     private Button logout;
     private Button play;
+    private Button login;
     //private Button playWithFriend;
     private TextView username;
     private ImageView playerImage;
 
-    GoogleSignInClient signInClient;
+
 
     public static HomeFragment getInstance() {
         if (INSTANCE == null) {
@@ -50,7 +55,7 @@ public class HomeFragment extends Fragment {
         INSTANCE.homeController.setHomeFragment(INSTANCE);
         return INSTANCE;
     }
-
+    private static boolean customExceptionHandlerAttached = false;
     public HomeFragment() {}
 
     @Override
@@ -59,88 +64,137 @@ public class HomeFragment extends Fragment {
 
         logout = v.findViewById(R.id.logout);
         play = v.findViewById(R.id.play);
+        login = v.findViewById(R.id.login);
         //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
         playerImage =  v.findViewById(R.id.playerImage);
-        if(MenuActivity.userId == null){
-            startSignInIntent();
-        }else{
-            username.setText(account.getDisplayName());
 
-        }
+        login.setOnClickListener(p -> {
+            signInIntent();
+        });
 
         logout.setOnClickListener(p -> {
-            signInClient.signOut();
+            signInClient.signOut()
+                 .addOnSuccessListener((message)->{
+                     Client.getInstance().disconnect();
+                     LocalCache.getInstance().saveString(TOKEN, null);
+                     LocalCache.getInstance().saveString(USER_ID, null);
+                        intentToStartPage();
+                    })
+                .addOnFailureListener((message)->{
+                    //TODO show message
+                });
         });
 
         play.setOnClickListener(p -> {
 		   homeController.findGame();
         });
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(Const.android_web_id)
+                .requestEmail()
+                .build();
+        signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
+
+        silentSignIn();
+
+        if(!customExceptionHandlerAttached) {
+            final Thread.UncaughtExceptionHandler defaultEH = Thread.getDefaultUncaughtExceptionHandler();
+            Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) ->{
+                if(e instanceof io.reactivex.exceptions.OnErrorNotImplementedException){
+                    intentToStartPage();
+                }else{
+                    defaultEH.uncaughtException(thread, e);
+                }
+            });
+            customExceptionHandlerAttached = true;
+        }
+
+
         return v;
     }
 
-    private void startSignInIntent() {
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
+    private void signInIntent() {
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(intent, 0);
+    }
+
+    private void signInAgain() {
+        String token = (String) LocalCache.getInstance().getString(TOKEN);
+        if(token != null){
+            intentToStartPage();
+        }
+    }
+
+    private void intentToStartPage(){
+        Intent intent = new Intent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setClass(MenuActivity.getAppContext(), StartActivity.class);
+        startActivity(intent);
+    }
+
+    private void silentSignIn() {
+        Task<GoogleSignInAccount> task = signInClient.silentSignIn();
+        try {
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+            if(account != null){
+                onLogin(account);
+            }else{
+                signInAgain();
+            }
+        } catch (ApiException e) {
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            signInAgain();
+        }catch (Exception e){
+            Log.w(TAG, "signInResult:failed ", e);
+            signInAgain();
+        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == 0) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            account = completedTask.getResult(ApiException.class);
-
-            onLogin(account);
-
-        } catch (ApiException e) {
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if(account != null){
+                    onLogin(account);
+                }else{
+                    //TODO repost exception to usesr
+                }
+            } catch (ApiException e) {
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            }catch (Exception e){
+                //TODO repost exception to usesr
+                Log.w(TAG, "signInResult:failed ", e);
+            }
         }
     }
 
     private void onLogin(GoogleSignInAccount account){
-        username.setText(account.getDisplayName());
-
-        if(account.getPhotoUrl() != null){
-            Picasso.with(this.getActivity())
-                    .load(account.getPhotoUrl().toString()).error(R.mipmap.ic_launcher)
-                    .into(playerImage, new Callback() {
-                        @Override
-                        public void onSuccess() {     }
-
-                        @Override
-                        public void onError() {
-                            //TODO
-                        }
-                    });
+        LocalCache.getInstance().saveString(TOKEN, account.getIdToken());
+        if(Client.isConnected()){
+            Client.getInstance().disconnect();
+            Client.getInstance();
+            getPlayerDetails();
+        }else{
+            Client.getInstance();
         }
-
-
-        MenuActivity.userId = account.getId();
-
-        HomeController.getInstance().login(account);
     }
 
-    public void populatePlayerDetails(PlayerDetails playerDetails){
+    public void getPlayerDetails(){
+        if(!populated){
+            homeController.getPlayerDetails();
+            populated = true;
+        }else{
+            homeController.getPlayerDetailsIfExpired();
+        }
+    }
+
+    public void populatePlayerDetails(UserDto playerDto){
         getActivity().runOnUiThread(() -> {
-            username.setText(playerDetails.getUsername());
+            username.setText(playerDto.getUsername());
         });
     }
 }

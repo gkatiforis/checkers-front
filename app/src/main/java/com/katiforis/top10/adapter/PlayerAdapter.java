@@ -9,17 +9,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.MenuActivity;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder>{
-    private List<PlayerDto> players;
+    private List<UserDto> players;
     Context context;
 
-    public PlayerAdapter(List<PlayerDto> players, Context context){
+    public PlayerAdapter(List<UserDto> players, Context context){
         this.players = players;
         this.context = context;
     }

@@ -10,8 +10,11 @@ import com.katiforis.top10.activities.GameActivity;
 import com.katiforis.top10.conf.Const;
 import com.katiforis.top10.fragment.GameStatsFragment;
 import com.katiforis.top10.stomp.Client;
+import com.katiforis.top10.util.LocalCache;
 
 import ua.naiksoftware.stomp.dto.StompMessage;
+
+import static com.katiforis.top10.util.CachedObjectProperties.CURRENT_GAME_ID;
 
 
 public class GameController extends AbstractController{
@@ -56,15 +59,15 @@ public class GameController extends AbstractController{
     }
 
     public void sendAnswer(String gameId, Object object ){
-        addTopic(GameActivity.getGameId());
+        addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
         Gson gson = new Gson();
         String jsonInString = gson.toJson(object);
         Client.getInstance().send( Const.SEND_WORD.replace("placeholder", gameId), jsonInString);
     }
 
-    public void getGameState(String userId, String gameId){
-        addTopic(GameActivity.getGameId());
-        Client.getInstance().send(Const.GET_GAME_STATE, userId + "|" + gameId);
+    public void getGameState(String gameId){
+        addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
+        Client.getInstance().send(Const.GET_GAME_STATE,  gameId);
     }
 
     public GameActivity getGameActivity() {

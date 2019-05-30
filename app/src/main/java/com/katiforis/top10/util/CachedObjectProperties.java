@@ -1,7 +1,12 @@
 package com.katiforis.top10.util;
 
 public enum CachedObjectProperties {
-    RANK_LIST("RANK_LIST", 60*5);
+    TOKEN("TOKEN", -1),
+    USER_ID("USER_ID", -1),
+    CURRENT_GAME_ID("CURRENT_GAME_ID", -1),
+    RANK_LIST("RANK_LIST", 60*5),
+    USER_DETAILS("USER_DETAILS", -1);
+
     private String key;
     private int expireLimitInSeconds;
 

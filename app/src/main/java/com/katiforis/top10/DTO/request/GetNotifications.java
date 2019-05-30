@@ -5,8 +5,7 @@ public class GetNotifications extends BaseRequest {
     long from;
 
     public GetNotifications(){}
-    public GetNotifications(String playerId, long from) {
-        super(playerId);
+    public GetNotifications(long from) {
         this.from = from;
     }
 

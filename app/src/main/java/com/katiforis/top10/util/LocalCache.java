@@ -1,6 +1,10 @@
 package com.katiforis.top10.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.katiforis.top10.activities.MenuActivity;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -68,6 +72,9 @@ public class LocalCache {
     }
 
     private Map<String, CachedObject> load(Context context) {
+        if(context == null)
+            return new HashMap<>();
+
         try (FileInputStream fileInputStream = context.openFileInput(filename);
              ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
             Map<String, CachedObject> map = (Map) objectInputStream.readObject();
@@ -84,5 +91,18 @@ public class LocalCache {
             e.printStackTrace();
         }
         return new HashMap<>();
+    }
+
+    public void saveString(CachedObjectProperties properties, String value) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
+        SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(properties.getKey(),value);
+        editor.commit();
+    }
+
+    public String getString(CachedObjectProperties properties) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
+        String value = sharedPref.getString(properties.getKey(), null);
+        return value;
     }
 }

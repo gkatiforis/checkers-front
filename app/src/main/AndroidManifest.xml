@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.katiforis.top10.activities.StartActivity"/>
         <activity android:name="com.katiforis.top10.activities.MainActivity" />
         <activity android:name="com.katiforis.top10.activities.GameActivity" />
         <activity android:name=".speech.ScreenSlidePagerActivity" />

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.katiforis.top10.DTO.Answer;
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.DTO.response.GameState;
 import com.katiforis.top10.DTO.PlayerAnswer;
 import com.katiforis.top10.DTO.Question;
@@ -38,8 +38,11 @@ import com.katiforis.top10.game.QuestionHandler;
 import com.katiforis.top10.game.QuestionHandlerImpl;
 import com.katiforis.top10.speech.SpeechRecognizerManager;
 import com.katiforis.top10.adapter.PlayerAdapter;
+import com.katiforis.top10.util.LocalCache;
 
 import tyrantgit.explosionfield.ExplosionField;
+
+import static com.katiforis.top10.util.CachedObjectProperties.CURRENT_GAME_ID;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -68,7 +71,7 @@ public class GameActivity extends AppCompatActivity {
 
 	private RecyclerView userRecyclerView;
 	private PlayerAdapter playerAdapter;
-	private List<PlayerDto> userList = new ArrayList<>();
+	private List<UserDto> userList = new ArrayList<>();
 
 	private SpeechRecognizerManager mSpeechManager;
 
@@ -83,9 +86,8 @@ public class GameActivity extends AppCompatActivity {
 	public void sendAnswer(String answer){
 		PlayerAnswer playerAnswer = new PlayerAnswer();
 		playerAnswer.setDescription(answer);
-		playerAnswer.setUserId(MenuActivity.userId);
 		playerAnswer.setQuestionId(this.currentQuestionId);
-		gameController.sendAnswer(getGameId(), playerAnswer);
+		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
 	}
 
 	public  void showAnswer(PlayerAnswer playerAnswer){
@@ -194,7 +196,6 @@ public class GameActivity extends AppCompatActivity {
 					playerAnswer.setDescription(s.toString());
 					//playerAnswer.setQuestionId(1);
 					playerAnswer.setQuestionId(currentQuestionId);
-					playerAnswer.setUserId(MenuActivity.userId);
 					Answer answer = questionHandler.isAnswerValid(playerAnswer);
 					if(answer != null){
 						//answerText.setText(answer.getDescription());
@@ -257,7 +258,7 @@ public class GameActivity extends AppCompatActivity {
 
 
 	private void updatePlayerScore(String username, String points) {
-		for (PlayerDto player :userList){
+		for (UserDto player :userList){
 			if(player.getUsername().equals(username)){
 				player.getPlayerDetails().setElo(player.getPlayerDetails().getElo() + Integer.valueOf(points));
 			}
@@ -265,7 +266,7 @@ public class GameActivity extends AppCompatActivity {
 		playerAdapter.notifyDataSetChanged();
 	}
 
-	void setPlayerList(List<PlayerDto> players){
+	void setPlayerList(List<UserDto> players){
 		userList.clear();
 		userList.addAll(players);
 		playerAdapter.notifyDataSetChanged();
@@ -511,27 +512,12 @@ public class GameActivity extends AppCompatActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		String gameId = getGameId();
-		if (gameId.length() == 0) {
+		String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID);
+		if (gameId == null || gameId.length() == 0) {
 			return;
 		}
-		gameController.getGameState(MenuActivity.userId.trim(), gameId.trim());
+		gameController.getGameState(gameId);
 	}
-
-    public static void saveGameId(String gameId) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("gameId", gameId);
-        editor.commit();
-    }
-
-
-    public static String getGameId() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
-        String gamaId = sharedPref.getString("gameId", null);
-        return gamaId;
-    }
-
 
 	@Override
 	protected void onStop() {

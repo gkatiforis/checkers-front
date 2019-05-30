@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.katiforis.top10.DTO.PlayerDto;
+import com.katiforis.top10.DTO.UserDto;
 import com.katiforis.top10.R;
 import com.katiforis.top10.activities.MenuActivity;
 import com.squareup.picasso.Callback;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder> {
 
-    private List<PlayerDto> rankList;
+    private List<UserDto> rankList;
 
     public class RankViewHolder extends RecyclerView.ViewHolder {
         public TextView rank, username, level, points;
@@ -33,7 +33,7 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
         }
     }
 
-    public RankAdapter(List<PlayerDto> rankList) {
+    public RankAdapter(List<UserDto> rankList) {
         this.rankList = rankList;
     }
 
@@ -47,7 +47,7 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
     @Override
     public void onBindViewHolder(RankViewHolder holder, int position) {
 
-        PlayerDto player = rankList.get(position);
+        UserDto player = rankList.get(position);
 
             Picasso.with(MenuActivity.getAppContext())
                     .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")

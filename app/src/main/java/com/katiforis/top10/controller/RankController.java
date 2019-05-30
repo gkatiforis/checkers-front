@@ -55,28 +55,23 @@ public class RankController extends MenuController {
         }
     }
 
-    public void getRankList(String playerId){
-        if(playerId == null)
-            return;
-
+    public void getRankList(){
         RankList rankList = LocalCache.getInstance().get(RANK_LIST, rankFragment.getActivity());
         if(rankList != null){
             rankFragment.setRankList(rankList);
         }
         else{
-            addTopic(playerId);
-            GetRank get = new GetRank(playerId);
+            addTopic();
+            GetRank get = new GetRank();
             Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
         }
     }
 
-    public void getRankListIfExpired(String playerId){
-        if(playerId == null)
-            return;
+    public void getRankListIfExpired(){
         RankList rankList = LocalCache.getInstance().get(RANK_LIST, rankFragment.getActivity());
         if(rankList == null){
-            addTopic(playerId);
-            GetRank get = new GetRank(playerId);
+            addTopic();
+            GetRank get = new GetRank();
             Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
         }
     }
