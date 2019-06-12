@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.katiforis.top10">
+    package="com.katiforis.checkers">
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
@@ -12,16 +12,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.katiforis.top10.activities.MenuActivity">
+        <activity android:name="com.katiforis.checkers.activities.MenuActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.katiforis.top10.activities.StartActivity"/>
-        <activity android:name="com.katiforis.top10.activities.MainActivity" />
-        <activity android:name="com.katiforis.top10.activities.GameActivity" />
+        <activity android:name="com.katiforis.checkers.activities.StartActivity"/>
+        <activity android:name="com.katiforis.checkers.activities.MainActivity" />
+        <activity android:name="com.katiforis.checkers.activities.GameActivity" />
+
         <activity android:name=".speech.ScreenSlidePagerActivity" />
     </application>
 

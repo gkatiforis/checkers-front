@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    tools:context="com.katiforis.top10.activities.GameActivity">
+    tools:context="com.katiforis.checkers.activities.GameActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_viewH"
@@ -16,89 +16,23 @@
         android:scrollbars="horizontal"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="TextView"
-        android:textSize="28dp"
-        app:layout_constraintTop_toBottomOf="@+id/my_recycler_viewH"
-       />
-
     <ProgressBar
         android:id="@+id/progressBar"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:progress="0"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/my_recycler_viewH"
         />
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:scrollbars="vertical"
+    <include
+        android:id="@+id/gameboard"
+        layout="@layout/board"
         app:layout_constraintTop_toBottomOf="@+id/progressBar"
-        app:layout_constraintBottom_toTopOf="@+id/editText"
-        tools:context="me.xlui.top10.activities.GameActivity"
-        tools:showIn="@layout/activity_game_layout" />
-
-
-    <!--<EditText android:text="@+id/EditText01"-->
-    <!--android:id="@+id/EditText01"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:layout_width="fill_parent">-->
-    <!--</EditText>-->
-
-
-
-    <!--<Button-->
-    <!--android:id="@+id/send"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content" />-->
-
-
-    <TextView
-        android:id="@+id/letterHelp"
-        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="ΠΕ_ _ _ _ "
-        android:visibility="invisible"
-        android:textSize="23dp"
-        app:layout_constraintBottom_toTopOf="@+id/editText"
         />
-
-
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/getLetter"
-        android:hint="γράψε εδώ"/>
-
-    <Button
-        android:id="@+id/send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="send"
-        app:layout_constraintBottom_toTopOf="@+id/getLetter"
-        app:layout_constraintLeft_toRightOf="@+id/editText"></Button>
-
-    <Button
-        android:id="@+id/getLetter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="get letter"
-        app:layout_constraintBottom_toBottomOf="parent"></Button>
-
 
 </android.support.constraint.ConstraintLayout>
