@@ -2,16 +2,18 @@ package com.katiforis.checkers.DTO.response;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.game.Board;
+import com.katiforis.checkers.game.Piece;
 
 import java.util.Date;
 import java.util.List;
 
 public class GameState extends GameResponse {
     private List<UserDto> players;
-    private UserDto currentPlayer;
     private Board board;
     private Date dateStarted;
     private Date currentDate;
+    private Date lastMoveDate;
+    private Integer gameMaxTime;
 
     public GameState(){
         super();
@@ -48,11 +50,51 @@ public class GameState extends GameResponse {
         this.currentDate = currentDate;
     }
 
-    public UserDto getCurrentPlayer() {
-        return currentPlayer;
+    public Date getLastMoveDate() {
+        return lastMoveDate;
     }
 
-    public void setCurrentPlayer(UserDto currentPlayer) {
-        this.currentPlayer = currentPlayer;
+    public void setLastMoveDate(Date lastMoveDate) {
+        this.lastMoveDate = lastMoveDate;
+    }
+
+    public Integer getGameMaxTime() {
+        return gameMaxTime;
+    }
+
+    public void setGameMaxTime(Integer gameMaxTime) {
+        this.gameMaxTime = gameMaxTime;
+    }
+
+    public UserDto getCurrentPlayer(){
+        if(players.get(0).getCurrent()){
+            return players.get(0);
+        }else{
+            return players.get(1);
+        }
+    }
+
+    public UserDto getPrevPlayer(){
+        if(players.get(0).getCurrent()){
+            return players.get(1);
+        }else{
+            return players.get(0);
+        }
+    }
+
+    public UserDto getWhitePlayer(){
+        if(players.get(0).getColor().equals(Piece.LIGHT)){
+            return players.get(0);
+        }else{
+            return players.get(1);
+        }
+    }
+
+    public UserDto getDarkPlayer(){
+        if(players.get(0).getColor().equals(Piece.DARK)){
+            return players.get(0);
+        }else{
+            return players.get(1);
+        }
     }
 }

@@ -11,6 +11,8 @@ public class UserDto implements Serializable {
     private String imageUrl;
     private PlayerDetailsDto playerDetails;
     private String color;
+    private Long secondsRemaining;
+    private Boolean isCurrent;
 
     public UserDto() {
     }
@@ -80,6 +82,22 @@ public class UserDto implements Serializable {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Long getSecondsRemaining() {
+        return secondsRemaining;
+    }
+
+    public void setSecondsRemaining(Long secondsRemaining) {
+        this.secondsRemaining = secondsRemaining;
+    }
+
+    public Boolean getCurrent() {
+        return isCurrent;
+    }
+
+    public void setCurrent(Boolean current) {
+        isCurrent = current;
     }
 
     @Override

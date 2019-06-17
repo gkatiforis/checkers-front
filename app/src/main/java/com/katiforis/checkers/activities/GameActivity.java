@@ -4,12 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -20,7 +19,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,10 +34,10 @@ import com.katiforis.checkers.game.Board;
 import com.katiforis.checkers.game.Cell;
 import com.katiforis.checkers.game.Move;
 import com.katiforis.checkers.game.Piece;
-
-import com.katiforis.checkers.adapter.PlayerAdapter;
 import com.katiforis.checkers.util.LocalCache;
+import com.katiforis.checkers.util.Utils;
 
+import me.itangqi.waveloadingview.WaveLoadingView;
 import tyrantgit.explosionfield.ExplosionField;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
@@ -47,21 +46,21 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 public class GameActivity extends AppCompatActivity {
 
     public static GameActivity INSTANCE;
+	TextView username;
+	WaveLoadingView player1Time;
 
-	ProgressBar mProgressBar;
-	CountDownTimer mCountDownTimer;
-	int timerStep=0;
+	TextView username2;
+	WaveLoadingView player2Time;
+
+	CountDownTimer countDownTimer;
 	long dateStarted;
 	long dateCurrent;
 	ExplosionField explosionField;
 
-	private RecyclerView userRecyclerView;
-	private PlayerAdapter playerAdapter;
-	private List<UserDto> userList = new ArrayList<>();
-
 	private GameController gameController;
 	public static boolean populated;
 
+	private Integer gameMaxTime;
 	private int[] buttons_id;
 	private Button[][] buttonBoard;
 	private List<Cell> highlightedCells;
@@ -77,6 +76,7 @@ public class GameActivity extends AppCompatActivity {
 				setPlayerList(gamestate.getPlayers());
 				dateStarted = gamestate.getDateStarted().getTime();
 				dateCurrent = gamestate.getCurrentDate().getTime();
+			    gameMaxTime = gamestate.getGameMaxTime();
 
 				final Handler someHandler = new Handler(getMainLooper());
 
@@ -91,21 +91,20 @@ public class GameActivity extends AppCompatActivity {
 					}
 				}, 10);
 
-			this.player1 = gamestate.getPlayers().get(0);
-			this.player2 = gamestate.getPlayers().get(1);
+			this.player1 = gamestate.getWhitePlayer();
+			this.player2 = gamestate.getDarkPlayer();
 			this.currentPlayer = gamestate.getCurrentPlayer();
+
+
+			long remainingTime = currentPlayer.getSecondsRemaining() -
+					Utils.getDiffInSeconds(gamestate.getLastMoveDate(), gamestate.getCurrentDate());
+			currentPlayer.setSecondsRemaining(remainingTime);
+
+			setPlayerTime(gamestate.getPrevPlayer(), this.currentPlayer);
 
 			updateTurnTracker();
 
 			setBoard(gamestate.getBoard());
-
-			player1.setUsername(player1.getColor() + player1.getUsername());
-			player2.setUsername(player2.getColor() + player2.getUsername());
-			if(this.player1.getUserId().equals(LocalCache.getInstance().getString(USER_ID))){
-				player1.setUsername("Q" + player1.getUsername());
-			}else{
-				player2.setUsername("Q" + player2.getUsername());
-			}
 
 			if(this.player1.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
 					player1.getColor().equals(Piece.LIGHT)){
@@ -118,22 +117,43 @@ public class GameActivity extends AppCompatActivity {
 				mView.setRotation(180);
 				ViewGroup.LayoutParams lp = mView.getLayoutParams();
 			}
-
 		});
 	}
 
 	void initComponents(){
 		getSupportActionBar().hide();
 		explosionField = ExplosionField.attach2Window(this);
-		mProgressBar=(ProgressBar)findViewById(R.id.progressBar);
+
+		username =  findViewById(R.id.username);
+
+		player1Time = (WaveLoadingView) findViewById(R.id.player1Time);
+		player1Time.setShapeType(WaveLoadingView.ShapeType.CIRCLE);
+		player1Time.setProgressValue(100);
+		player1Time.setBorderWidth(10);
+		player1Time.setAmplitudeRatio(60);
+		player1Time.setCenterTitleColor(Color.WHITE);
+		player1Time.setAnimDuration(1000);
+		player1Time.pauseAnimation();
+		player1Time.resumeAnimation();
+		player1Time.cancelAnimation();
+		player1Time.startAnimation();
 
 
-        userRecyclerView = findViewById(R.id.my_recycler_viewH);
-      //  userRecyclerView.addItemDecoration(new DividerItemDecoration(GameActivity.this, LinearLayoutManager.HORIZONTAL));
-        playerAdapter = new PlayerAdapter(userList, getApplicationContext());
-        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
-        userRecyclerView.setLayoutManager(horizontalLayoutManager);
-        userRecyclerView.setAdapter(playerAdapter);
+
+		username2 =  findViewById(R.id.username2);
+
+		player2Time = (WaveLoadingView) findViewById(R.id.player2Time);
+		player2Time.setShapeType(WaveLoadingView.ShapeType.CIRCLE);
+		player2Time.setProgressValue(100);
+		player2Time.setBorderWidth(10);
+		player2Time.setAmplitudeRatio(60);
+		player2Time.setCenterTitleColor(Color.WHITE);
+		player2Time.setAnimDuration(1000);
+		player2Time.pauseAnimation();
+		player2Time.resumeAnimation();
+		player2Time.cancelAnimation();
+		player2Time.startAnimation();
+
 
 //		viewKonfetti = (KonfettiView)findViewById(R.id.viewKonfetti);
 ////		viewKonfetti.build()
@@ -159,18 +179,23 @@ public class GameActivity extends AppCompatActivity {
 
 
 	private void updatePlayerScore(String username, String points) {
-		for (UserDto player :userList){
-			if(player.getUsername().equals(username)){
-				player.getPlayerDetails().setElo(player.getPlayerDetails().getElo() + Integer.valueOf(points));
-			}
-		}
-		playerAdapter.notifyDataSetChanged();
+		//TODO
+//		for (UserDto player :userList){
+//			if(player.getUsername().equals(username)){
+//				player.getPlayerDetails().setElo(player.getPlayerDetails().getElo() + Integer.valueOf(points));
+//			}
+//		}
+//		playerAdapter.notifyDataSetChanged();
 	}
 
 	void setPlayerList(List<UserDto> players){
-		userList.clear();
-		userList.addAll(players);
-		playerAdapter.notifyDataSetChanged();
+		if(players.get(0).getColor().equals(Piece.LIGHT)){
+			username.setText(players.get(0).getUsername());
+			username2.setText(players.get(1).getUsername());
+		}else{
+			username2.setText(players.get(0).getUsername());
+			username.setText(players.get(1).getUsername());
+		}
 	}
 
 	public void sendMove(Move move){
@@ -181,7 +206,15 @@ public class GameActivity extends AppCompatActivity {
 
 	public void makeMove(PlayerAnswer playerAnswer){
 		runOnUiThread(() -> {
-			makeMove(playerAnswer.getCurrentPlayer(), playerAnswer.getMove().getFrom(), playerAnswer.getMove().getTo());
+			UserDto current, prev;
+			if(playerAnswer.getPlayers().get(0).getCurrent()){
+				current = playerAnswer.getPlayers().get(0);
+				prev = playerAnswer.getPlayers().get(1);
+			}else{
+				current = playerAnswer.getPlayers().get(1);
+				prev = playerAnswer.getPlayers().get(0);
+			}
+			makeMove(prev, current, playerAnswer.getMove().getFrom(), playerAnswer.getMove().getTo());
 		});
 	}
 
@@ -219,11 +252,6 @@ public class GameActivity extends AppCompatActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if(mCountDownTimer != null){
-			mCountDownTimer.cancel();
-			mCountDownTimer = null;
-			timerStep=0;
-		}
 	}
 
 	@Override
@@ -310,9 +338,12 @@ public class GameActivity extends AppCompatActivity {
 		return false;
 	}
 
-	public void makeMove(UserDto currentPlayer, Cell givenSrcCell, Cell givenDstCell) {
+	public void makeMove(UserDto fromPlayer, UserDto toPlayer, Cell givenSrcCell, Cell givenDstCell) {
 		unHighlightPieces();
 		boolean captureMove = cellBoard.isCaptureMove(givenSrcCell, givenDstCell);
+//		if(!cellBoard.isValidMove(givenSrcCell, givenDstCell)){
+//			return;
+//		}
 		List<Cell> changedCells = cellBoard.movePiece(givenSrcCell.getCoords(), givenDstCell.getCoords());
 		updatePieces(changedCells);
 		if (captureMove) {
@@ -321,7 +352,7 @@ public class GameActivity extends AppCompatActivity {
 				this.srcCell = null;
 				this.dstCell = null;
 				srcCellFixed = false;
-				changeTurn(currentPlayer);
+				changeTurn(fromPlayer, toPlayer);
 
 			}
 			else {
@@ -335,7 +366,7 @@ public class GameActivity extends AppCompatActivity {
 			srcCell = null;
 			dstCell = null;
 			srcCellFixed = false;
-			changeTurn(currentPlayer);
+			changeTurn(fromPlayer, toPlayer);
 		}
 	}
 
@@ -419,10 +450,13 @@ public class GameActivity extends AppCompatActivity {
 	}
 
 	public void updatePieces(List<Cell> changedCells) {
-		Move possMoves;
+		Move possibleMoves;
 		for (int i = 0; i < moves.size(); i++) {
-			possMoves = moves.get(i);
-			buttonBoard[possMoves.getTo().getX()][possMoves.getTo().getY()].setBackgroundResource(R.drawable.blank_square);   // color possible moves blank
+			possibleMoves = moves.get(i);
+			Cell cell = possibleMoves.getTo();
+			if(!cell.containsPiece()){
+				buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.blank_square);
+			}
 		}
 
 		for (Cell cell : changedCells) {
@@ -467,9 +501,55 @@ public class GameActivity extends AppCompatActivity {
 		}
 	}
 
-	public void changeTurn(UserDto player) {
-		this.currentPlayer = player;
+	public void changeTurn(UserDto fromPlayer, UserDto toPlayer) {
+		setPlayerTime(fromPlayer, toPlayer);
+		this.currentPlayer = toPlayer;
 		updateTurnTracker();
+	}
+
+	public void setPlayerTime(UserDto fromPlayer, UserDto toPlayer){
+		Long toPlayerMinutes = toPlayer.getSecondsRemaining()/60;
+		Long toPlayerSeconds = toPlayer.getSecondsRemaining() - toPlayerMinutes * 60;
+
+		Long fromPlayerMinutes = fromPlayer.getSecondsRemaining()/60;
+		Long fromPlayerSeconds = fromPlayer.getSecondsRemaining() - fromPlayerMinutes * 60;
+
+
+		if(toPlayer.getColor().equals(Piece.LIGHT)){
+			player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
+			player2Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + fromPlayerSeconds.toString());
+		}else{
+			player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
+			player1Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + fromPlayerSeconds.toString());
+		}
+
+		Integer progress = 100 * fromPlayer.getSecondsRemaining().intValue() / (gameMaxTime * 60);
+		if(fromPlayer.getColor().equals(Piece.LIGHT)){
+			player1Time.setProgressValue(progress);
+		}else{
+			player2Time.setProgressValue(progress);
+		}
+
+
+		if(countDownTimer != null){
+			countDownTimer.cancel();
+		}
+		countDownTimer = new CountDownTimer(toPlayer.getSecondsRemaining() * 1000, 1000) {
+			public void onTick(long millisUntilFinished) {
+				Long remainingSeconds = millisUntilFinished / 1000;
+				Long toPlayerMinutes = remainingSeconds/60;
+				Long toPlayerSeconds = remainingSeconds - toPlayerMinutes * 60;
+				Integer progress = 100 * remainingSeconds.intValue() / (gameMaxTime * 60);
+				if(toPlayer.getColor().equals(Piece.LIGHT)){
+					player1Time.setProgressValue(progress);
+					player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
+				}else{
+					player2Time.setProgressValue(progress);
+					player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
+				}
+			}
+			public void onFinish() { }
+		}.start();
 	}
 
 	public void unHighlightPieces() {
@@ -493,8 +573,7 @@ public class GameActivity extends AppCompatActivity {
 	}
 
 	public void updateTurnTracker() {
-		if(this.currentPlayer != null) {
-			// Get all the pieces of the current player that can move & highlight them
+		if(isMe(this.currentPlayer)) {
 			List<Cell> currentPlayerPieces = cellBoard.getCellPieces(this.currentPlayer.getColor());
 			List<Move> moves = cellBoard.possibleMoves(currentPlayerPieces);
 			for (Move cell : moves) {
@@ -586,4 +665,8 @@ public class GameActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {}
+
+	public boolean isMe(UserDto player){
+		return this.currentPlayer != null && player.getUserId().equals(LocalCache.getInstance().getString(USER_ID));
+	}
 }

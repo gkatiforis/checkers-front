@@ -59,6 +59,16 @@ public class Board implements Serializable {
         return changedCells;
     }
 
+    public boolean isValidMove(Cell srcCell, Cell dstCell){
+        List<Move> moves = possibleMoves(srcCell);
+        for(Move move:moves){
+            if(move.getTo().equals(dstCell)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Cell> movePiece(int[] src, int[] dst) {
         if(src.length != 2 || dst.length != 2){
            return Collections.emptyList();
@@ -73,6 +83,9 @@ public class Board implements Serializable {
         else if(cell.getPlacedPiece().getColor().equals(Piece.DARK)){
             cell.placePiece(null);
         }
+    }
+    public List<Move> possibleMoves(Cell cell)  {
+        return possibleMoves(Arrays.asList(cell));
     }
 
     public List<Move> possibleMoves(List<Cell> cells)  {

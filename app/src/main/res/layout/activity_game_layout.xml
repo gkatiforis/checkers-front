@@ -9,27 +9,146 @@
     android:gravity="center"
     tools:context="com.katiforis.checkers.activities.GameActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_recycler_viewH"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scrollbars="horizontal"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/playerImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/user"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:progress="0"
-        app:layout_constraintTop_toBottomOf="@+id/my_recycler_viewH"
         />
 
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+
+        android:text="Username"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playerImage"
+
+        />
+
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/player1Time"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:wlv_borderColor="@color/colorAccent"
+        app:wlv_borderWidth="3dp"
+        app:wlv_progressValue="40"
+        app:wlv_shapeType="circle"
+        app:wlv_round_rectangle="true"
+        app:wlv_triangle_direction="north"
+        app:wlv_waveColor="@color/colorAccent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/username"
+        >
+    </me.itangqi.waveloadingview.WaveLoadingView>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/player_labels"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--&gt;-->
+
+
+        <!--<ImageView-->
+            <!--android:id="@+id/lvlImage"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:src="@drawable/alerter_ic_notifications"-->
+
+            <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
+            <!--app:layout_constraintLeft_toRightOf="@+id/playerImage"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/lvlTitle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="12dp"-->
+            <!--android:text="111 lvl"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/player_labels"-->
+
+            <!--/>-->
+    <!--</LinearLayout>-->
+
+
+
+    <ImageView
+        android:id="@+id/playerImage2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/user"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
+
+    <TextView
+        android:id="@+id/username2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+
+        android:text="Username"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playerImage"
+
+        />
+
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/player2Time"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:wlv_borderColor="@color/colorAccent"
+        app:wlv_borderWidth="3dp"
+        app:wlv_progressValue="40"
+        app:wlv_shapeType="circle"
+        app:wlv_round_rectangle="true"
+        app:wlv_triangle_direction="north"
+        app:wlv_waveColor="@color/colorAccent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/username2"
+        >
+    </me.itangqi.waveloadingview.WaveLoadingView>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/player_labels2"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--&gt;-->
+
+
+        <!--<ImageView-->
+            <!--android:id="@+id/lvlImage2"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:src="@drawable/alerter_ic_notifications"-->
+
+            <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
+            <!--app:layout_constraintLeft_toRightOf="@+id/playerImage2"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/lvlTitle2"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="12dp"-->
+            <!--android:text="111 lvl"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/player_labels2"-->
+
+            <!--/>-->
+    <!--</LinearLayout>-->
 
     <include
         android:id="@+id/gameboard"
         layout="@layout/board"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/player1Time"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

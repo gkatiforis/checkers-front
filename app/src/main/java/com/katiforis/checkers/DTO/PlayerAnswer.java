@@ -4,6 +4,8 @@ import com.katiforis.checkers.DTO.response.GameResponse;
 import com.katiforis.checkers.DTO.response.ResponseState;
 import com.katiforis.checkers.game.Move;
 
+import java.util.List;
+
 
 public class PlayerAnswer extends GameResponse {
     private String description;
@@ -11,7 +13,7 @@ public class PlayerAnswer extends GameResponse {
     private boolean isCorrect = false;
     private UserDto player;
     private Move move;
-    private UserDto currentPlayer;
+    private List<UserDto> players;
 
     public PlayerAnswer(String status, String gameId) {
         super(status, gameId);
@@ -57,11 +59,11 @@ public class PlayerAnswer extends GameResponse {
         this.move = move;
     }
 
-    public UserDto getCurrentPlayer() {
-        return currentPlayer;
+    public List<UserDto> getPlayers() {
+        return players;
     }
 
-    public void setCurrentPlayer(UserDto currentPlayer) {
-        this.currentPlayer = currentPlayer;
+    public void setPlayers(List<UserDto> players) {
+        this.players = players;
     }
 }

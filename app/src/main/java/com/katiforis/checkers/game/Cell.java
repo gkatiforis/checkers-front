@@ -45,7 +45,7 @@ public class Cell implements Serializable {
 		return (this.placedPiece != null);
 	}
 
-	public void movePiece(Cell anotherCell) throws IllegalArgumentException {
+	public void movePiece(Cell anotherCell) {
 		if(anotherCell == null){
 			return;
 		}
