@@ -61,7 +61,7 @@ public class RankController extends MenuController {
             rankFragment.setRankList(rankList);
         }
         else{
-            addTopic();
+            addTopic(false);
             GetRank get = new GetRank();
             Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
         }
@@ -70,7 +70,7 @@ public class RankController extends MenuController {
     public void getRankListIfExpired(){
         RankList rankList = LocalCache.getInstance().get(RANK_LIST, rankFragment.getActivity());
         if(rankList == null){
-            addTopic();
+            addTopic(false);
             GetRank get = new GetRank();
             Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
         }

@@ -8,40 +8,18 @@ import java.util.List;
 
 
 public class PlayerAnswer extends GameResponse {
-    private String description;
-    private Integer points;
-    private boolean isCorrect = false;
     private UserDto player;
     private Move move;
     private List<UserDto> players;
+
+    private String message;
+    private Boolean resign;
+    private Boolean offerDraw;
 
     public PlayerAnswer(String status, String gameId) {
         super(status, gameId);
     }
     public PlayerAnswer(){this.status = ResponseState.ANSWER.getState();}
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getPoints() {
-        return points;
-    }
-
-    public void setPoints(Integer points) {
-        this.points = points;
-    }
-
-    public boolean isCorrect() {
-        return isCorrect;
-    }
-
-    public void setCorrect(boolean correct) {
-        isCorrect = correct;
-    }
 
     public UserDto getPlayer() {
         return player;
@@ -65,5 +43,29 @@ public class PlayerAnswer extends GameResponse {
 
     public void setPlayers(List<UserDto> players) {
         this.players = players;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Boolean getResign() {
+        return resign;
+    }
+
+    public void setResign(Boolean resign) {
+        this.resign = resign;
+    }
+
+    public Boolean getOfferDraw() {
+        return offerDraw;
+    }
+
+    public void setOfferDraw(Boolean offerDraw) {
+        this.offerDraw = offerDraw;
     }
 }

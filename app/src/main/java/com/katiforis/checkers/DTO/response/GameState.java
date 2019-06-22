@@ -14,6 +14,7 @@ public class GameState extends GameResponse {
     private Date currentDate;
     private Date lastMoveDate;
     private Integer gameMaxTime;
+    private boolean draw;
 
     public GameState(){
         super();
@@ -96,5 +97,13 @@ public class GameState extends GameResponse {
         }else{
             return players.get(1);
         }
+    }
+
+    public boolean isDraw() {
+        return draw;
+    }
+
+    public void setDraw(boolean draw) {
+        this.draw = draw;
     }
 }

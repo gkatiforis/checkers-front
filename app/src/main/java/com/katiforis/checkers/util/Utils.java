@@ -16,7 +16,7 @@ public class Utils {
 
     public static long getDiffInSeconds(Date d1, Date d2){
         long diff = d2.getTime() - d1.getTime();
-        long diffSeconds = diff / 1000 % 60;
+        long diffSeconds = diff / 1000;
         return diffSeconds;
     }
 }

@@ -40,9 +40,7 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
     @Override
     public void onBindViewHolder(AnswerViewHolder holder, int position) {
         PlayerAnswer playerAnswer = playerAnswers.get(position);
-        holder.description.setText(playerAnswer.getDescription());
         holder.username.setText(playerAnswer.getPlayer().getUsername());
-        holder.points.setText(playerAnswer.getPoints().toString());
     }
 
     @Override

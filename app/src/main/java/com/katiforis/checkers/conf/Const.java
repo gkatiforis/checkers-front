@@ -9,7 +9,6 @@ public class Const {
 
 	public static final String MENU = "/menu";
 	public static final String FIND_GAME = MENU + "/game/find";
-	public static final String LOGIN = MENU + "/login";
 	public static final String GET_FRIEND_LIST = MENU + "/friend";
 	public static final String GET_NOTIFICATION_LIST = MENU + "/notification";
 	public static final String GET_RANK = MENU + "/rank";
@@ -17,7 +16,7 @@ public class Const {
 	public static final String GET_LOBBY = MENU + "/lobby";
 	public static final String MAIN_TOPIC_RESPONSE = "/user/main";
 
-	public static final String SEND_WORD = "/game/group/word/" + placeholder;
+	public static final String SEND_WORD = "/game/group/game/" + placeholder;
 	public static final String GET_GAME_STATE = "/game/gamestate";
 	public static final String GAME_RESPONSE = "/game/group/" + placeholder;
 

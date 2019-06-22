@@ -5,8 +5,9 @@ import com.katiforis.checkers.DTO.UserDto;
 import java.util.List;
 
 public class GameStats extends GameResponse {
-
-    List<UserDto> players;
+    private String winnerColor;
+    private List<UserDto> players;
+    private boolean draw;
 
     public GameStats(String gameId) {
         super(ResponseState.END_GAME.getState(), gameId);
@@ -33,5 +34,21 @@ public class GameStats extends GameResponse {
 
     public void setPlayers(List<UserDto> players) {
         this.players = players;
+    }
+
+    public String getWinnerColor() {
+        return winnerColor;
+    }
+
+    public void setWinnerColor(String winnerColor) {
+        this.winnerColor = winnerColor;
+    }
+
+    public boolean isDraw() {
+        return draw;
+    }
+
+    public void setDraw(boolean draw) {
+        this.draw = draw;
     }
 }

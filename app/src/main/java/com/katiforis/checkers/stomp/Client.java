@@ -1,10 +1,14 @@
 package com.katiforis.checkers.stomp;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
+import com.katiforis.checkers.activities.GameActivity;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.conf.Const;
+import com.katiforis.checkers.controller.GameController;
+import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.fragment.NotificationFragment;
 import com.katiforis.checkers.util.LocalCache;
 
@@ -100,6 +104,7 @@ public class Client {
             NotificationFragment.populated = false;
             MenuActivity.populated = false;
             MenuActivity.INSTANCE.showNoInternetDialog(true);
+            GameActivity.INSTANCE.showNoInternetDialog(true);
             this.tryToReconnect();
     }
 
@@ -114,6 +119,9 @@ public class Client {
             reconnecting = false;
             handler.removeCallbacks(this::reconnect);
             MenuActivity.INSTANCE.showNoInternetDialog(false);
+            GameActivity.INSTANCE.showNoInternetDialog(false);
+            HomeController.getInstance().addTopic(true);
+            GameController.getInstance().getGameState();
         }
     }
 
@@ -122,16 +130,16 @@ public class Client {
         handler.postDelayed(this::reconnect, RECONNECT_DELAY_IN_SECONDS * 1000);
     }
 
-    public static Flowable<StompMessage> addTopic(final String controllerId, final String topicId){
+    public static Flowable<StompMessage> addTopic(final String controllerId, final String topicId, final boolean force){
         if(controllerId == null || topicId == null){
             return null;
         }
 
-        if (subscriptionsByTopics.get(topicId) == null) {
+        if (subscriptionsByTopics.get(topicId) == null || force) {
             subscriptionsByTopics.put(topicId,stompClient.topic(topicId));
         }
 
-        if(topicsByControllers.get(controllerId) == null) {
+        if(topicsByControllers.get(controllerId) == null || force) {
             topicsByControllers.put(controllerId, topicId);
             return subscriptionsByTopics.get(topicId);
         }else{
@@ -148,7 +156,7 @@ public class Client {
     }
 
     public static void send(String destination, String data) {
-        final Handler handler = new Handler();
+        final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

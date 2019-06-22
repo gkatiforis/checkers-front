@@ -18,10 +18,10 @@
 
 
     <TextView
-        android:id="@+id/dialogTitle"
+        android:id="@+id/statsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Αποτελεσματα"
+        android:text="Results"
         android:textSize="25dp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/dialogImage"
@@ -57,9 +57,16 @@
         app:layout_constrainedHeight="true"
         android:scrollbars="vertical"
         android:background="@drawable/background"
-        app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
-        app:layout_constraintBottom_toTopOf="@+id/returnToMenu"
+        app:layout_constraintTop_toBottomOf="@+id/statsTitle"
+        app:layout_constraintBottom_toTopOf="@+id/restartGame"
         tools:showIn="@layout/fragment_game_stats_layout"/>
+
+    <Button
+        android:id="@+id/restartGame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="restart game"
+        app:layout_constraintBottom_toTopOf="@+id/returnToMenu"></Button>
 
     <Button
         android:id="@+id/returnToMenu"

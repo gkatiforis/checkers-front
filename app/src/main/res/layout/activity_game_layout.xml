@@ -3,7 +3,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout"
+    android:id="@+id/gameActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -77,6 +77,28 @@
     <!--</LinearLayout>-->
 
 
+    <LinearLayout
+        android:id="@+id/actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/username">
+
+        <Button
+            android:id="@+id/offerDraw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Offer draw" />
+
+        <Button
+            android:id="@+id/resign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Resign" />
+
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/playerImage2"

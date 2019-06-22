@@ -8,10 +8,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -57,6 +59,11 @@ public class GameActivity extends AppCompatActivity {
 	long dateCurrent;
 	ExplosionField explosionField;
 
+	Snackbar snack;
+
+	private Button offerDraw;
+	private Button resign;
+
 	private GameController gameController;
 	public static boolean populated;
 
@@ -73,6 +80,7 @@ public class GameActivity extends AppCompatActivity {
 	public void setGameState(GameState gamestate){
 		runOnUiThread(() -> {
 				Log.i(Const.TAG, "GameState：" + gamestate);
+				initComponents();
 				setPlayerList(gamestate.getPlayers());
 				dateStarted = gamestate.getDateStarted().getTime();
 				dateCurrent = gamestate.getCurrentDate().getTime();
@@ -175,6 +183,38 @@ public class GameActivity extends AppCompatActivity {
 //				.setPosition(0f, -359f, -359f, 0f)
 //				.stream(200, 5000L);
 
+		offerDraw = findViewById(R.id.offerDraw);
+		resign = findViewById(R.id.resign);
+
+		offerDraw.setOnClickListener(p -> {
+			sendOfferDraw();
+		});
+
+		resign.setOnClickListener(p -> {
+			sendResign();
+		});
+
+
+		snack = Snackbar.make(findViewById(R.id.gameActivity), "No internet connection. ", Snackbar.LENGTH_INDEFINITE);
+		View view = snack.getView();
+		FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
+		params.gravity = Gravity.TOP;
+		view.setLayoutParams(params);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+			this.resizeBoardToScreenSizePortrait();
+		}
+		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			this.resizeBoardToScreenSizeLandscape();
+		}
+		srcCell = null;
+		dstCell = null;
+		srcCellFixed = false;
+		highlightedCells = new ArrayList<>();
+		buttons_id = getButtonArray();
+		buttonBoard = new Button[8][8];
+		fillButtonBoard(listener);
+		this.moves = new ArrayList<>();
     }
 
 
@@ -201,6 +241,18 @@ public class GameActivity extends AppCompatActivity {
 	public void sendMove(Move move){
 		PlayerAnswer playerAnswer = new PlayerAnswer();
 		playerAnswer.setMove(move);
+		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+	}
+
+	public void sendResign(){
+		PlayerAnswer playerAnswer = new PlayerAnswer();
+		playerAnswer.setResign(true);
+		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+	}
+
+	public void sendOfferDraw(){
+		PlayerAnswer playerAnswer = new PlayerAnswer();
+		playerAnswer.setOfferDraw(true);
 		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
 	}
 
@@ -233,20 +285,7 @@ public class GameActivity extends AppCompatActivity {
 		populated = false;
 		gameController = GameController.getInstance();
 		gameController.setGameActivity(this);
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-			this.resizeBoardToScreenSizePortrait();
-		}
-		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			this.resizeBoardToScreenSizeLandscape();
-		}
-		srcCell = null;
-		dstCell = null;
-		srcCellFixed = false;
-		highlightedCells = new ArrayList<>();
-		buttons_id = getButtonArray();
-		buttonBoard = new Button[8][8];
-		fillButtonBoard(listener);
-		this.moves = new ArrayList<>();
+
 	}
 
 	@Override
@@ -261,7 +300,7 @@ public class GameActivity extends AppCompatActivity {
 		if (gameId == null || gameId.length() == 0) {
 			return;
 		}
-		gameController.getGameState(gameId);
+		gameController.getGameState();
 	}
 
 	@Override
@@ -285,6 +324,7 @@ public class GameActivity extends AppCompatActivity {
 	public void playerTurn(int xCord, int yCord){
 
 		if (cellBoard.hasMoves(Piece.DARK) && cellBoard.hasMoves(Piece.LIGHT)) {
+
 			if (cellBoard.getCell(xCord, yCord).containsPiece() && cellBoard.getCell(xCord, yCord).getPlacedPiece().getColor().equals(currentPlayer.getColor()) && srcCell == null) {
 				unHighlightPieces();
 				srcCell = cellBoard.getCell(xCord, yCord);
@@ -307,15 +347,14 @@ public class GameActivity extends AppCompatActivity {
 				else {
 					showPossibleMoves(moves);
 				}
-			}
-			else if (srcCell != null && srcCell.equals(cellBoard.getCell(xCord, yCord)) && !srcCellFixed) {
+			}//&& srcCell.equals(cellBoard.getCell(xCord, yCord))
+			else if (srcCell != null && !cellBoard.isPossibleMove(srcCell.getX(), srcCell.getY(), xCord, yCord) && !srcCellFixed) {
 				srcCell = null;
 				updatePieces(xCord, yCord);
 				updateTurnTracker();
 			} else if (!cellBoard.getCell(xCord, yCord).containsPiece() && moveExist(cellBoard.getCell(xCord, yCord)) && srcCell != null) {
 				dstCell = cellBoard.getCell(xCord, yCord);
 				sendMove(new Move(dstCell, srcCell, srcCell.getPlacedPiece()));
-
 			}
 		}
 	}
@@ -341,9 +380,9 @@ public class GameActivity extends AppCompatActivity {
 	public void makeMove(UserDto fromPlayer, UserDto toPlayer, Cell givenSrcCell, Cell givenDstCell) {
 		unHighlightPieces();
 		boolean captureMove = cellBoard.isCaptureMove(givenSrcCell, givenDstCell);
-//		if(!cellBoard.isValidMove(givenSrcCell, givenDstCell)){
-//			return;
-//		}
+		if(!cellBoard.isValidMove(givenSrcCell, givenDstCell)){
+			return;
+		}
 		List<Cell> changedCells = cellBoard.movePiece(givenSrcCell.getCoords(), givenDstCell.getCoords());
 		updatePieces(changedCells);
 		if (captureMove) {
@@ -371,14 +410,15 @@ public class GameActivity extends AppCompatActivity {
 	}
 
 	public int[] getButtonArray(){
-		int[] buttons_id = {R.id.button0, R.id.button2, R.id.button4, R.id.button6,
-				R.id.button9, R.id.button11, R.id.button13, R.id.button15,
-				R.id.button16, R.id.button18, R.id.button20, R.id.button22,
-				R.id.button25, R.id.button27, R.id.button29, R.id.button31,
-				R.id.button32, R.id.button34, R.id.button36, R.id.button38,
-				R.id.button41, R.id.button43, R.id.button45, R.id.button47,
-				R.id.button48, R.id.button50, R.id.button52, R.id.button54,
-				R.id.button57, R.id.button59, R.id.button61, R.id.button63};
+		int[] buttons_id = {R.id.button0, R.id.button1, R.id.button2, R.id.button3, R.id.button4,
+				R.id.button5, R.id.button6, R.id.button7, R.id.button8,
+				R.id.button9, R.id.button10, R.id.button11, R.id.button12, R.id.button13, R.id.button14, R.id.button15,
+				R.id.button16, R.id.button17, R.id.button18, R.id.button19, R.id.button20, R.id.button21, R.id.button22,
+				R.id.button23, R.id.button24, R.id.button25, R.id.button26, R.id.button27, R.id.button28, R.id.button29, R.id.button30, R.id.button31,
+				R.id.button32, R.id.button33, R.id.button34, R.id.button35, R.id.button36, R.id.button37, R.id.button38,
+				R.id.button39, R.id.button40, R.id.button41, R.id.button42, R.id.button43, R.id.button44, R.id.button45, R.id.button46, R.id.button47,
+				R.id.button48, R.id.button49, R.id.button50, R.id.button51, R.id.button52, R.id.button53, R.id.button54,
+				R.id.button55, R.id.button56, R.id.button57, R.id.button58, R.id.button59, R.id.button60, R.id.button61, R.id.button62, R.id.button63};
 		return buttons_id;
 	}
 
@@ -386,12 +426,12 @@ public class GameActivity extends AppCompatActivity {
 		int index = 0;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				if ((i + j) % 2 == 0) {
+				//if ((i + j) % 2 == 0) {
 					buttonBoard[i][j] = (Button) findViewById(buttons_id[index]);
 					index++;
 					buttonBoard[i][j].setTag(i * 10 + j);
 					buttonBoard[i][j].setOnClickListener(listener);
-				}
+				//}
 			}
 		}
 	}
@@ -430,21 +470,24 @@ public class GameActivity extends AppCompatActivity {
 			possMoves = moves.get(i);
 			buttonBoard[possMoves.getTo().getX()][possMoves.getTo().getY()].setBackgroundResource(R.drawable.blank_square);
 		}
-//		&& cellBoard.getCell(xCord, yCord).containsPiece()
-		if (cellBoard.getCell(xCord, yCord).getPlacedPiece().getColor().equals(Piece.LIGHT)) {
-			if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
-				buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.light_king_piece);
+		Cell cell = cellBoard.getCell(xCord, yCord);
+
+		if(cell.getPlacedPiece() != null){
+			if (cell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
+				if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
+					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.light_king_piece);
+				}
+				else {
+					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.light_piece);
+				}
 			}
 			else {
-				buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.light_piece);
-			}
-		}
-		else {
-			if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
-				buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.dark_king_piece);
-			}
-			else {
-				buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.dark_piece);
+				if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
+					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.dark_king_piece);
+				}
+				else {
+					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.dark_piece);
+				}
 			}
 		}
 	}
@@ -593,6 +636,7 @@ public class GameActivity extends AppCompatActivity {
 		}
 	}
 
+
 	public void showPossibleMoves(List<Move> moves) {
 		for (Move cell : moves) {
 			if(srcCell != null && srcCell.equals(cell.getFrom())){
@@ -616,14 +660,12 @@ public class GameActivity extends AppCompatActivity {
 	}
 
 	public void resizeBoardToScreenSizePortrait(){
-		// Gets the width of the current screen
 		WindowManager wm = (WindowManager) this.getApplication().getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
 		double width = metrics.widthPixels;
 
-		// Sets the width & height for the game board image
 		ImageView imageView = (ImageView) findViewById(R.id.boardImageView);
 		ViewGroup.LayoutParams imageParams = imageView.getLayoutParams();
 		imageParams.width =  (int) (width * 1.0028);
@@ -669,4 +711,15 @@ public class GameActivity extends AppCompatActivity {
 	public boolean isMe(UserDto player){
 		return this.currentPlayer != null && player.getUserId().equals(LocalCache.getInstance().getString(USER_ID));
 	}
+
+	public void showNoInternetDialog(boolean show){
+		if(snack == null)return;
+		if(!show){
+			snack.dismiss();
+		}
+		if(show && !snack.isShown()){
+			snack.show();
+		}
+	}
+
 }

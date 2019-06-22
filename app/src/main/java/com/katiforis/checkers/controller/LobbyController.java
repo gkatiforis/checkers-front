@@ -60,7 +60,7 @@ public class LobbyController extends MenuController{
     }
 
     public void getLobby(){
-        addTopic();
+        addTopic(false);
         Client.getInstance().send(Const.GET_LOBBY);
     }
 }

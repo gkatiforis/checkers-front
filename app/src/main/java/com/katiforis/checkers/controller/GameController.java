@@ -45,12 +45,14 @@ public class GameController extends AbstractController{
             //JSONObject message= messageWrapper.getJSONObject("message");
 
             if (messageStatus.equalsIgnoreCase(ResponseState.END_GAME.getState())) {
-                Client.clearTopics(this.getClass().getName());
+               // Client.clearTopics(this.getClass().getName());
                 Gson gson = new Gson();
                 GameStats gameStats = gson.fromJson(message, GameStats.class);
                 gameStatsFragment = GameStatsFragment.getInstance();
-                gameStatsFragment.show(gameActivity.getSupportFragmentManager(), "");
                 gameStatsFragment.setGameStats(gameStats);
+                gameStatsFragment.show(gameActivity.getSupportFragmentManager(), "");
+                gameStatsFragment.showPlayerList();
+
             } else if (messageStatus.equalsIgnoreCase(ResponseState.ANSWER.getState())) {
                 Gson gson = new Gson();
                 PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
@@ -58,15 +60,20 @@ public class GameController extends AbstractController{
             }
     }
 
+    public void restartGame() {
+        HomeController.getInstance().restartGame();
+    }
+
     public void sendAnswer(String gameId, Object object ){
-        addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
+        //addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
         Gson gson = new Gson();
         String jsonInString = gson.toJson(object);
         Client.getInstance().send( Const.SEND_WORD.replace("placeholder", gameId), jsonInString);
     }
 
-    public void getGameState(String gameId){
-        addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
+    public void getGameState(){
+        String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID);
+        addTopic(gameId, true);
         Client.getInstance().send(Const.GET_GAME_STATE,  gameId);
     }
 
@@ -82,8 +89,8 @@ public class GameController extends AbstractController{
         this.gameStatsFragment = gameStatsFragment;
     }
 
-    public void addTopic(String gameId) {
+    public void addTopic(String gameId, final boolean force) {
         if(gameId == null)return;
-        super.addTopic(Const.GAME_RESPONSE.replace("placeholder", gameId));
+        super.addTopic(Const.GAME_RESPONSE.replace("placeholder", gameId), force);
     }
 }

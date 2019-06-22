@@ -91,13 +91,21 @@ public class HomeController extends MenuController{
     }
 
     public void findGame(){
+        Client.clearTopics(GameController.class.getName());
         FindGame findGame = new FindGame(LocalCache.getInstance().getString(CURRENT_GAME_ID));
-        addTopic();
+        addTopic(false);
+        Client.send(Const.FIND_GAME, gson.toJson(findGame));
+    }
+
+    public void restartGame(){
+        FindGame findGame = new FindGame(LocalCache.getInstance().getString(CURRENT_GAME_ID));
+        findGame.setRestart(true);
+        addTopic(false);
         Client.send(Const.FIND_GAME, gson.toJson(findGame));
     }
 
     public void getFriendList() {
-        addTopic();
+        addTopic(false);
         Client.send(Const.GET_FRIEND_LIST);
     }
 
@@ -107,7 +115,7 @@ public class HomeController extends MenuController{
             homeFragment.populatePlayerDetails(playerDto);
         }
         else{
-            addTopic();
+            addTopic(false);
             Client.getInstance().send(Const.GET_USER_DETAILS);
         }
     }
@@ -115,7 +123,7 @@ public class HomeController extends MenuController{
     public void getPlayerDetailsIfExpired(){
         UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, homeFragment.getActivity());
         if(playerDto == null){
-            addTopic();
+            addTopic(false);
             Client.getInstance().send(Const.GET_USER_DETAILS);
         }
     }

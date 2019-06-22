@@ -60,6 +60,7 @@ public class Board implements Serializable {
     }
 
     public boolean isValidMove(Cell srcCell, Cell dstCell){
+        srcCell = getCell(srcCell.getX(), srcCell.getY());
         List<Move> moves = possibleMoves(srcCell);
         for(Move move:moves){
             if(move.getTo().equals(dstCell)){
@@ -84,6 +85,18 @@ public class Board implements Serializable {
             cell.placePiece(null);
         }
     }
+
+    public boolean isPossibleMove(int fromX, int fromY, int toX, int toY) {
+        Cell fromCell = getCell(fromX, fromY);
+        Cell toCell = getCell(toX, toY);
+        for(Move move:possibleMoves(fromCell)){
+           if(move.getTo().equals(toCell)){
+               return true;
+           }
+        }
+        return false;
+    }
+
     public List<Move> possibleMoves(Cell cell)  {
         return possibleMoves(Arrays.asList(cell));
     }
