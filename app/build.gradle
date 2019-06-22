@@ -1,18 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.katiforis.checkers"
         minSdkVersion 16
-        targetSdkVersion 26
-        versionCode 11
+        targetSdkVersion 28
+        versionCode 15
         versionName "0.0.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -33,27 +34,28 @@ repositories {
 
 dependencies {
 
-    implementation 'com.google.android.gms:play-services-auth:15.0.1'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation 'com.android.support:cardview-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.nightonke:boommenu:2.1.1'
     implementation 'com.txusballesteros:bubbles:1.2.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
     implementation 'com.facebook.shimmer:shimmer:0.3.0'
     implementation 'tyrantgit:explosionfield:1.0.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.tapadoo.android:alerter:2.0.0'
     implementation 'com.squareup.picasso:picasso:2.2.0'
     implementation 'me.itangqi.waveloadingview:library:0.3.5'

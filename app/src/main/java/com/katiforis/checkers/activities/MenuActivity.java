@@ -3,16 +3,18 @@ package com.katiforis.checkers.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,17 +24,14 @@ import android.widget.FrameLayout;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.FriendList;
-import com.katiforis.checkers.DTO.response.GameStats;
 import com.katiforis.checkers.adapter.FriendAdapter;
 import com.katiforis.checkers.adapter.ViewPagerAdapter;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.controller.HomeController;
-import com.katiforis.checkers.fragment.GameStatsFragment;
 import com.katiforis.checkers.fragment.LobbyFragment;
 import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.fragment.RankFragment;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
@@ -152,7 +151,7 @@ public class MenuActivity extends AppCompatActivity {
 		ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 		adapter.addFragment(RankFragment.getInstance());
 		adapter.addFragment(HomeFragment.getInstance());
-		adapter.addFragment(new android.support.v4.app.Fragment());
+		adapter.addFragment(new Fragment());
 		adapter.addFragment(LobbyFragment.getInstance());
 		viewPager.setAdapter(adapter);
 		viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
