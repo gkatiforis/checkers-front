@@ -6,15 +6,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/background">
 
-    <ImageView
-        android:id="@+id/dialogImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/notification"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+    <!--<ImageView-->
+        <!--android:id="@+id/dialogImage"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:src="@drawable/notification"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--/>-->
 
 
     <TextView
@@ -65,13 +65,20 @@
         android:id="@+id/restartGame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="restart game"
+        android:text="Play again ("
+        app:layout_constraintBottom_toTopOf="@+id/newOpponent"></Button>
+
+    <Button
+        android:id="@+id/newOpponent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Search for new opponent"
         app:layout_constraintBottom_toTopOf="@+id/returnToMenu"></Button>
 
     <Button
         android:id="@+id/returnToMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Επιστροφή στο menu"
+        android:text="Main menu"
         app:layout_constraintBottom_toBottomOf="parent"></Button>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.katiforis.checkers.DTO.PlayerDetailsDto;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.activities.MenuActivity;
@@ -25,6 +26,8 @@ import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.LocalCache;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import static android.content.ContentValues.TAG;
 import static com.katiforis.checkers.util.CachedObjectProperties.TOKEN;
@@ -41,6 +44,10 @@ public class HomeFragment extends Fragment {
     private Button login;
     //private Button playWithFriend;
     private TextView username;
+    private TextView lvlTitle;
+    private TextView pointsTitle;
+    private TextView coinsTitle;
+
     private ImageView playerImage;
 
 
@@ -65,8 +72,13 @@ public class HomeFragment extends Fragment {
         logout = v.findViewById(R.id.logout);
         play = v.findViewById(R.id.play);
         login = v.findViewById(R.id.login);
+        logout.setVisibility(View.GONE);
+        login.setVisibility(View.GONE);
         //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
+        lvlTitle = v.findViewById(R.id.lvlTitle);
+        pointsTitle = v.findViewById(R.id.pointsTitle);
+        coinsTitle = v.findViewById(R.id.coinsTitle);
         playerImage =  v.findViewById(R.id.playerImage);
 
         login.setOnClickListener(p -> {
@@ -148,18 +160,23 @@ public class HomeFragment extends Fragment {
                     onLogin(account);
                 }else{
                     //TODO repost exception to usesr
+                    login.setVisibility(View.VISIBLE);
                 }
             } catch (ApiException e) {
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                login.setVisibility(View.VISIBLE);
             }catch (Exception e){
                 //TODO repost exception to usesr
                 Log.w(TAG, "signInResult:failed ", e);
+                login.setVisibility(View.VISIBLE);
             }
         }
     }
 
     private void onLogin(GoogleSignInAccount account){
-        LocalCache.getInstance().saveString(TOKEN, account.getIdToken());
+         logout.setVisibility(View.VISIBLE);
+         login.setVisibility(View.GONE);
+        LocalCache.getInstance().saveString(TOKEN,account.getIdToken());
         if(Client.isConnected()){
             Client.getInstance().disconnect();
             Client.getInstance();
@@ -180,7 +197,26 @@ public class HomeFragment extends Fragment {
 
     public void populatePlayerDetails(UserDto playerDto){
         getActivity().runOnUiThread(() -> {
+            if(playerDto.getUserId().startsWith("guest_")){
+                login.setVisibility(View.VISIBLE);
+            }
             username.setText(playerDto.getUsername());
+            PlayerDetailsDto playerDetailsDto = playerDto.getPlayerDetails();
+            lvlTitle.setText(String.valueOf(playerDetailsDto.getLevel()));
+            coinsTitle.setText(String.valueOf(playerDetailsDto.getCoins()));
+            pointsTitle.setText(String.valueOf(playerDetailsDto.getElo()));
+            Picasso.with(getActivity())
+                    .load(playerDto.getPictureUrl())
+                    .error(R.mipmap.ic_launcher)
+                    .into(playerImage, new Callback() {
+                        @Override
+                        public void onSuccess() {     }
+
+                        @Override
+                        public void onError() {
+                            //TODO
+                        }
+                    });
         });
     }
 }

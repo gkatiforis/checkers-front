@@ -180,6 +180,7 @@ public class Client {
                     stompClient.send(destination).subscribe(
                             () -> Log.d(TAG, "Data sent"),
                             throwable -> {
+                                handler.postDelayed(this, 1000);
                                 Log.e(TAG, "Error on sending data", throwable);
                             });
                 }

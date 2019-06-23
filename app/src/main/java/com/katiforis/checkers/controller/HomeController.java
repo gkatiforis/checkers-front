@@ -77,11 +77,7 @@ public class HomeController extends MenuController{
             GameActivity.INSTANCE.setGameState(gameState);
         }else if(messageStatus.equalsIgnoreCase(ResponseState.USER_STATS.getState())){
             UserStats userStats = gson.fromJson(message, UserStats.class);
-            if(userStats.getUserDto().getEmail() == null){
-                LocalCache.getInstance().saveString(USER_ID, userStats.getUserDto().getUserId());
-            }else{
-                LocalCache.getInstance().saveString(USER_ID, null);
-            }
+            LocalCache.getInstance().saveString(USER_ID, userStats.getUserDto().getUserId());
             homeFragment.populatePlayerDetails(userStats.getUserDto());
         }
         else if(messageStatus.equalsIgnoreCase(ResponseState.FRIEND_LIST.getState())){

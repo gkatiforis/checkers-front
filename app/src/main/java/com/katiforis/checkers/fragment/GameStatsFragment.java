@@ -10,6 +10,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -21,13 +23,14 @@ import com.katiforis.checkers.R;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.adapter.PlayersStatsAdapter;
 import com.katiforis.checkers.controller.GameController;
+import com.katiforis.checkers.game.Piece;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameStatsFragment extends DialogFragment {
     private static GameStatsFragment INSTANCE = null;
-   GameController gameController;
+    private GameController gameController;
     private Button restart;
     private TextView title;
     public static boolean populated;
@@ -35,7 +38,11 @@ public class GameStatsFragment extends DialogFragment {
     private RecyclerView playersStatsRecyclerView;
     private PlayersStatsAdapter playersStatsAdapter;
     private List<UserDto> players = new ArrayList<>();
+    private GameStats gameStats;
     private Button returnToMenu;
+    private Button newOpponent;
+    private CountDownTimer countDownTimer;
+    private boolean restartGame = false;
 
     public static GameStatsFragment getInstance() {
             synchronized(GameStatsFragment.class) {
@@ -61,6 +68,7 @@ public class GameStatsFragment extends DialogFragment {
         playersStatsAdapter = new PlayersStatsAdapter(players);
         returnToMenu = (Button) view.findViewById(R.id.returnToMenu);
         restart = (Button) view.findViewById(R.id.restartGame);
+        newOpponent = (Button) view.findViewById(R.id.newOpponent);
         title = (TextView) view.findViewById(R.id.statsTitle);
 
         returnToMenu.setOnClickListener(c ->{
@@ -69,6 +77,12 @@ public class GameStatsFragment extends DialogFragment {
 
         restart.setOnClickListener(c ->{
             gameController.restartGame();
+            restartGame = true;
+        });
+
+        newOpponent.setOnClickListener(c ->{
+            restart.setVisibility(View.GONE);
+            gameController.findNewOpponent();
         });
 
         playersStatsRecyclerView.smoothScrollToPosition(0);
@@ -88,6 +102,26 @@ public class GameStatsFragment extends DialogFragment {
                 }
             });
         }
+
+        if(countDownTimer != null){
+            countDownTimer.cancel();
+        }
+
+        countDownTimer = new CountDownTimer(30 * 1000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                Long remainingSeconds = millisUntilFinished / 1000;
+                if(restartGame){
+                    restart.setText("Waiting for your opponent (" + remainingSeconds + ")");
+                }else {
+                    restart.setText("Play again(" + remainingSeconds + ")");
+                }
+            }
+            public void onFinish() {
+                restartGame = false;
+                restart.setVisibility(View.GONE);
+            }
+        }.start();
+
         return dialog;
     }
 
@@ -98,7 +132,7 @@ public class GameStatsFragment extends DialogFragment {
         startActivity(intent);
     }
 
-    private GameStats gameStats;
+
     public GameStats getGameStats() {
         return gameStats;
     }
@@ -117,6 +151,4 @@ public class GameStatsFragment extends DialogFragment {
             });
         }
     }
-
-
 }

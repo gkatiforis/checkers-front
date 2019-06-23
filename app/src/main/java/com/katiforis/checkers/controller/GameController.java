@@ -64,6 +64,10 @@ public class GameController extends AbstractController{
         HomeController.getInstance().restartGame();
     }
 
+    public void findNewOpponent() {
+        HomeController.getInstance().findGame();
+    }
+
     public void sendAnswer(String gameId, Object object ){
         //addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
         Gson gson = new Gson();

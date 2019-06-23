@@ -114,19 +114,19 @@ public class RankFragment extends Fragment {
                    players.remove(0);
 
                    Picasso.with(MenuActivity.getAppContext())
-                           .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                           .load(first.getPictureUrl())
                            .error(R.mipmap.ic_launcher)
                            .into(playerImage);
                    username.setText(first.getUsername());
 
                    Picasso.with(MenuActivity.getAppContext())
-                           .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                           .load(second.getPictureUrl())
                            .error(R.mipmap.ic_launcher)
                            .into(playerImage2);
                    username2.setText(second.getUsername());
 
                    Picasso.with(MenuActivity.getAppContext())
-                           .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                           .load(third.getPictureUrl())
                            .error(R.mipmap.ic_launcher)
                            .into(playerImage3);
                    username3.setText(third.getUsername());

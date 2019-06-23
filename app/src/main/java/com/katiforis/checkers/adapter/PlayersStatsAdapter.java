@@ -46,7 +46,13 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
         UserDto playerDto = players.get(position);
         holder.username.setText(playerDto.getUsername());
         holder.points.setText(String.valueOf(playerDto.getPlayerDetails().getElo()));
-        holder.pointsExtra.setText(" + " + String.valueOf(playerDto.getPlayerDetails().getEloExtra()));
+
+        int extra = playerDto.getPlayerDetails().getEloExtra();
+        if(extra < 0){
+            holder.pointsExtra.setText("" + extra);
+        }else{
+            holder.pointsExtra.setText(" + " + extra);
+        }
     }
 
     @Override

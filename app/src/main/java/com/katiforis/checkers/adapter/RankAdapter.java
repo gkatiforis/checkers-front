@@ -50,7 +50,7 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
         UserDto player = rankList.get(position);
 
             Picasso.with(MenuActivity.getAppContext())
-                    .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                    .load(player.getPictureUrl())
                     .error(R.mipmap.ic_launcher)
                     .into(holder.playerImage, new Callback() {
                         @Override

@@ -9,7 +9,6 @@
         android:id="@+id/playerImage"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        android:src="@drawable/user"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -22,7 +21,7 @@
         android:layout_height="wrap_content"
         android:textSize="26dp"
         android:textStyle="bold"
-        android:text="Username"
+        android:text=""
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playerImage"
@@ -53,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp"
-        android:text="111 lvl"
+        android:text=""
         app:layout_constraintTop_toBottomOf="@+id/player_labels"
 
         />
@@ -67,14 +66,14 @@
         android:src="@drawable/star"
 
         app:layout_constraintTop_toBottomOf="@+id/username"
-        app:layout_constraintLeft_toRightOf="@+id/lvlP"/>
+        app:layout_constraintLeft_toRightOf="@+id/lvlTitle"/>
 
     <TextView
         android:id="@+id/pointsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp"
-        android:text="1.0999"
+        android:text=""
         app:layout_constraintTop_toBottomOf="@+id/username"
         app:layout_constraintLeft_toRightOf="@+id/pointsImage"
         />
@@ -93,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp"
-        android:text="99.9999"
+        android:text=""
         app:layout_constraintTop_toBottomOf="@+id/username"
         app:layout_constraintLeft_toRightOf="@+id/coinsImage"
         />
@@ -105,25 +104,26 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical|center"
         android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/player_labels">
 
-
         <!--<com.facebook.shimmer.ShimmerFrameLayout-->
-            <!--android:id="@+id/shimmer_view_container"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--app:shimmer_duration="5000">-->
+        <!--android:id="@+id/shimmer_view_container"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:shimmer_duration="5000">-->
 
 
-            <!--<TextView-->
-                <!--android:id="@+id/hi"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:gravity="center"-->
-                <!--android:textSize="38dp"-->
-                <!--android:text="Please wait a sec..." />-->
+        <!--<TextView-->
+        <!--android:id="@+id/hi"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center"-->
+        <!--android:textSize="38dp"-->
+        <!--android:text="Please wait a sec..." />-->
         <!--</com.facebook.shimmer.ShimmerFrameLayout>-->
 
         <Button
@@ -145,16 +145,17 @@
             android:text="@string/send" />
 
         <!--<Button-->
-            <!--android:id="@+id/play_with_friend"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="Play with friend" />-->
+        <!--android:id="@+id/play_with_friend"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Play with friend" />-->
+
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/show"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <!--<TextView-->
+        <!--android:id="@+id/show"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

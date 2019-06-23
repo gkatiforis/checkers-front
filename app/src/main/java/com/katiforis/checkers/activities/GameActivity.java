@@ -38,6 +38,8 @@ import com.katiforis.checkers.game.Move;
 import com.katiforis.checkers.game.Piece;
 import com.katiforis.checkers.util.LocalCache;
 import com.katiforis.checkers.util.Utils;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
 import tyrantgit.explosionfield.ExplosionField;
@@ -48,9 +50,11 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 public class GameActivity extends AppCompatActivity {
 
     public static GameActivity INSTANCE;
+	ImageView playerImage;
 	TextView username;
 	WaveLoadingView player1Time;
 
+	ImageView playerImage2;
 	TextView username2;
 	WaveLoadingView player2Time;
 
@@ -132,6 +136,7 @@ public class GameActivity extends AppCompatActivity {
 		getSupportActionBar().hide();
 		explosionField = ExplosionField.attach2Window(this);
 
+		playerImage = findViewById(R.id.playerImage);
 		username =  findViewById(R.id.username);
 
 		player1Time = (WaveLoadingView) findViewById(R.id.player1Time);
@@ -147,7 +152,7 @@ public class GameActivity extends AppCompatActivity {
 		player1Time.startAnimation();
 
 
-
+		playerImage2 = findViewById(R.id.playerImage2);
 		username2 =  findViewById(R.id.username2);
 
 		player2Time = (WaveLoadingView) findViewById(R.id.player2Time);
@@ -229,10 +234,59 @@ public class GameActivity extends AppCompatActivity {
 	}
 
 	void setPlayerList(List<UserDto> players){
+
 		if(players.get(0).getColor().equals(Piece.LIGHT)){
+			Picasso.with(this)
+					.load(players.get(0).getPictureUrl())
+					.error(R.mipmap.ic_launcher)
+					.into(playerImage, new Callback() {
+						@Override
+						public void onSuccess() {     }
+
+						@Override
+						public void onError() {
+							//TODO
+						}
+					});
+			Picasso.with(this)
+					.load(players.get(1).getPictureUrl())
+					.error(R.mipmap.ic_launcher)
+					.into(playerImage2, new Callback() {
+						@Override
+						public void onSuccess() {     }
+
+						@Override
+						public void onError() {
+							//TODO
+						}
+					});
 			username.setText(players.get(0).getUsername());
 			username2.setText(players.get(1).getUsername());
 		}else{
+			Picasso.with(this)
+					.load(players.get(1).getPictureUrl())
+					.error(R.mipmap.ic_launcher)
+					.into(playerImage, new Callback() {
+						@Override
+						public void onSuccess() {     }
+
+						@Override
+						public void onError() {
+							//TODO
+						}
+					});
+			Picasso.with(this)
+					.load(players.get(0).getPictureUrl())
+					.error(R.mipmap.ic_launcher)
+					.into(playerImage2, new Callback() {
+						@Override
+						public void onSuccess() {     }
+
+						@Override
+						public void onError() {
+							//TODO
+						}
+					});
 			username2.setText(players.get(0).getUsername());
 			username.setText(players.get(1).getUsername());
 		}
