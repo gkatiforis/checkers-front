@@ -1,10 +1,14 @@
 package com.katiforis.checkers.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.crashlytics.android.Crashlytics;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -34,6 +38,8 @@ import com.katiforis.checkers.fragment.RankFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fabric.sdk.android.Fabric;
+
 public class MenuActivity extends AppCompatActivity {
 	public static MenuActivity INSTANCE;
 	private static Context context;
@@ -61,6 +67,24 @@ public class MenuActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		Fabric.with(this, new Crashlytics());
+		PendingIntent intent = PendingIntent.getActivity(
+				this.getApplication().getBaseContext(),
+				0,
+				new Intent(getIntent()),
+				getIntent().getFlags());
+
+		Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) ->{
+			if(e instanceof io.reactivex.exceptions.OnErrorNotImplementedException){
+				intentToStartPage();
+			}else{
+				Crashlytics.logException(e);
+				AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+				mgr.set(AlarmManager.RTC, System.currentTimeMillis(), intent);
+				System.exit(2);
+			}
+		});
+
 		initialize();
 	}
 	public void intentToStartPage(){

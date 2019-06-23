@@ -34,8 +34,8 @@ public class Client {
 
     private static final Map<String, Flowable<StompMessage>> subscriptionsByTopics = new HashMap<>();
     private static final Map<String, String> topicsByControllers = new HashMap<>();
-    public static final String HEADER_TOKEN = "TOKEN";
-    public static final String HEADER_USER_ID = "USER_ID";
+    private static final String HEADER_TOKEN = "TOKEN";
+    private static final String HEADER_USER_ID = "USER_ID";
     private static final int RECONNECT_DELAY_IN_SECONDS = 10;
     private boolean reconnecting = false;
     private static boolean disconnectedFromUser = false;
@@ -148,11 +148,7 @@ public class Client {
     }
 
     public static void clearTopics(final String controllerId){
-        try{
         topicsByControllers.remove(controllerId);
-        }catch (Throwable e){
-            Log.e(TAG, "Error on sending data", e);
-        }
     }
 
     public static void send(String destination, String data) {

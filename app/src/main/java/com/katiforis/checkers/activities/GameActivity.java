@@ -644,7 +644,6 @@ public class GameActivity extends AppCompatActivity {
 				srcCell = cellBoard.getCell(cell.getFrom().getX(), cell.getFrom().getY());
 				updatePiecePressed(srcCell);
 			}
-
 		}
 	}
 

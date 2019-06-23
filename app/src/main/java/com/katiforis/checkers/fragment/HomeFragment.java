@@ -55,7 +55,7 @@ public class HomeFragment extends Fragment {
         INSTANCE.homeController.setHomeFragment(INSTANCE);
         return INSTANCE;
     }
-    private static boolean customExceptionHandlerAttached = false;
+
     public HomeFragment() {}
 
     @Override
@@ -97,20 +97,6 @@ public class HomeFragment extends Fragment {
         signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
 
         silentSignIn();
-
-        if(!customExceptionHandlerAttached) {
-            final Thread.UncaughtExceptionHandler defaultEH = Thread.getDefaultUncaughtExceptionHandler();
-            Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) ->{
-                if(e instanceof io.reactivex.exceptions.OnErrorNotImplementedException){
-                    intentToStartPage();
-                }else{
-                    defaultEH.uncaughtException(thread, e);
-                }
-            });
-            customExceptionHandlerAttached = true;
-        }
-
-
         return v;
     }
 

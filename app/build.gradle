@@ -30,6 +30,7 @@ repositories {
     maven { url 'https://jitpack.io' }
     mavenCentral()
     google()
+    apply plugin: 'io.fabric'
 }
 
 dependencies {
@@ -59,6 +60,8 @@ dependencies {
     implementation 'com.tapadoo.android:alerter:2.0.0'
     implementation 'com.squareup.picasso:picasso:2.2.0'
     implementation 'me.itangqi.waveloadingview:library:0.3.5'
+    implementation 'com.google.firebase:firebase-core:17.0.0'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

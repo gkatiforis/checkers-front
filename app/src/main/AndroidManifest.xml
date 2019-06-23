@@ -20,10 +20,12 @@
             </intent-filter>
         </activity>
         <activity android:name="com.katiforis.checkers.activities.StartActivity"/>
-        <activity android:name="com.katiforis.checkers.activities.MainActivity" />
         <activity android:name="com.katiforis.checkers.activities.GameActivity" />
 
-        <activity android:name=".speech.ScreenSlidePagerActivity" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="72eee972c8f6dbd187a32ffd03726323696e2ea6"
+            />
     </application>
 
 </manifest>
