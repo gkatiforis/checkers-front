@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fbutton="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/playerImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/user"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginLeft="10dp"
+        android:text="Username"
+        android:textColor="#fff"
+        app:layout_constraintLeft_toRightOf="@+id/playerImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        />
+
+    <ImageView
+        android:id="@+id/pointsImage"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+
+        android:src="@drawable/points"
+        app:layout_constraintRight_toLeftOf="@+id/elo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <TextView
+        android:id="@+id/elo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginRight="10dp"
+        android:text="1999"
+        android:textColor="#fff"
+        app:layout_constraintRight_toLeftOf="@+id/lvlImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        />
+
+    <ImageView
+        android:id="@+id/lvlImage"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/leaderboard"
+        app:layout_constraintRight_toLeftOf="@+id/lvl"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <TextView
+        android:id="@+id/lvl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginRight="10dp"
+        android:text="1999"
+        android:textColor="#fff"
+        app:layout_constraintRight_toLeftOf="@+id/playerTime"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        />
+
+    <me.itangqi.waveloadingview.WaveLoadingView
+        android:id="@+id/playerTime"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        app:wlv_borderColor="@color/fbutton_color_pomegranate"
+        app:wlv_borderWidth="3dp"
+        app:wlv_progressValue="40"
+        app:wlv_shapeType="circle"
+        app:wlv_round_rectangle="true"
+        app:wlv_triangle_direction="north"
+        app:wlv_waveColor="@color/fbutton_color_pomegranate"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:wlv_titleCenterSize="17dp"
+        >
+    </me.itangqi.waveloadingview.WaveLoadingView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

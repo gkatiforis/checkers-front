@@ -8,18 +8,17 @@
 
 
     <ImageView
-        android:layout_width="361dp"
-        android:layout_height="363dp"
+        android:layout_width="461dp"
+        android:layout_height="463dp"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/checkers_board_background"
+        app:srcCompat="@drawable/referferff"
         android:id="@+id/boardImageView" />
-
 
 
     <LinearLayout
         android:id="@+id/parent_layout"
-        android:layout_width="348dp"
-        android:layout_height="350dp"
+        android:layout_width="448dp"
+        android:layout_height="450dp"
         android:orientation="vertical"
         android:layout_gravity="center">
 

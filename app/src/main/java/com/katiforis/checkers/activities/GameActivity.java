@@ -36,37 +36,58 @@ import com.katiforis.checkers.game.Board;
 import com.katiforis.checkers.game.Cell;
 import com.katiforis.checkers.game.Move;
 import com.katiforis.checkers.game.Piece;
+import com.katiforis.checkers.util.CircleTransform;
 import com.katiforis.checkers.util.LocalCache;
 import com.katiforis.checkers.util.Utils;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import info.hoang8f.widget.FButton;
 import me.itangqi.waveloadingview.WaveLoadingView;
 import tyrantgit.explosionfield.ExplosionField;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
+import static com.katiforis.checkers.util.Utils.twoDigits;
 
 public class GameActivity extends AppCompatActivity {
 
     public static GameActivity INSTANCE;
-	ImageView playerImage;
-	TextView username;
-	WaveLoadingView player1Time;
+    private static final int DARK_PIECE_ICON = R.drawable.redp;
+    private static final int DARK_KING_PIECE_ICON = R.drawable.redpk;
+    private static final int DARK_PIECE_PRESSED = R.drawable.redp;
+    private static final int DARK_KING_PIECE_PRESSED = R.drawable.redpk;
+    private static final int DARK_PIECE_HIGHLIGHTED = R.drawable.redp;
+    private static final int DARK_KING_PIECE_HIGHLIGHTED = R.drawable.redpk;
 
-	ImageView playerImage2;
-	TextView username2;
-	WaveLoadingView player2Time;
+    private static final int LIGHT_PIECE_ICON = R.drawable.whitep;
+    private static final int LIGHT_KING_PIECE_ICON = R.drawable.whitepk;
+	private static final int LIGHT_PIECE_PRESSED = R.drawable.whitep;
+	private static final int LIGHT_KING_PIECE_PRESSED = R.drawable.whitepk;
+	private static final int LIGHT_PIECE_HIGHLIGHTED = R.drawable.whitep;
+	private static final int LIGHT_KING_PIECE_HIGHLIGHTED = R.drawable.whitepk;
 
-	CountDownTimer countDownTimer;
-	long dateStarted;
-	long dateCurrent;
-	ExplosionField explosionField;
+	private static final int POSSIBLE_MOVE = R.drawable.possible_moves_image;
 
-	Snackbar snack;
+	private ImageView gameOptionsDialogButton;
+	private ImageView playerImage;
+	private TextView username;
+	private WaveLoadingView player1Time;
 
-	private Button offerDraw;
-	private Button resign;
+	private ImageView playerImage2;
+	private TextView username2;
+	private WaveLoadingView player2Time;
+
+	private CountDownTimer countDownTimer;
+	private long dateStarted;
+	private long dateCurrent;
+	private ExplosionField explosionField;
+
+	private Snackbar snack;
+
 
 	private GameController gameController;
 	public static boolean populated;
@@ -80,6 +101,17 @@ public class GameActivity extends AppCompatActivity {
 	private boolean srcCellFixed;
 	private Board cellBoard = new Board();
 	private Cell srcCell, dstCell;
+
+	private FButton resign;
+	private FButton offerDraw;
+	private FButton acceptDraw;
+	private FButton declineDraw;
+	private ImageView cancel;
+	private DialogPlus optionsDialog;
+	private ViewGroup optionsDialogView;
+
+	private DialogPlus offerDrawDialog;
+	private ViewGroup offerDrawDialogView;
 
 	public void setGameState(GameState gamestate){
 		runOnUiThread(() -> {
@@ -136,10 +168,12 @@ public class GameActivity extends AppCompatActivity {
 		getSupportActionBar().hide();
 		explosionField = ExplosionField.attach2Window(this);
 
-		playerImage = findViewById(R.id.playerImage);
-		username =  findViewById(R.id.username);
+		View user1 = findViewById(R.id.user1);
+		playerImage = user1.findViewById(R.id.playerImage);
+		username =  user1.findViewById(R.id.username);
+		gameOptionsDialogButton = findViewById(R.id.gameOptionsDialogButton);
 
-		player1Time = (WaveLoadingView) findViewById(R.id.player1Time);
+		player1Time = (WaveLoadingView) user1.findViewById(R.id.playerTime);
 		player1Time.setShapeType(WaveLoadingView.ShapeType.CIRCLE);
 		player1Time.setProgressValue(100);
 		player1Time.setBorderWidth(10);
@@ -152,10 +186,11 @@ public class GameActivity extends AppCompatActivity {
 		player1Time.startAnimation();
 
 
-		playerImage2 = findViewById(R.id.playerImage2);
-		username2 =  findViewById(R.id.username2);
+		View user2 = findViewById(R.id.user2);
+		playerImage2 = user2.findViewById(R.id.playerImage);
+		username2 =  user2.findViewById(R.id.username);
 
-		player2Time = (WaveLoadingView) findViewById(R.id.player2Time);
+		player2Time = (WaveLoadingView) user2.findViewById(R.id.playerTime);
 		player2Time.setShapeType(WaveLoadingView.ShapeType.CIRCLE);
 		player2Time.setProgressValue(100);
 		player2Time.setBorderWidth(10);
@@ -168,38 +203,6 @@ public class GameActivity extends AppCompatActivity {
 		player2Time.startAnimation();
 
 
-//		viewKonfetti = (KonfettiView)findViewById(R.id.viewKonfetti);
-////		viewKonfetti.build()
-////				.addColors(Color.RED, Color.GREEN)
-////				.setSpeed(1f, 5f)
-////				.setFadeOutEnabled(true)
-////				.setTimeToLive(2000L)
-////				.addShapes(Shape.RECT, Shape.CIRCLE)
-////				.setPosition(0f, -359f, -359f, 0f)
-////				.stream(200, 5000L);
-//
-//		final KonfettiView konfettiView = (KonfettiView)findViewById(R.id.viewKonfetti);
-//		konfettiView.build()
-//				.addColors(Color.RED, Color.GREEN)
-//				.setSpeed(1f, 5f)
-//				.setFadeOutEnabled(true)
-//				.setTimeToLive(2000L)
-//				.addShapes(Shape.RECT, Shape.CIRCLE)
-//				.setPosition(0f, -359f, -359f, 0f)
-//				.stream(200, 5000L);
-
-		offerDraw = findViewById(R.id.offerDraw);
-		resign = findViewById(R.id.resign);
-
-		offerDraw.setOnClickListener(p -> {
-			sendOfferDraw();
-		});
-
-		resign.setOnClickListener(p -> {
-			sendResign();
-		});
-
-
 		snack = Snackbar.make(findViewById(R.id.gameActivity), "No internet connection. ", Snackbar.LENGTH_INDEFINITE);
 		View view = snack.getView();
 		FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
@@ -209,9 +212,9 @@ public class GameActivity extends AppCompatActivity {
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
 			this.resizeBoardToScreenSizePortrait();
 		}
-		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			this.resizeBoardToScreenSizeLandscape();
-		}
+//		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//			//this.resizeBoardToScreenSizeLandscape();
+//		}
 		srcCell = null;
 		dstCell = null;
 		srcCellFixed = false;
@@ -220,8 +223,92 @@ public class GameActivity extends AppCompatActivity {
 		buttonBoard = new Button[8][8];
 		fillButtonBoard(listener);
 		this.moves = new ArrayList<>();
-    }
 
+		optionsDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_options_layout, null);
+
+		offerDraw =  optionsDialogView.findViewById(R.id.offerDraw);
+		resign =  optionsDialogView.findViewById(R.id.resign);
+		cancel = optionsDialogView.findViewById(R.id.cancel);
+
+		offerDrawDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_offer_draw_layout, null);
+		declineDraw = offerDrawDialogView.findViewById(R.id.declineDraw);
+		acceptDraw = offerDrawDialogView.findViewById(R.id.acceptDraw);
+
+		resign.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+		offerDraw.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
+
+		declineDraw.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+		acceptDraw.setButtonColor(getResources().getColor(R.color.fbutton_color_emerald));
+
+
+		gameOptionsDialogButton.setOnClickListener(p -> {
+//			gameOptionsFragment = GameOptionsFragment.getInstance();
+//			gameOptionsFragment.show(getSupportFragmentManager(), "");
+
+			optionsDialog = DialogPlus.newDialog(this)
+//					.setAdapter(adapter)
+					.setOnItemClickListener(new OnItemClickListener() {
+						@Override
+						public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+							System.out.println(item);
+						}
+					}).setContentHolder(new ViewHolder(optionsDialogView))
+					//.setExpanded(true)
+					.create();
+			optionsDialog.show();
+
+			offerDraw.setOnClickListener(pa -> {
+				sendOfferDraw();
+			});
+
+			resign.setOnClickListener(pa -> {
+				sendResign();
+			});
+
+			cancel.setOnClickListener(pa -> {
+				optionsDialog.dismiss();
+			});
+		});
+
+		offerDrawDialog = DialogPlus.newDialog(this)
+				.setOnItemClickListener(new OnItemClickListener() {
+					@Override
+					public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+						System.out.println(item);
+					}
+				}).setContentHolder(new ViewHolder(offerDrawDialogView))
+				//.setExpanded(true)
+				.create();
+		acceptDraw.setOnClickListener(pa -> {
+			sendOfferDraw();
+		});
+
+		declineDraw.setOnClickListener(pa -> {
+			offerDrawDialog.dismiss();
+		});
+	}
+
+	public void showOfferDraw(){
+		runOnUiThread(() -> {
+			if(optionsDialog != null){
+				optionsDialog.dismiss();
+			}
+
+			offerDrawDialog.show();
+		});
+	}
+
+	public void sendResign(){
+		PlayerAnswer playerAnswer = new PlayerAnswer();
+		playerAnswer.setResign(true);
+		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+	}
+
+	public void sendOfferDraw(){
+		PlayerAnswer playerAnswer = new PlayerAnswer();
+		playerAnswer.setOfferDraw(true);
+		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+	}
 
 	private void updatePlayerScore(String username, String points) {
 		//TODO
@@ -239,6 +326,8 @@ public class GameActivity extends AppCompatActivity {
 			Picasso.with(this)
 					.load(players.get(0).getPictureUrl())
 					.error(R.mipmap.ic_launcher)
+					.placeholder(getResources().getDrawable(R.drawable.user))
+					.transform(new CircleTransform())
 					.into(playerImage, new Callback() {
 						@Override
 						public void onSuccess() {     }
@@ -251,6 +340,8 @@ public class GameActivity extends AppCompatActivity {
 			Picasso.with(this)
 					.load(players.get(1).getPictureUrl())
 					.error(R.mipmap.ic_launcher)
+					.placeholder(getResources().getDrawable(R.drawable.user))
+					.transform(new CircleTransform())
 					.into(playerImage2, new Callback() {
 						@Override
 						public void onSuccess() {     }
@@ -265,7 +356,9 @@ public class GameActivity extends AppCompatActivity {
 		}else{
 			Picasso.with(this)
 					.load(players.get(1).getPictureUrl())
+					.placeholder(getResources().getDrawable(R.drawable.user))
 					.error(R.mipmap.ic_launcher)
+					.transform(new CircleTransform())
 					.into(playerImage, new Callback() {
 						@Override
 						public void onSuccess() {     }
@@ -277,7 +370,9 @@ public class GameActivity extends AppCompatActivity {
 					});
 			Picasso.with(this)
 					.load(players.get(0).getPictureUrl())
+					.placeholder(getResources().getDrawable(R.drawable.user))
 					.error(R.mipmap.ic_launcher)
+					.transform(new CircleTransform())
 					.into(playerImage2, new Callback() {
 						@Override
 						public void onSuccess() {     }
@@ -298,17 +393,6 @@ public class GameActivity extends AppCompatActivity {
 		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
 	}
 
-	public void sendResign(){
-		PlayerAnswer playerAnswer = new PlayerAnswer();
-		playerAnswer.setResign(true);
-		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
-	}
-
-	public void sendOfferDraw(){
-		PlayerAnswer playerAnswer = new PlayerAnswer();
-		playerAnswer.setOfferDraw(true);
-		gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
-	}
 
 	public void makeMove(PlayerAnswer playerAnswer){
 		runOnUiThread(() -> {
@@ -499,18 +583,18 @@ public class GameActivity extends AppCompatActivity {
 					}
 					else if (board.getCell(i, j).getPlacedPiece().getColor().equals(Piece.LIGHT)) {
 						if (board.getCell(i, j).getPlacedPiece().isKing()) {
-							buttonIndexes[i][j].setBackgroundResource(R.drawable.light_king_piece);
+							buttonIndexes[i][j].setBackgroundResource(LIGHT_KING_PIECE_ICON);
 						}
 						else {
-							buttonIndexes[i][j].setBackgroundResource(R.drawable.light_piece);
+							buttonIndexes[i][j].setBackgroundResource(LIGHT_PIECE_ICON);
 						}
 					}
 					else if (board.getCell(i, j).getPlacedPiece().getColor().equals(Piece.DARK)) {
 						if (board.getCell(i, j).getPlacedPiece().isKing()) {
-							buttonIndexes[i][j].setBackgroundResource(R.drawable.dark_king_piece);
+							buttonIndexes[i][j].setBackgroundResource(DARK_KING_PIECE_ICON);
 						}
 						else {
-							buttonIndexes[i][j].setBackgroundResource(R.drawable.dark_piece);
+							buttonIndexes[i][j].setBackgroundResource(DARK_PIECE_ICON);
 						}
 					}
 				}
@@ -529,18 +613,18 @@ public class GameActivity extends AppCompatActivity {
 		if(cell.getPlacedPiece() != null){
 			if (cell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
 				if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
-					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.light_king_piece);
+					buttonBoard[xCord][yCord].setBackgroundResource(LIGHT_KING_PIECE_ICON);
 				}
 				else {
-					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.light_piece);
+					buttonBoard[xCord][yCord].setBackgroundResource(LIGHT_PIECE_ICON);
 				}
 			}
 			else {
 				if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
-					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.dark_king_piece);
+					buttonBoard[xCord][yCord].setBackgroundResource(DARK_KING_PIECE_ICON);
 				}
 				else {
-					buttonBoard[xCord][yCord].setBackgroundResource(R.drawable.dark_piece);
+					buttonBoard[xCord][yCord].setBackgroundResource(DARK_PIECE_ICON);
 				}
 			}
 		}
@@ -561,15 +645,15 @@ public class GameActivity extends AppCompatActivity {
 				buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.blank_square);
 			} else if (cell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
 				if (cell.getPlacedPiece().isKing()) {
-					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.light_king_piece);
+					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(LIGHT_KING_PIECE_ICON);
 				} else {
-					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.light_piece);
+					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(LIGHT_PIECE_ICON);
 				}
 			} else if (cell.getPlacedPiece().getColor().equals(Piece.DARK)) {
 				if (cell.getPlacedPiece().isKing()) {
-					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.dark_king_piece);
+					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(DARK_KING_PIECE_ICON);
 				} else {
-					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.dark_piece);
+					buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(DARK_PIECE_ICON);
 				}
 			}
 		}
@@ -582,18 +666,18 @@ public class GameActivity extends AppCompatActivity {
 		if (currentPlayer.getColor().equals(Piece.LIGHT) && givenCell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
 
 			if (givenCell.getPlacedPiece().isKing()) {
-				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(R.drawable.light_king_piece_pressed);
+				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(LIGHT_KING_PIECE_PRESSED);
 			}
 			else {
-				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(R.drawable.light_piece_pressed);
+				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(LIGHT_PIECE_PRESSED);
 			}
 		}
 		if (currentPlayer.getColor().equals(Piece.DARK) && givenCell.getPlacedPiece().getColor().equals(Piece.DARK)) {
 			if (cellBoard.getCell(givenCell.getX(), givenCell.getY()).getPlacedPiece().isKing()) {
-				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(R.drawable.dark_king_piece_pressed);
+				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(DARK_KING_PIECE_PRESSED);
 			}
 			else {
-				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(R.drawable.dark_piece_pressed);
+				buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(DARK_PIECE_PRESSED);
 			}
 		}
 	}
@@ -613,11 +697,11 @@ public class GameActivity extends AppCompatActivity {
 
 
 		if(toPlayer.getColor().equals(Piece.LIGHT)){
-			player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
-			player2Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + fromPlayerSeconds.toString());
+			player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
+			player2Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + twoDigits(fromPlayerSeconds.toString()));
 		}else{
-			player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
-			player1Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + fromPlayerSeconds.toString());
+			player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
+			player1Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + twoDigits(fromPlayerSeconds.toString()));
 		}
 
 		Integer progress = 100 * fromPlayer.getSecondsRemaining().intValue() / (gameMaxTime * 60);
@@ -639,10 +723,10 @@ public class GameActivity extends AppCompatActivity {
 				Integer progress = 100 * remainingSeconds.intValue() / (gameMaxTime * 60);
 				if(toPlayer.getColor().equals(Piece.LIGHT)){
 					player1Time.setProgressValue(progress);
-					player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
+					player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
 				}else{
 					player2Time.setProgressValue(progress);
-					player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + toPlayerSeconds.toString());
+					player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
 				}
 			}
 			public void onFinish() { }
@@ -655,15 +739,15 @@ public class GameActivity extends AppCompatActivity {
 			highlightedCell = highlightedCells.remove(0);
 			if (highlightedCell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
 				if (highlightedCell.getPlacedPiece().isKing()) {
-					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(R.drawable.light_king_piece);
+					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(LIGHT_KING_PIECE_ICON);
 				} else {
-					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(R.drawable.light_piece);
+					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(LIGHT_PIECE_ICON);
 				}
 			} else {
 				if (highlightedCell.getPlacedPiece().isKing()) {
-					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(R.drawable.dark_king_piece);
+					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(DARK_KING_PIECE_ICON);
 				} else {
-					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(R.drawable.dark_piece);
+					buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(DARK_PIECE_ICON);
 				}
 			}
 		}
@@ -676,13 +760,13 @@ public class GameActivity extends AppCompatActivity {
 			for (Move cell : moves) {
 				if (!moves.isEmpty()) {
 					if (cell.getPiece().getColor().equals(Piece.DARK) && cell.getPiece().isKing()) {
-						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(R.drawable.dark_king_highlighted);
+						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(DARK_KING_PIECE_HIGHLIGHTED);
 					} else if (cell.getPiece().getColor().equals(Piece.DARK)) {
-						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(R.drawable.dark_piece_highlighted);
+						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(DARK_PIECE_HIGHLIGHTED);
 					} else if (cell.getPiece().getColor().equals(Piece.LIGHT) && cell.getPiece().isKing()) {
-						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(R.drawable.light_king_highlighted);
+						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(LIGHT_KING_PIECE_HIGHLIGHTED);
 					} else if (cell.getPiece().getColor().equals(Piece.LIGHT)) {
-						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(R.drawable.light_piece_highlighted);
+						buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(LIGHT_PIECE_HIGHLIGHTED);
 					}
 					highlightedCells.add(cell.getFrom());
 				}
@@ -694,7 +778,7 @@ public class GameActivity extends AppCompatActivity {
 	public void showPossibleMoves(List<Move> moves) {
 		for (Move cell : moves) {
 			if(srcCell != null && srcCell.equals(cell.getFrom())){
-				buttonBoard[cell.getTo().getX()][cell.getTo().getY()].setBackgroundResource(R.drawable.possible_moves_image);
+				buttonBoard[cell.getTo().getX()][cell.getTo().getY()].setBackgroundResource(POSSIBLE_MOVE);
 				srcCell = cellBoard.getCell(cell.getFrom().getX(), cell.getFrom().getY());
 				updatePiecePressed(srcCell);
 			}
@@ -707,9 +791,9 @@ public class GameActivity extends AppCompatActivity {
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
 			this.resizeBoardToScreenSizePortrait();
 		}
-		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			this.resizeBoardToScreenSizeLandscape();
-		}
+//		else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//			//this.resizeBoardToScreenSizeLandscape();
+//		}
 	}
 
 	public void resizeBoardToScreenSizePortrait(){
@@ -728,8 +812,8 @@ public class GameActivity extends AppCompatActivity {
 		// Sets the width & height for the grid of game buttons in the layout
 		LinearLayout buttonLayout = (LinearLayout) findViewById(R.id.parent_layout);
 		ViewGroup.LayoutParams buttonLayoutParams = buttonLayout.getLayoutParams();     // Gets the layout params that will allow you to resize the layout
-		buttonLayoutParams.width =  (int) (width * 0.967);
-		buttonLayoutParams.height = (int) (width * 0.9723);
+		buttonLayoutParams.width =  (int) (width * 1.017);
+		buttonLayoutParams.height = (int) (width * 1.0123);
 		buttonLayout.setLayoutParams(buttonLayoutParams);
 	}
 
@@ -743,7 +827,7 @@ public class GameActivity extends AppCompatActivity {
 		Display display = wm.getDefaultDisplay();
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		double height = metrics.heightPixels - (actionBarHeight * 1.75);    // subtract size of top action bar so it doesn't partially hide board
+		double height = metrics.heightPixels - (actionBarHeight * 1.75);
 
 		ImageView imageView = (ImageView) findViewById(R.id.boardImageView);
 		ViewGroup.LayoutParams imageParams = imageView.getLayoutParams();
@@ -752,7 +836,7 @@ public class GameActivity extends AppCompatActivity {
 		imageView.setLayoutParams(imageParams);
 
 		LinearLayout buttonLayout = (LinearLayout) findViewById(R.id.parent_layout);
-		ViewGroup.LayoutParams buttonLayoutParams = buttonLayout.getLayoutParams();     // Gets the layout params that will allow you to resize the layout
+		ViewGroup.LayoutParams buttonLayoutParams = buttonLayout.getLayoutParams();
 		buttonLayoutParams.width =  (int) (height * 0.967);
 		buttonLayoutParams.height = (int) (height * 0.9723);
 		buttonLayout.setLayoutParams(buttonLayoutParams);

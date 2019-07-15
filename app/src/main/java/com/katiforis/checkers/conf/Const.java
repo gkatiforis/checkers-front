@@ -1,6 +1,7 @@
 package com.katiforis.checkers.conf;
 
 public class Const {
+//	public static final String host_stomp = "ws://checkers.eu-west-2.elasticbeanstalk.com/top/websocket";
 	public static final String host_stomp = "ws://192.168.1.3:5000/top/websocket";
 //	public static final String host_stomp = "ws://192.168.16.116:5000/top/websocket";
 	public static final String android_web_id = "794218231402-hb2lq8lk48qf8tb755ha9dugiuvkfj3r.apps.googleusercontent.com";
@@ -8,6 +9,7 @@ public class Const {
 	public static final String placeholder = "placeholder";
 
 	public static final String MENU = "/menu";
+	public static final String KEEP_CONNECTION = MENU + "/keepConnection";
 	public static final String FIND_GAME = MENU + "/game/find";
 	public static final String GET_FRIEND_LIST = MENU + "/friend";
 	public static final String GET_NOTIFICATION_LIST = MENU + "/notification";
@@ -20,6 +22,6 @@ public class Const {
 	public static final String GET_GAME_STATE = "/game/gamestate";
 	public static final String GAME_RESPONSE = "/game/group/" + placeholder;
 
-	public static final String TAG = "TOP10";
+	public static final String TAG = "checkers";
 
 }

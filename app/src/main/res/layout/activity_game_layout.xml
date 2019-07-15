@@ -7,173 +7,153 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:background="@drawable/bbggg"
     tools:context="com.katiforis.checkers.activities.GameActivity">
 
-    <ImageView
-        android:id="@+id/playerImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/user"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
 
-        />
-
-    <TextView
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/user1"
+        layout="@layout/fragment_game_user_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16dp"
 
-        android:text="Username"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playerImage"
+        app:layout_constraintBottom_toTopOf="@+id/gameboard"
+
+        app:layout_constraintLeft_toLeftOf="@+id/gameboard"
+        android:layout_marginBottom="10dp"
 
         />
 
-    <me.itangqi.waveloadingview.WaveLoadingView
-        android:id="@+id/player1Time"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:wlv_borderColor="@color/colorAccent"
-        app:wlv_borderWidth="3dp"
-        app:wlv_progressValue="40"
-        app:wlv_shapeType="circle"
-        app:wlv_round_rectangle="true"
-        app:wlv_triangle_direction="north"
-        app:wlv_waveColor="@color/colorAccent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/username"
-        >
-    </me.itangqi.waveloadingview.WaveLoadingView>
 
     <!--<LinearLayout-->
-        <!--android:id="@+id/player_labels"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
-        <!--app:layout_constraintLeft_toLeftOf="parent"-->
-        <!--&gt;-->
+    <!--android:id="@+id/player_labels"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
+    <!--app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--&gt;-->
 
 
-        <!--<ImageView-->
-            <!--android:id="@+id/lvlImage"-->
-            <!--android:layout_width="30dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:src="@drawable/alerter_ic_notifications"-->
+    <!--<ImageView-->
+    <!--android:id="@+id/lvlImage"-->
+    <!--android:layout_width="30dp"-->
+    <!--android:layout_height="30dp"-->
+    <!--android:src="@drawable/alerter_ic_notifications"-->
 
-            <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
-            <!--app:layout_constraintLeft_toRightOf="@+id/playerImage"/>-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
+    <!--app:layout_constraintLeft_toRightOf="@+id/playerImage"/>-->
 
-        <!--<TextView-->
-            <!--android:id="@+id/lvlTitle"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textSize="12dp"-->
-            <!--android:text="111 lvl"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/player_labels"-->
+    <!--<TextView-->
+    <!--android:id="@+id/lvlTitle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textSize="12dp"-->
+    <!--android:text="111 lvl"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/player_labels"-->
 
-            <!--/>-->
+    <!--/>-->
     <!--</LinearLayout>-->
 
 
-    <LinearLayout
-        android:id="@+id/actions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical|center"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/username">
+    <!--<ImageView-->
+    <!--android:id="@+id/playerImage2"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:src="@drawable/user"-->
+    <!--app:layout_constraintRight_toRightOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent"-->
 
-        <Button
-            android:id="@+id/offerDraw"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Offer draw" />
+    <!--/>-->
 
-        <Button
-            android:id="@+id/resign"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Resign" />
+    <!--<TextView-->
+    <!--android:id="@+id/username2"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textSize="16dp"-->
 
+    <!--android:text="Username"-->
+    <!--app:layout_constraintRight_toRightOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/playerImage"-->
 
-    </LinearLayout>
+    <!--/>-->
 
-    <ImageView
-        android:id="@+id/playerImage2"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/user"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+    <!--<me.itangqi.waveloadingview.WaveLoadingView-->
+    <!--android:id="@+id/player2Time"-->
+    <!--android:layout_width="60dp"-->
+    <!--android:layout_height="60dp"-->
+    <!--app:wlv_borderColor="@color/colorAccent"-->
+    <!--app:wlv_borderWidth="3dp"-->
+    <!--app:wlv_progressValue="40"-->
+    <!--app:wlv_shapeType="circle"-->
+    <!--app:wlv_round_rectangle="true"-->
+    <!--app:wlv_triangle_direction="north"-->
+    <!--app:wlv_waveColor="@color/colorAccent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
+    <!--app:layout_constraintRight_toRightOf="parent"-->
+    <!--&gt;-->
+    <!--</me.itangqi.waveloadingview.WaveLoadingView>-->
 
-        />
-
-    <TextView
-        android:id="@+id/username2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16dp"
-
-        android:text="Username"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playerImage"
-
-        />
-
-    <me.itangqi.waveloadingview.WaveLoadingView
-        android:id="@+id/player2Time"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:wlv_borderColor="@color/colorAccent"
-        app:wlv_borderWidth="3dp"
-        app:wlv_progressValue="40"
-        app:wlv_shapeType="circle"
-        app:wlv_round_rectangle="true"
-        app:wlv_triangle_direction="north"
-        app:wlv_waveColor="@color/colorAccent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/username2"
-        >
-    </me.itangqi.waveloadingview.WaveLoadingView>
 
     <!--<LinearLayout-->
-        <!--android:id="@+id/player_labels2"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
-        <!--app:layout_constraintRight_toRightOf="parent"-->
-        <!--&gt;-->
+    <!--android:id="@+id/player_labels2"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
+    <!--app:layout_constraintRight_toRightOf="parent"-->
+    <!--&gt;-->
 
 
-        <!--<ImageView-->
-            <!--android:id="@+id/lvlImage2"-->
-            <!--android:layout_width="30dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:src="@drawable/alerter_ic_notifications"-->
+    <!--<ImageView-->
+    <!--android:id="@+id/lvlImage2"-->
+    <!--android:layout_width="30dp"-->
+    <!--android:layout_height="30dp"-->
+    <!--android:src="@drawable/alerter_ic_notifications"-->
 
-            <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
-            <!--app:layout_constraintLeft_toRightOf="@+id/playerImage2"/>-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/username2"-->
+    <!--app:layout_constraintLeft_toRightOf="@+id/playerImage2"/>-->
 
-        <!--<TextView-->
-            <!--android:id="@+id/lvlTitle2"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textSize="12dp"-->
-            <!--android:text="111 lvl"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/player_labels2"-->
+    <!--<TextView-->
+    <!--android:id="@+id/lvlTitle2"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textSize="12dp"-->
+    <!--android:text="111 lvl"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/player_labels2"-->
 
-            <!--/>-->
+    <!--/>-->
     <!--</LinearLayout>-->
 
     <include
         android:id="@+id/gameboard"
         layout="@layout/board"
-        app:layout_constraintTop_toBottomOf="@+id/player1Time"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/user2"
+        layout="@layout/fragment_game_user_layout"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="@+id/gameboard"
+        app:layout_constraintTop_toBottomOf="@+id/gameboard" />
+
+    <ImageView
+        android:id="@+id/gameOptionsDialogButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/menuji"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintRight_toRightOf="parent"
+
         />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

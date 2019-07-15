@@ -33,14 +33,14 @@ public class RankFragment extends Fragment {
     private RankAdapter rankAdapter;
     private List<UserDto> rankList = new ArrayList<>();
 
-    private TextView rank, username, level, points;
-    private ImageView playerImage;
-
-    private TextView rank2, username2, level2, points2;
-    private ImageView playerImage2;
-
-    private TextView rank3, username3, level3, points3;
-    private ImageView playerImage3;
+//    private TextView rank, username, level, points;
+//    private ImageView playerImage;
+//
+//    private TextView rank2, username2, level2, points2;
+//    private ImageView playerImage2;
+//
+//    private TextView rank3, username3, level3, points3;
+//    private ImageView playerImage3;
 
     public static RankFragment getInstance() {
         if (INSTANCE == null) {
@@ -70,23 +70,23 @@ public class RankFragment extends Fragment {
         rankAdapter.notifyDataSetChanged();
         rankRecyclerView.setAdapter(rankAdapter);
 
-        playerImage = (ImageView) view.findViewById(R.id.firstImage);
-        username = (TextView) view.findViewById(R.id.firstUsername);
-        rank = (TextView) view.findViewById(R.id.rank);
-        level = (TextView) view.findViewById(R.id.level);
-        points = (TextView) view.findViewById(R.id.points);
-
-        playerImage2 = (ImageView) view.findViewById(R.id.secondImage);
-        username2 = (TextView) view.findViewById(R.id.secondUsername);
-        rank2 = (TextView) view.findViewById(R.id.rank);
-        level2 = (TextView) view.findViewById(R.id.level);
-        points2 = (TextView) view.findViewById(R.id.points);
-
-        playerImage3 = (ImageView) view.findViewById(R.id.thirdImage);
-        username3 = (TextView) view.findViewById(R.id.thirdUsername);
-        rank3 = (TextView) view.findViewById(R.id.rank);
-        level3 = (TextView) view.findViewById(R.id.level);
-        points3 = (TextView) view.findViewById(R.id.points);
+//        playerImage = (ImageView) view.findViewById(R.id.firstImage);
+//        username = (TextView) view.findViewById(R.id.firstUsername);
+//        rank = (TextView) view.findViewById(R.id.rank);
+//        level = (TextView) view.findViewById(R.id.level);
+//        points = (TextView) view.findViewById(R.id.points);
+//
+//        playerImage2 = (ImageView) view.findViewById(R.id.secondImage);
+//        username2 = (TextView) view.findViewById(R.id.secondUsername);
+//        rank2 = (TextView) view.findViewById(R.id.rank);
+//        level2 = (TextView) view.findViewById(R.id.level);
+//        points2 = (TextView) view.findViewById(R.id.points);
+//
+//        playerImage3 = (ImageView) view.findViewById(R.id.thirdImage);
+//        username3 = (TextView) view.findViewById(R.id.thirdUsername);
+//        rank3 = (TextView) view.findViewById(R.id.rank);
+//        level3 = (TextView) view.findViewById(R.id.level);
+//        points3 = (TextView) view.findViewById(R.id.points);
 
        return view;
     }
@@ -105,32 +105,32 @@ public class RankFragment extends Fragment {
         if(activity != null){
             activity.runOnUiThread(() -> {
                List<UserDto> players = rankList.getPlayers();
-               if(players.size() >=3){
-                   UserDto first = players.get(0);
-                   UserDto second = players.get(1);
-                   UserDto third = players.get(2);
-                   players.remove(0);
-                   players.remove(0);
-                   players.remove(0);
+//               if(players.size() >=3){
+//                   UserDto first = players.get(0);
+//                   UserDto second = players.get(1);
+//                   UserDto third = players.get(2);
+//                   players.remove(0);
+//                   players.remove(0);
+//                   players.remove(0);
 
-                   Picasso.with(MenuActivity.getAppContext())
-                           .load(first.getPictureUrl())
-                           .error(R.mipmap.ic_launcher)
-                           .into(playerImage);
-                   username.setText(first.getUsername());
-
-                   Picasso.with(MenuActivity.getAppContext())
-                           .load(second.getPictureUrl())
-                           .error(R.mipmap.ic_launcher)
-                           .into(playerImage2);
-                   username2.setText(second.getUsername());
-
-                   Picasso.with(MenuActivity.getAppContext())
-                           .load(third.getPictureUrl())
-                           .error(R.mipmap.ic_launcher)
-                           .into(playerImage3);
-                   username3.setText(third.getUsername());
-               }
+//                   Picasso.with(MenuActivity.getAppContext())
+//                           .load(first.getPictureUrl())
+//                           .error(R.mipmap.ic_launcher)
+//                           .into(playerImage);
+//                   username.setText(first.getUsername());
+//
+//                   Picasso.with(MenuActivity.getAppContext())
+//                           .load(second.getPictureUrl())
+//                           .error(R.mipmap.ic_launcher)
+//                           .into(playerImage2);
+//                   username2.setText(second.getUsername());
+//
+//                   Picasso.with(MenuActivity.getAppContext())
+//                           .load(third.getPictureUrl())
+//                           .error(R.mipmap.ic_launcher)
+//                           .into(playerImage3);
+//                   username3.setText(third.getUsername());
+//               }
 
                 this.rankList.clear();
                 this.rankList.addAll(players);

@@ -28,10 +28,11 @@ import com.katiforis.checkers.game.Piece;
 import java.util.ArrayList;
 import java.util.List;
 
+import info.hoang8f.widget.FButton;
+
 public class GameStatsFragment extends DialogFragment {
     private static GameStatsFragment INSTANCE = null;
     private GameController gameController;
-    private Button restart;
     private TextView title;
     public static boolean populated;
 
@@ -39,8 +40,9 @@ public class GameStatsFragment extends DialogFragment {
     private PlayersStatsAdapter playersStatsAdapter;
     private List<UserDto> players = new ArrayList<>();
     private GameStats gameStats;
-    private Button returnToMenu;
-    private Button newOpponent;
+    private FButton restart;
+    private FButton returnToMenu;
+    private FButton newOpponent;
     private CountDownTimer countDownTimer;
     private boolean restartGame = false;
 
@@ -66,10 +68,14 @@ public class GameStatsFragment extends DialogFragment {
 
         playersStatsRecyclerView.addItemDecoration(new DividerItemDecoration(playersStatsRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         playersStatsAdapter = new PlayersStatsAdapter(players);
-        returnToMenu = (Button) view.findViewById(R.id.returnToMenu);
-        restart = (Button) view.findViewById(R.id.restartGame);
-        newOpponent = (Button) view.findViewById(R.id.newOpponent);
+        returnToMenu = (FButton) view.findViewById(R.id.returnToMenu);
+        restart = (FButton) view.findViewById(R.id.restartGame);
+        newOpponent = (FButton) view.findViewById(R.id.newOpponent);
         title = (TextView) view.findViewById(R.id.statsTitle);
+
+        restart.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
+        newOpponent.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
+        returnToMenu.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 
         returnToMenu.setOnClickListener(c ->{
             intentToMenuActivity();

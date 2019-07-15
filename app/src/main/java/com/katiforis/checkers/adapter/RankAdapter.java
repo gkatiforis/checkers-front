@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.activities.MenuActivity;
+import com.katiforis.checkers.util.CircleTransform;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -51,7 +52,9 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
 
             Picasso.with(MenuActivity.getAppContext())
                     .load(player.getPictureUrl())
+                    .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
                     .error(R.mipmap.ic_launcher)
+                    .transform(new CircleTransform())
                     .into(holder.playerImage, new Callback() {
                         @Override
                         public void onSuccess() {     }

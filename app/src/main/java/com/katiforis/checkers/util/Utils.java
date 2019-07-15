@@ -19,4 +19,11 @@ public class Utils {
         long diffSeconds = diff / 1000;
         return diffSeconds;
     }
+
+    public static String twoDigits(String number){
+       if(number != null && number.length() == 1){
+           return "0" + number;
+       }
+        return number;
+    }
 }

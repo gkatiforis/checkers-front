@@ -36,6 +36,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     public void onBindViewHolder(PlayerViewHolder holder, final int position) {
         Picasso.with(MenuActivity.getAppContext())
                 .load("https://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg")
+                .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
                 .error(R.mipmap.ic_launcher)
                 .into(holder.imageView, new Callback() {
                     @Override

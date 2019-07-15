@@ -58,6 +58,9 @@ public class GameController extends AbstractController{
                 PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
                 gameActivity.makeMove(playerAnswer);
             }
+             else if (messageStatus.equalsIgnoreCase(ResponseState.OFFER_DRAW.getState())) {
+                gameActivity.showOfferDraw();
+            }
     }
 
     public void restartGame() {

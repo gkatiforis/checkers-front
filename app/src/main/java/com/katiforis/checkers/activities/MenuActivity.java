@@ -40,6 +40,8 @@ import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 
+import static com.katiforis.checkers.conf.Const.TAG;
+
 public class MenuActivity extends AppCompatActivity {
 	public static MenuActivity INSTANCE;
 	private static Context context;
@@ -75,6 +77,7 @@ public class MenuActivity extends AppCompatActivity {
 				getIntent().getFlags());
 
 		Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) ->{
+			Log.e(TAG, "Error: ", e);
 			if(e instanceof io.reactivex.exceptions.OnErrorNotImplementedException){
 				intentToStartPage();
 			}else{

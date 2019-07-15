@@ -20,8 +20,7 @@
     <item
         android:id="@+id/action_rank"
         android:checked="false"
-        android:icon="@drawable/ic_contact"
-        android:title=""
+        android:icon="@drawable/cup"
         app:showAsAction="ifRoom" />
 
     <item

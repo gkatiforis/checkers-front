@@ -4,6 +4,7 @@ public enum ResponseState {
 
     GAME_STATE("game_state"),
     ANSWER("answer"),
+    OFFER_DRAW("offer_draw"),
     END_GAME("end_game"),
     START_GAME("start_game"),
     FRIEND_LIST("friend_list"),

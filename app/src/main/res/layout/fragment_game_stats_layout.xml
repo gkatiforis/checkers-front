@@ -3,8 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/background">
+
+    xmlns:fbutton="http://schemas.android.com/tools">
 
     <!--<ImageView-->
         <!--android:id="@+id/dialogImage"-->
@@ -17,16 +19,13 @@
         <!--/>-->
 
 
-    <TextView
-        android:id="@+id/statsTitle"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/rank_panel_title"
+        layout="@layout/fragment_game_stats_title_layout"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Results"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/dialogImage"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         />
 
 
@@ -51,34 +50,69 @@
         <!--tools:showIn="@layout/fragment_invite_friend_layout"/>-->
 
     <androidx.recyclerview.widget.RecyclerView
+
         android:id="@+id/player_stats_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constrainedHeight="true"
         android:scrollbars="vertical"
-        android:background="@drawable/background"
-        app:layout_constraintTop_toBottomOf="@+id/statsTitle"
-        app:layout_constraintBottom_toTopOf="@+id/restartGame"
+        app:layout_constraintTop_toBottomOf="@+id/rank_panel_title"
         tools:showIn="@layout/fragment_game_stats_layout"/>
 
-    <Button
+
+    <info.hoang8f.widget.FButton
         android:id="@+id/restartGame"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        fbutton:buttonColor="@color/fbutton_color_alizarin"
+        fbutton:shadowEnabled="true"
+        android:textColor="@android:color/black"
         android:text="Play again ("
-        app:layout_constraintBottom_toTopOf="@+id/newOpponent"></Button>
+        app:layout_constraintTop_toBottomOf="@+id/player_stats_list"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        />
 
-    <Button
-        android:id="@+id/newOpponent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Search for new opponent"
-        app:layout_constraintBottom_toTopOf="@+id/returnToMenu"></Button>
-
-    <Button
+    <info.hoang8f.widget.FButton
         android:id="@+id/returnToMenu"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/restartGame"
+        android:textColor="@android:color/black"
+        fbutton:shadowEnabled="true"
         android:text="Main menu"
-        app:layout_constraintBottom_toBottomOf="parent"></Button>
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent=".48"
+        />
+
+        <info.hoang8f.widget.FButton
+            android:id="@+id/newOpponent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@+id/restartGame"
+            app:layout_constraintLeft_toRightOf="@+id/returnToMenu"
+            app:layout_constraintBottom_toBottomOf="parent"
+            fbutton:shadowEnabled="true"
+            android:text="New opponent"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="0dp"
+
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent=".48"
+            />
+
+
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

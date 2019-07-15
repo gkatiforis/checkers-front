@@ -40,6 +40,7 @@ public class Client {
     private boolean reconnecting = false;
     private static boolean disconnectedFromUser = false;
     private Handler handler = new Handler();
+    private Handler sendConnectionHandler;
 
     private Client() {}
 
@@ -84,8 +85,29 @@ public class Client {
                     }, throwable -> {
                         Log.e(TAG, "Error on sending data", throwable);
                     });
+
+        sendConnectionMessage();
     }
 
+
+    public void sendConnectionMessage(){
+        if(sendConnectionHandler != null){
+            sendConnectionHandler.removeCallbacksAndMessages(null);
+        }
+        sendConnectionHandler = new Handler(Looper.getMainLooper());
+        sendConnectionHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                    stompClient.send(Const.KEEP_CONNECTION, "data").subscribe(
+                            () -> Log.d(TAG, "Data sent"),
+                            throwable -> {
+                                Log.e(TAG, "Error on sending data", throwable);
+                            });
+                sendConnectionHandler.postDelayed(this, 50000);
+
+            }
+        }, 50000);
+    }
 
     public void disconnect() {
         disconnectedFromUser = true;

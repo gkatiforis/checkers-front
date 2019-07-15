@@ -1,6 +1,7 @@
 package com.katiforis.checkers.fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
@@ -9,8 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,9 +31,14 @@ import com.katiforis.checkers.activities.StartActivity;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.stomp.Client;
+import com.katiforis.checkers.util.CircleTransform;
 import com.katiforis.checkers.util.LocalCache;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+
+import info.hoang8f.widget.FButton;
 
 import static android.content.ContentValues.TAG;
 import static com.katiforis.checkers.util.CachedObjectProperties.TOKEN;
@@ -40,16 +51,15 @@ public class HomeFragment extends Fragment {
     private HomeController homeController;
 
     private Button logout;
-    private Button play;
-    private Button login;
+    private FButton  playButton;
+    private TextView  loginButton;
     //private Button playWithFriend;
     private TextView username;
-    private TextView lvlTitle;
     private TextView pointsTitle;
     private TextView coinsTitle;
-
+    private ProgressBar playLoading;
     private ImageView playerImage;
-
+    PieChart pieChart;
 
 
     public static HomeFragment getInstance() {
@@ -70,19 +80,37 @@ public class HomeFragment extends Fragment {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout,  null);
 
         logout = v.findViewById(R.id.logout);
-        play = v.findViewById(R.id.play);
-        login = v.findViewById(R.id.login);
+
+        loginButton = v.findViewById(R.id.login);
+        playButton = (FButton) v.findViewById(R.id.play);
         logout.setVisibility(View.GONE);
-        login.setVisibility(View.GONE);
+        loginButton.setVisibility(View.GONE);
         //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
-        lvlTitle = v.findViewById(R.id.lvlTitle);
         pointsTitle = v.findViewById(R.id.pointsTitle);
         coinsTitle = v.findViewById(R.id.coinsTitle);
         playerImage =  v.findViewById(R.id.playerImage);
 
-        login.setOnClickListener(p -> {
-            signInIntent();
+        pieChart = v.findViewById(R.id.user_lvl_chart);
+        pieChart.getDescription().setEnabled(false);
+        pieChart.getLegend().setEnabled(false);
+
+        pieChart.setHoleColor(Color.TRANSPARENT);
+
+        pieChart.setHoleRadius(70);
+
+
+//        playLoading = (ProgressBar)v.findViewById(R.id.playLoading);
+
+
+
+        playButton.setButtonColor(getResources().getColor(R.color.fbutton_color_nephritis));
+
+
+
+
+        loginButton.setOnClickListener(p -> {
+           signInIntent();
         });
 
         logout.setOnClickListener(p -> {
@@ -98,8 +126,10 @@ public class HomeFragment extends Fragment {
                 });
         });
 
-        play.setOnClickListener(p -> {
+        playButton.setOnClickListener(p -> {
 		   homeController.findGame();
+//            playLoading.setVisibility(View.VISIBLE);
+//            playButton.setVisibility(View.GONE);
         });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -160,22 +190,22 @@ public class HomeFragment extends Fragment {
                     onLogin(account);
                 }else{
                     //TODO repost exception to usesr
-                    login.setVisibility(View.VISIBLE);
+                    loginButton.setVisibility(View.VISIBLE);
                 }
             } catch (ApiException e) {
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                login.setVisibility(View.VISIBLE);
+                loginButton.setVisibility(View.VISIBLE);
             }catch (Exception e){
                 //TODO repost exception to usesr
                 Log.w(TAG, "signInResult:failed ", e);
-                login.setVisibility(View.VISIBLE);
+                loginButton.setVisibility(View.VISIBLE);
             }
         }
     }
 
     private void onLogin(GoogleSignInAccount account){
-         logout.setVisibility(View.VISIBLE);
-         login.setVisibility(View.GONE);
+        // logout.setVisibility(View.VISIBLE);
+        loginButton.setVisibility(View.GONE);
         LocalCache.getInstance().saveString(TOKEN,account.getIdToken());
         if(Client.isConnected()){
             Client.getInstance().disconnect();
@@ -198,16 +228,36 @@ public class HomeFragment extends Fragment {
     public void populatePlayerDetails(UserDto playerDto){
         getActivity().runOnUiThread(() -> {
             if(playerDto.getUserId().startsWith("guest_")){
-                login.setVisibility(View.VISIBLE);
+                loginButton.setVisibility(View.VISIBLE);
             }
             username.setText(playerDto.getUsername());
             PlayerDetailsDto playerDetailsDto = playerDto.getPlayerDetails();
-            lvlTitle.setText(String.valueOf(playerDetailsDto.getLevel()));
+            pieChart.setCenterText("LVL 100");
+            ArrayList<PieEntry> NoOfEmp = new ArrayList();
+            NoOfEmp.add(new PieEntry(90));
+            NoOfEmp.add(new PieEntry(10));
+
+            final int[] MY_COLORS = {
+                    getActivity().getResources().getColor(R.color.fbutton_color_pomegranate),
+                    Color.TRANSPARENT
+            };
+            ArrayList<Integer> colors = new ArrayList<>();
+
+            for(int c: MY_COLORS) colors.add(c);
+            PieDataSet dataSet = new PieDataSet(NoOfEmp, "");
+            dataSet.setColors(colors);
+            PieData data = new PieData( dataSet);
+            pieChart.setData(data);
+            pieChart.animateXY(1000, 1000);
             coinsTitle.setText(String.valueOf(playerDetailsDto.getCoins()));
             pointsTitle.setText(String.valueOf(playerDetailsDto.getElo()));
             Picasso.with(getActivity())
                     .load(playerDto.getPictureUrl())
+                    .placeholder(getResources().getDrawable(R.drawable.user))
+                    .transform(new CircleTransform())
+
                     .error(R.mipmap.ic_launcher)
+
                     .into(playerImage, new Callback() {
                         @Override
                         public void onSuccess() {     }

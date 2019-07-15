@@ -6,65 +6,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <ImageView
-        android:id="@+id/dialogImage"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/user"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
-
-
-    <TextView
-        android:id="@+id/dialogTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Κορυφαίοι παίκτες"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/dialogImage"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
-
-    <View
-        android:id="@+id/line"
-        android:layout_width="fill_parent"
-        android:layout_height="3dp"
-        android:background="@color/title"
-        app:layout_constraintTop_toBottomOf="@+id/dialogTitle"
-        />
-
-
     <include
-        android:id="@+id/rank_panel"
-        layout="@layout/fragment_rank_panel_layout"
-        app:layout_constraintTop_toBottomOf="@+id/line"
-        app:layout_constraintBottom_toTopOf="@+id/rank_list"
+        android:id="@+id/rank_panel_title"
+        layout="@layout/fragment_rank_title_layout"
+        app:layout_constraintTop_toTopOf="parent"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
+
+
+    <!--<include-->
+        <!--android:id="@+id/rank_panel"-->
+        <!--layout="@layout/fragment_rank_panel_layout"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/rank_panel_title"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/rank_list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--/>-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rank_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/rank_panel"
+        app:layout_constraintTop_toBottomOf="@+id/rank_panel_title"
         app:layout_constraintBottom_toTopOf="@+id/currentPlayer"
         tools:showIn="@layout/fragment_rank_layout"
         />
 
     <include
         android:id="@+id/currentPlayer"
-        layout="@layout/item_rank_player_layout"
+        layout="@layout/item_rank_current_player_layout"
         app:layout_constraintTop_toBottomOf="@+id/rank_list"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#80000000"
         />
 
     <!--<Button-->
