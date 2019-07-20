@@ -37,6 +37,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import info.hoang8f.widget.FButton;
 
@@ -232,10 +233,19 @@ public class HomeFragment extends Fragment {
             }
             username.setText(playerDto.getUsername());
             PlayerDetailsDto playerDetailsDto = playerDto.getPlayerDetails();
-            pieChart.setCenterText("LVL 100");
-            ArrayList<PieEntry> NoOfEmp = new ArrayList();
-            NoOfEmp.add(new PieEntry(90));
-            NoOfEmp.add(new PieEntry(10));
+            int lvl = playerDto.getPlayerDetails().getLevel();
+            pieChart.setCenterText("LVL " + lvl);
+            List<PieEntry> exps = new ArrayList();
+
+            float exp = playerDto.getPlayerDetails().getLevelPoints();
+            float maxExp = lvl * 20;
+
+            float per = exp / maxExp * 100;
+            if(per < 5){
+                per = 5;
+            }
+            exps.add(new PieEntry(per));
+            exps.add(new PieEntry(100 - per));
 
             final int[] MY_COLORS = {
                     getActivity().getResources().getColor(R.color.fbutton_color_pomegranate),
@@ -244,7 +254,7 @@ public class HomeFragment extends Fragment {
             ArrayList<Integer> colors = new ArrayList<>();
 
             for(int c: MY_COLORS) colors.add(c);
-            PieDataSet dataSet = new PieDataSet(NoOfEmp, "");
+            PieDataSet dataSet = new PieDataSet(exps, "");
             dataSet.setColors(colors);
             PieData data = new PieData( dataSet);
             pieChart.setData(data);

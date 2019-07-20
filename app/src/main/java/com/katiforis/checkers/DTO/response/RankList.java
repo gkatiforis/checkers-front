@@ -10,6 +10,8 @@ import java.util.List;
 public class RankList extends BaseResponse implements Serializable{
     static final long serialVersionUID =-1396591853482889445L;
     List<UserDto> players = new ArrayList<>();
+    UserDto currentPlayer;
+    long currentPlayerPosition;
 
     public RankList(String status) {
         super(status);
@@ -25,5 +27,21 @@ public class RankList extends BaseResponse implements Serializable{
 
     public void setPlayers(List<UserDto> players) {
         this.players = players;
+    }
+
+    public UserDto getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(UserDto currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public long getCurrentPlayerPosition() {
+        return currentPlayerPosition;
+    }
+
+    public void setCurrentPlayerPosition(long currentPlayerPosition) {
+        this.currentPlayerPosition = currentPlayerPosition;
     }
 }

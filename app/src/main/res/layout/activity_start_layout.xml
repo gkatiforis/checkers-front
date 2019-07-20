@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/menu_background"
     xmlns:fbutton="http://schemas.android.com/tools">
 
     <ImageView
@@ -26,24 +27,29 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
 
-        <Button
+        <info.hoang8f.widget.FButton
             android:id="@+id/login_with_google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="login with google" />
+            android:drawableLeft="@drawable/google_icon"
+            android:paddingRight="15dp"
+            android:paddingLeft="15dp"
+            android:text="Login with google"
+            android:textColor="@android:color/white"
+            fbutton:buttonColor="@color/fbutton_color_alizarin"
+            />
 
-        <Button
+        <info.hoang8f.widget.FButton
             android:id="@+id/login_as_guest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="login as guest" />
-
-
+            android:layout_gravity="right|top"
+            android:layout_margin="10dp"
+            android:minHeight="@dimen/demo_button_min_height"
+            android:minWidth="@dimen/demo_button_min_width"
+            android:text="Login as guest"
+            android:textColor="@android:color/black"
+            fbutton:buttonColor="@color/fbutton_color_silver2"
+            />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/show"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

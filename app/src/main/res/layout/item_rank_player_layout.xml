@@ -12,7 +12,12 @@
         android:layout_height="wrap_content"
         android:textSize="20dp"
         android:text="1. "
+        android:textStyle="bold"
+        android:paddingRight="5dp"
+        android:layout_marginLeft="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <ImageView
@@ -20,7 +25,10 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@drawable/user"
+        android:paddingRight="5dp"
         app:layout_constraintLeft_toRightOf="@+id/rank"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <TextView
@@ -30,6 +38,8 @@
         android:textSize="20dp"
         android:text="username"
         app:layout_constraintLeft_toRightOf="@+id/playerImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <ImageView

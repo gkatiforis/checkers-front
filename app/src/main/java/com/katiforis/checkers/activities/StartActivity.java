@@ -18,6 +18,8 @@ import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.LocalCache;
 
+import info.hoang8f.widget.FButton;
+
 import static android.content.ContentValues.TAG;
 import static com.katiforis.checkers.util.CachedObjectProperties.TOKEN;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
@@ -26,8 +28,8 @@ public class StartActivity extends AppCompatActivity {
 	public static StartActivity INSTANCE;
 	private static Context context;
 	public static String userId = null;
-    private Button loginWithGoogle;
-	private Button loginAsGuest;
+    private FButton loginWithGoogle;
+	private FButton loginAsGuest;
 	Snackbar snack;
 
 	@Override
@@ -43,7 +45,8 @@ public class StartActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_start_layout);
 		loginAsGuest = findViewById(R.id.login_as_guest);
 		loginWithGoogle = findViewById(R.id.login_with_google);
-
+		loginWithGoogle.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+		loginAsGuest.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 		loginAsGuest.setOnClickListener(p -> {
 			LocalCache.getInstance().saveString(TOKEN, null);
 			LocalCache.getInstance().saveString(USER_ID, null);

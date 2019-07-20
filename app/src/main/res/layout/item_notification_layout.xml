@@ -59,13 +59,13 @@
             android:id="@+id/accept"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/accept" />
+             />
 
         <ImageButton
             android:id="@+id/decline"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/cancel" />
+            />
 
     </LinearLayout>
 

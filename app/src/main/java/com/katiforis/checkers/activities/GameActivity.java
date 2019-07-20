@@ -17,6 +17,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -29,6 +31,7 @@ import java.util.List;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.GameState;
 import com.katiforis.checkers.DTO.PlayerAnswer;
+import com.katiforis.checkers.DTO.response.OfferDraw;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.GameController;
@@ -56,18 +59,18 @@ import static com.katiforis.checkers.util.Utils.twoDigits;
 public class GameActivity extends AppCompatActivity {
 
     public static GameActivity INSTANCE;
-    private static final int DARK_PIECE_ICON = R.drawable.redp;
+    private static final int DARK_PIECE_ICON = R.drawable.redpf;
     private static final int DARK_KING_PIECE_ICON = R.drawable.redpk;
-    private static final int DARK_PIECE_PRESSED = R.drawable.redp;
+    private static final int DARK_PIECE_PRESSED = R.drawable.redpf;
     private static final int DARK_KING_PIECE_PRESSED = R.drawable.redpk;
-    private static final int DARK_PIECE_HIGHLIGHTED = R.drawable.redp;
+    private static final int DARK_PIECE_HIGHLIGHTED = R.drawable.redpf;
     private static final int DARK_KING_PIECE_HIGHLIGHTED = R.drawable.redpk;
 
-    private static final int LIGHT_PIECE_ICON = R.drawable.whitep;
+    private static final int LIGHT_PIECE_ICON = R.drawable.whitept;
     private static final int LIGHT_KING_PIECE_ICON = R.drawable.whitepk;
-	private static final int LIGHT_PIECE_PRESSED = R.drawable.whitep;
+	private static final int LIGHT_PIECE_PRESSED = R.drawable.whitept;
 	private static final int LIGHT_KING_PIECE_PRESSED = R.drawable.whitepk;
-	private static final int LIGHT_PIECE_HIGHLIGHTED = R.drawable.whitep;
+	private static final int LIGHT_PIECE_HIGHLIGHTED = R.drawable.whitept;
 	private static final int LIGHT_KING_PIECE_HIGHLIGHTED = R.drawable.whitepk;
 
 	private static final int POSSIBLE_MOVE = R.drawable.possible_moves_image;
@@ -75,10 +78,14 @@ public class GameActivity extends AppCompatActivity {
 	private ImageView gameOptionsDialogButton;
 	private ImageView playerImage;
 	private TextView username;
+	private TextView elo;
+	private TextView lvl;
 	private WaveLoadingView player1Time;
 
 	private ImageView playerImage2;
 	private TextView username2;
+	private TextView elo2;
+	private TextView lvl2;
 	private WaveLoadingView player2Time;
 
 	private CountDownTimer countDownTimer;
@@ -102,16 +109,12 @@ public class GameActivity extends AppCompatActivity {
 	private Board cellBoard = new Board();
 	private Cell srcCell, dstCell;
 
-	private FButton resign;
-	private FButton offerDraw;
-	private FButton acceptDraw;
-	private FButton declineDraw;
+	private FButton resignButton;
+	private FButton offerDrawButton;
 	private ImageView cancel;
 	private DialogPlus optionsDialog;
 	private ViewGroup optionsDialogView;
-
-	private DialogPlus offerDrawDialog;
-	private ViewGroup offerDrawDialogView;
+	private Animation anim;
 
 	public void setGameState(GameState gamestate){
 		runOnUiThread(() -> {
@@ -171,6 +174,8 @@ public class GameActivity extends AppCompatActivity {
 		View user1 = findViewById(R.id.user1);
 		playerImage = user1.findViewById(R.id.playerImage);
 		username =  user1.findViewById(R.id.username);
+		elo =  user1.findViewById(R.id.elo);
+		lvl =  user1.findViewById(R.id.lvl);
 		gameOptionsDialogButton = findViewById(R.id.gameOptionsDialogButton);
 
 		player1Time = (WaveLoadingView) user1.findViewById(R.id.playerTime);
@@ -188,6 +193,8 @@ public class GameActivity extends AppCompatActivity {
 
 		View user2 = findViewById(R.id.user2);
 		playerImage2 = user2.findViewById(R.id.playerImage);
+		elo2 = user2.findViewById(R.id.elo);
+		lvl2 = user2.findViewById(R.id.lvl);
 		username2 =  user2.findViewById(R.id.username);
 
 		player2Time = (WaveLoadingView) user2.findViewById(R.id.playerTime);
@@ -226,75 +233,69 @@ public class GameActivity extends AppCompatActivity {
 
 		optionsDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_options_layout, null);
 
-		offerDraw =  optionsDialogView.findViewById(R.id.offerDraw);
-		resign =  optionsDialogView.findViewById(R.id.resign);
+		offerDrawButton =  optionsDialogView.findViewById(R.id.offerDraw);
+		resignButton =  optionsDialogView.findViewById(R.id.resign);
 		cancel = optionsDialogView.findViewById(R.id.cancel);
 
-		offerDrawDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_offer_draw_layout, null);
-		declineDraw = offerDrawDialogView.findViewById(R.id.declineDraw);
-		acceptDraw = offerDrawDialogView.findViewById(R.id.acceptDraw);
+		resignButton.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+		offerDrawButton.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
 
-		resign.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
-		offerDraw.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
-
-		declineDraw.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
-		acceptDraw.setButtonColor(getResources().getColor(R.color.fbutton_color_emerald));
-
+        optionsDialog = DialogPlus.newDialog(this)
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        System.out.println(item);
+                    }
+                }).setContentHolder(new ViewHolder(optionsDialogView))
+                .create();
 
 		gameOptionsDialogButton.setOnClickListener(p -> {
-//			gameOptionsFragment = GameOptionsFragment.getInstance();
-//			gameOptionsFragment.show(getSupportFragmentManager(), "");
-
-			optionsDialog = DialogPlus.newDialog(this)
-//					.setAdapter(adapter)
-					.setOnItemClickListener(new OnItemClickListener() {
-						@Override
-						public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-							System.out.println(item);
-						}
-					}).setContentHolder(new ViewHolder(optionsDialogView))
-					//.setExpanded(true)
-					.create();
 			optionsDialog.show();
-
-			offerDraw.setOnClickListener(pa -> {
-				sendOfferDraw();
-			});
-
-			resign.setOnClickListener(pa -> {
-				sendResign();
-			});
-
-			cancel.setOnClickListener(pa -> {
-				optionsDialog.dismiss();
-			});
 		});
 
-		offerDrawDialog = DialogPlus.newDialog(this)
-				.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-						System.out.println(item);
-					}
-				}).setContentHolder(new ViewHolder(offerDrawDialogView))
-				//.setExpanded(true)
-				.create();
-		acceptDraw.setOnClickListener(pa -> {
+		offerDrawButton.setOnClickListener(pa -> {
+			offerDrawButton.setText("Offer Draw");
+
+			if(anim != null){
+				anim.cancel();
+			}
+
 			sendOfferDraw();
 		});
 
-		declineDraw.setOnClickListener(pa -> {
-			offerDrawDialog.dismiss();
+		resignButton.setOnClickListener(pa -> {
+			sendResign();
+		});
+
+		cancel.setOnClickListener(pa -> {
+			optionsDialog.dismiss();
 		});
 	}
 
-	public void showOfferDraw(){
+	public void showOfferDraw(OfferDraw offerDraw){
 		runOnUiThread(() -> {
-			if(optionsDialog != null){
-				optionsDialog.dismiss();
-			}
 
-			offerDrawDialog.show();
+            if(!offerDraw.getByUser().equals(LocalCache.getInstance().getString(USER_ID))) {
+                if (!optionsDialog.isShowing()) {
+                    optionsDialog.show();
+                }
+
+               anim = new AlphaAnimation(0.4f, 1.0f);
+                anim.setDuration(500);
+                anim.setStartOffset(20);
+                anim.setRepeatMode(Animation.REVERSE);
+                anim.setRepeatCount(30);
+                offerDrawButton.startAnimation(anim);
+
+                offerDrawButton.setText("Your opponent has proposed draw");
+                final Handler handler = new Handler(getMainLooper());
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						offerDrawButton.setText("Offer Draw");
+					}
+				}, 30 * 500);
+            }
 		});
 	}
 
@@ -322,25 +323,15 @@ public class GameActivity extends AppCompatActivity {
 
 	void setPlayerList(List<UserDto> players){
 
-		if(players.get(0).getColor().equals(Piece.LIGHT)){
-			Picasso.with(this)
-					.load(players.get(0).getPictureUrl())
-					.error(R.mipmap.ic_launcher)
-					.placeholder(getResources().getDrawable(R.drawable.user))
-					.transform(new CircleTransform())
-					.into(playerImage, new Callback() {
-						@Override
-						public void onSuccess() {     }
+		UserDto player = players.get(0);
+		UserDto player2 = players.get(1);
 
-						@Override
-						public void onError() {
-							//TODO
-						}
-					});
+		if(player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID))){
+
 			Picasso.with(this)
-					.load(players.get(1).getPictureUrl())
-					.error(R.mipmap.ic_launcher)
+					.load(player2.getPictureUrl())
 					.placeholder(getResources().getDrawable(R.drawable.user))
+					.error(R.mipmap.ic_launcher)
 					.transform(new CircleTransform())
 					.into(playerImage2, new Callback() {
 						@Override
@@ -351,11 +342,29 @@ public class GameActivity extends AppCompatActivity {
 							//TODO
 						}
 					});
-			username.setText(players.get(0).getUsername());
-			username2.setText(players.get(1).getUsername());
+			Picasso.with(this)
+					.load(player.getPictureUrl())
+					.placeholder(getResources().getDrawable(R.drawable.user))
+					.error(R.mipmap.ic_launcher)
+					.transform(new CircleTransform())
+					.into(playerImage, new Callback() {
+						@Override
+						public void onSuccess() {     }
+
+						@Override
+						public void onError() {
+							//TODO
+						}
+					});
+			username.setText(player.getUsername());
+			elo.setText(String.valueOf(player.getPlayerDetails().getElo()));
+			lvl.setText(String.valueOf(player.getPlayerDetails().getLevel()));
+			username2.setText(player2.getUsername());
+			elo2.setText(String.valueOf(player2.getPlayerDetails().getElo()));
+			lvl2.setText(String.valueOf(player2.getPlayerDetails().getLevel()));
 		}else{
 			Picasso.with(this)
-					.load(players.get(1).getPictureUrl())
+					.load(player2.getPictureUrl())
 					.placeholder(getResources().getDrawable(R.drawable.user))
 					.error(R.mipmap.ic_launcher)
 					.transform(new CircleTransform())
@@ -369,7 +378,7 @@ public class GameActivity extends AppCompatActivity {
 						}
 					});
 			Picasso.with(this)
-					.load(players.get(0).getPictureUrl())
+					.load(player.getPictureUrl())
 					.placeholder(getResources().getDrawable(R.drawable.user))
 					.error(R.mipmap.ic_launcher)
 					.transform(new CircleTransform())
@@ -382,8 +391,12 @@ public class GameActivity extends AppCompatActivity {
 							//TODO
 						}
 					});
-			username2.setText(players.get(0).getUsername());
-			username.setText(players.get(1).getUsername());
+			username.setText(player2.getUsername());
+			elo.setText(String.valueOf(player2.getPlayerDetails().getElo()));
+			lvl.setText(String.valueOf(player2.getPlayerDetails().getLevel()));
+			username2.setText(player.getUsername());
+			elo2.setText(String.valueOf(player.getPlayerDetails().getElo()));
+			lvl2.setText(String.valueOf(player.getPlayerDetails().getLevel()));
 		}
 	}
 
@@ -696,7 +709,7 @@ public class GameActivity extends AppCompatActivity {
 		Long fromPlayerSeconds = fromPlayer.getSecondsRemaining() - fromPlayerMinutes * 60;
 
 
-		if(toPlayer.getColor().equals(Piece.LIGHT)){
+		if(fromPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))){
 			player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
 			player2Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + twoDigits(fromPlayerSeconds.toString()));
 		}else{
@@ -705,7 +718,7 @@ public class GameActivity extends AppCompatActivity {
 		}
 
 		Integer progress = 100 * fromPlayer.getSecondsRemaining().intValue() / (gameMaxTime * 60);
-		if(fromPlayer.getColor().equals(Piece.LIGHT)){
+		if(toPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))){
 			player1Time.setProgressValue(progress);
 		}else{
 			player2Time.setProgressValue(progress);
@@ -721,7 +734,7 @@ public class GameActivity extends AppCompatActivity {
 				Long toPlayerMinutes = remainingSeconds/60;
 				Long toPlayerSeconds = remainingSeconds - toPlayerMinutes * 60;
 				Integer progress = 100 * remainingSeconds.intValue() / (gameMaxTime * 60);
-				if(toPlayer.getColor().equals(Piece.LIGHT)){
+				if(fromPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))){
 					player1Time.setProgressValue(progress);
 					player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
 				}else{

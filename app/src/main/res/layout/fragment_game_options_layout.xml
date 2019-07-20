@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/cancel"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:text="Cancel"
         android:textAlignment="center"
         android:src="@drawable/close"
@@ -23,12 +23,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="30dp"
         android:layout_marginRight="15dp"
         android:layout_marginBottom="15dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/cancel">
 
         <info.hoang8f.widget.FButton
             android:id="@+id/offerDraw"

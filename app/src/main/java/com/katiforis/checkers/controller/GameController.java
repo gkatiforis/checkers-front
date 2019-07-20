@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.katiforis.checkers.DTO.PlayerAnswer;
 import com.katiforis.checkers.DTO.response.GameStats;
+import com.katiforis.checkers.DTO.response.OfferDraw;
 import com.katiforis.checkers.DTO.response.ResponseState;
 import com.katiforis.checkers.activities.GameActivity;
 import com.katiforis.checkers.conf.Const;
@@ -59,7 +60,9 @@ public class GameController extends AbstractController{
                 gameActivity.makeMove(playerAnswer);
             }
              else if (messageStatus.equalsIgnoreCase(ResponseState.OFFER_DRAW.getState())) {
-                gameActivity.showOfferDraw();
+                Gson gson = new Gson();
+                OfferDraw offerDraw = gson.fromJson(message, OfferDraw.class);
+                gameActivity.showOfferDraw(offerDraw);
             }
     }
 

@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.R;
+import com.katiforis.checkers.activities.GameActivity;
+import com.katiforis.checkers.util.CircleTransform;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -17,7 +21,7 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
     private List<UserDto> players;
 
     public class PlayersStatsViewHolder extends RecyclerView.ViewHolder {
-        public TextView username, points, pointsExtra;
+        public TextView username, points, pointsExtra, coins, coinsExtra;
         ImageView userImage;
 
         public PlayersStatsViewHolder(View view) {
@@ -26,6 +30,8 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
             points = (TextView) view.findViewById(R.id.pointsStats);
             pointsExtra = (TextView) view.findViewById(R.id.pointsExtra);
             userImage = (ImageView) view.findViewById(R.id.userImage);
+            coins = (TextView) view.findViewById(R.id.coins);
+            coinsExtra = (TextView) view.findViewById(R.id.coinsExtra);
         }
     }
 
@@ -45,14 +51,53 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
     public void onBindViewHolder(PlayersStatsViewHolder holder, int position) {
         UserDto playerDto = players.get(position);
         holder.username.setText(playerDto.getUsername());
-        holder.points.setText(String.valueOf(playerDto.getPlayerDetails().getElo()));
 
-        int extra = playerDto.getPlayerDetails().getEloExtra();
-        if(extra < 0){
-            holder.pointsExtra.setText("" + extra);
+        int eloExtra = playerDto.getPlayerDetails().getEloExtra();
+        int coinsExtra = playerDto.getPlayerDetails().getCoinsExtra();
+        int elo = playerDto.getPlayerDetails().getElo();
+        int finalElo = elo - eloExtra;
+        int coins = playerDto.getPlayerDetails().getCoins();
+        int finalCoins = coins - coinsExtra;
+
+        if(elo == 0){
+            holder.points.setText("" + 0);
         }else{
-            holder.pointsExtra.setText(" + " + extra);
+            holder.points.setText("" + finalElo);
         }
+
+        if(coins == 0){
+            holder.coins.setText("" + 0);
+        }else{
+            holder.coins.setText("" + finalCoins);
+        }
+
+
+        if(eloExtra < 0){
+            holder.pointsExtra.setText("" + eloExtra);
+        }else{
+            holder.pointsExtra.setText(" +" + eloExtra);
+        }
+        if(coinsExtra < 0){
+            holder.coinsExtra.setText("" + coinsExtra);
+        }else{
+            holder.coinsExtra.setText(" +" + coinsExtra);
+        }
+
+        Picasso.with(GameActivity.INSTANCE)
+                .load(playerDto.getPictureUrl())
+                .error(R.mipmap.ic_launcher)
+                .placeholder(GameActivity.INSTANCE.getResources().getDrawable(R.drawable.user))
+                .transform(new CircleTransform())
+                .into(holder.userImage, new Callback() {
+                    @Override
+                    public void onSuccess() {     }
+
+                    @Override
+                    public void onError() {
+                        //TODO
+                    }
+                });
+
     }
 
     @Override

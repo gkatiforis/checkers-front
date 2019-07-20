@@ -18,8 +18,10 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/user"
-        app:layout_constraintTop_toBottomOf="@+id/date"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
+
 
     <TextView
         android:id="@+id/usernameStats"
@@ -30,32 +32,77 @@
         android:textSize="16dp"
         android:textStyle="bold"
         android:text="username"
-        app:layout_constraintLeft_toRightOf="@+id/userImage"/>
+        app:layout_constraintLeft_toRightOf="@+id/userImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/pointsIcon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/points"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/pointsStats"
+        android:paddingRight="5dp"
+        />
 
     <TextView
         android:id="@+id/pointsStats"
-        android:gravity="left"
-        android:layout_height="fill_parent"
         android:layout_width="wrap_content"
-        android:inputType="textMultiLine"
-        android:paddingLeft="10px"
-        android:textColor="@color/title"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:text="2555"
-        app:layout_constraintLeft_toRightOf="@+id/usernameStats"/>
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="1200"
+        android:paddingRight="2dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/pointsExtra"
+        />
 
     <TextView
         android:id="@+id/pointsExtra"
-        android:gravity="left"
-        android:layout_height="fill_parent"
         android:layout_width="wrap_content"
-        android:inputType="textMultiLine"
-        android:paddingLeft="10px"
-        android:textColor="@color/fbutton_color_belize_hole"
-        android:textSize="16dp"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="+10"
+        android:paddingRight="5dp"
         android:textStyle="bold"
-        android:text="+25"
-        app:layout_constraintLeft_toRightOf="@+id/pointsStats"/>
+        android:textColor="@color/fbutton_color_peter_river"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pointsStats"
+        app:layout_constraintRight_toRightOf="parent"
+        />
 
+    <ImageView
+        android:id="@+id/coinsIcon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/coin"
+        android:layout_marginTop="5dp"
+        android:paddingRight="5dp"
+        app:layout_constraintRight_toLeftOf="@+id/coins"
+        app:layout_constraintTop_toBottomOf="@+id/pointsStats"
+        />
+    <TextView
+        android:id="@+id/coins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="100"
+        android:paddingRight="2dp"
+        app:layout_constraintTop_toBottomOf="@+id/pointsStats"
+        app:layout_constraintRight_toLeftOf="@+id/coinsExtra"
+        />
+    <TextView
+        android:id="@+id/coinsExtra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:text="+10"
+        android:paddingRight="5dp"
+        android:textStyle="bold"
+        android:textColor="@color/fbutton_color_peter_river"
+        app:layout_constraintTop_toBottomOf="@+id/pointsStats"
+        app:layout_constraintRight_toRightOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -50,21 +50,25 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
 
         UserDto player = rankList.get(position);
 
-            Picasso.with(MenuActivity.getAppContext())
-                    .load(player.getPictureUrl())
-                    .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
-                    .error(R.mipmap.ic_launcher)
-                    .transform(new CircleTransform())
-                    .into(holder.playerImage, new Callback() {
-                        @Override
-                        public void onSuccess() {     }
+        Picasso.with(MenuActivity.getAppContext())
+                .load(player.getPictureUrl())
+                .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
+                .error(R.mipmap.ic_launcher)
+                .transform(new CircleTransform())
+                .into(holder.playerImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                    }
 
-                        @Override
-                        public void onError() {
-                            //TODO
-                        }
-                    });
-            holder.username.setText(player.getUsername());
+                    @Override
+                    public void onError() {
+                        //TODO
+                    }
+                });
+        holder.username.setText(player.getUsername());
+        holder.rank.setText(position + 1 + ".");
+        holder.level.setText(String.valueOf(player.getPlayerDetails().getLevel()));
+        holder.points.setText(String.valueOf(player.getPlayerDetails().getElo()));
     }
 
 

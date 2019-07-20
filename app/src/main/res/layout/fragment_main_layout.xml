@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawableLeft="@drawable/google"
+        android:drawableLeft="@drawable/google_icon"
         android:drawablePadding="5dp"
         android:padding="10dp"
         android:textColor="@color/tab_unchecked"
@@ -28,6 +28,7 @@
         android:background="@color/fbutton_color_alizarin"
         app:layout_constraintTop_toTopOf="parent"
 
+        android:gravity="center_vertical"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp"
         android:text="Login with Google and save your progress"/>

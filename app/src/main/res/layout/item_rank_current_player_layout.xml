@@ -11,26 +11,37 @@
         android:id="@+id/rank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="24dp"
         android:text="1. "
+        android:textStyle="bold"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <ImageView
-        android:id="@+id/playerImage"
+        android:id="@+id/currentPlayerImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@drawable/user"
+        android:paddingRight="5dp"
         app:layout_constraintLeft_toRightOf="@+id/rank"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="24dp"
         android:text="username"
-        app:layout_constraintLeft_toRightOf="@+id/playerImage"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@+id/currentPlayerImage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <ImageView

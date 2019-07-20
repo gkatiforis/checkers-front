@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -46,8 +47,8 @@ public class MenuActivity extends AppCompatActivity {
 	public static MenuActivity INSTANCE;
 	private static Context context;
 
-	private static final int MAIN_MENU_TAB_INDEX = 1;
-	private static final int RANK_TAB_INDEX = 0;
+	private static final int MAIN_MENU_TAB_INDEX = 0;
+	private static final int RANK_TAB_INDEX = 1;
 	private static final int SHOP_TAB_INDEX = 2;
 
 	public static boolean populated;
@@ -119,18 +120,16 @@ public class MenuActivity extends AppCompatActivity {
 //								notificationFragment.show(getSupportFragmentManager(), "dialog");
 							case R.id.action_main_menu:
 								viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
-								HomeFragment.getInstance().getPlayerDetails();
 								break;
 //							case R.id.action_friend_list:
 //								drawerLayout.openDrawer(Gravity.RIGHT);
 //								INSTANCE.openFriendListDialog();
 //								break;
-							case R.id.action_shop:
-								viewPager.setCurrentItem(SHOP_TAB_INDEX);
-							    break;
+//							case R.id.action_shop:
+//								viewPager.setCurrentItem(SHOP_TAB_INDEX);
+//							    break;
 							case R.id.action_rank:
 								viewPager.setCurrentItem(RANK_TAB_INDEX);
-								RankFragment.getInstance().getRankList();
 								break;
 						}
 						return false;
@@ -150,12 +149,16 @@ public class MenuActivity extends AppCompatActivity {
 				}
 				else
 				{
-					bottomNavigationView.getMenu().getItem(0).setChecked(false);
+					bottomNavigationView.getMenu().getItem(MAIN_MENU_TAB_INDEX).setChecked(false);
 				}
-				Log.d("page", "onPageSelected: "+position);
 				bottomNavigationView.getMenu().getItem(position).setChecked(true);
 				prevMenuItem = bottomNavigationView.getMenu().getItem(position);
 
+				if(position == RANK_TAB_INDEX){
+					RankFragment.getInstance().getRankList();
+				}else if(position == MAIN_MENU_TAB_INDEX){
+					HomeFragment.getInstance().getPlayerDetails();
+				}
 			}
 
 			@Override
@@ -176,10 +179,10 @@ public class MenuActivity extends AppCompatActivity {
 
 	private void initViewPager(ViewPager viewPager) {
 		ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-		adapter.addFragment(RankFragment.getInstance());
 		adapter.addFragment(HomeFragment.getInstance());
-		adapter.addFragment(new Fragment());
-		adapter.addFragment(LobbyFragment.getInstance());
+		adapter.addFragment(RankFragment.getInstance());
+//		adapter.addFragment(new Fragment());
+//		adapter.addFragment(LobbyFragment.getInstance());
 		viewPager.setAdapter(adapter);
 		viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
 	}

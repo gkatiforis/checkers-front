@@ -18,9 +18,13 @@ import com.katiforis.checkers.R;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.adapter.RankAdapter;
 import com.katiforis.checkers.controller.RankController;
+import com.katiforis.checkers.util.CircleTransform;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RankFragment extends Fragment {
@@ -32,9 +36,10 @@ public class RankFragment extends Fragment {
     private RecyclerView rankRecyclerView;
     private RankAdapter rankAdapter;
     private List<UserDto> rankList = new ArrayList<>();
-
-//    private TextView rank, username, level, points;
-//    private ImageView playerImage;
+    private UserDto currentPlayer;
+    private TextView rank, username, level, points;
+    private TextView lastUpdate;
+    private ImageView playerImage;
 //
 //    private TextView rank2, username2, level2, points2;
 //    private ImageView playerImage2;
@@ -70,11 +75,14 @@ public class RankFragment extends Fragment {
         rankAdapter.notifyDataSetChanged();
         rankRecyclerView.setAdapter(rankAdapter);
 
-//        playerImage = (ImageView) view.findViewById(R.id.firstImage);
-//        username = (TextView) view.findViewById(R.id.firstUsername);
-//        rank = (TextView) view.findViewById(R.id.rank);
-//        level = (TextView) view.findViewById(R.id.level);
-//        points = (TextView) view.findViewById(R.id.points);
+        playerImage = (ImageView) view.findViewById(R.id.currentPlayerImage);
+        username = (TextView) view.findViewById(R.id.username);
+        rank = (TextView) view.findViewById(R.id.rank);
+        level = (TextView) view.findViewById(R.id.level);
+        points = (TextView) view.findViewById(R.id.points);
+
+        lastUpdate = (TextView) view.findViewById(R.id.lastUpdate);
+
 //
 //        playerImage2 = (ImageView) view.findViewById(R.id.secondImage);
 //        username2 = (TextView) view.findViewById(R.id.secondUsername);
@@ -105,6 +113,33 @@ public class RankFragment extends Fragment {
         if(activity != null){
             activity.runOnUiThread(() -> {
                List<UserDto> players = rankList.getPlayers();
+               currentPlayer = rankList.getCurrentPlayer();
+
+                Picasso.with(MenuActivity.getAppContext())
+                        .load(currentPlayer.getPictureUrl())
+                        .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
+                        .error(R.mipmap.ic_launcher)
+                        .transform(new CircleTransform())
+                        .into(playerImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onError() {
+                                //TODO
+                            }
+                        });
+
+//                Picasso.with(MenuActivity.getAppContext())
+//                           .load(currentPlayer.getPictureUrl())
+//                           .error(R.mipmap.ic_launcher)
+//                           .into(playerImage);
+                   username.setText(currentPlayer.getUsername());
+                rank.setText(rankList.getCurrentPlayerPosition() + ".");
+                level.setText(String.valueOf(currentPlayer.getPlayerDetails().getLevel()));
+                points.setText(String.valueOf(currentPlayer.getPlayerDetails().getElo()));
+
 //               if(players.size() >=3){
 //                   UserDto first = players.get(0);
 //                   UserDto second = players.get(1);
@@ -135,6 +170,10 @@ public class RankFragment extends Fragment {
                 this.rankList.clear();
                 this.rankList.addAll(players);
                 rankAdapter.notifyDataSetChanged();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                String now = sdf.format(new Date());
+                lastUpdate.setText("Last update: " + now);
             });
         }
     }

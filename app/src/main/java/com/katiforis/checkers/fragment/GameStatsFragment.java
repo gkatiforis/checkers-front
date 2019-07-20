@@ -24,11 +24,14 @@ import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.adapter.PlayersStatsAdapter;
 import com.katiforis.checkers.controller.GameController;
 import com.katiforis.checkers.game.Piece;
+import com.katiforis.checkers.util.LocalCache;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import info.hoang8f.widget.FButton;
+
+import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 public class GameStatsFragment extends DialogFragment {
     private static GameStatsFragment INSTANCE = null;
@@ -104,7 +107,16 @@ public class GameStatsFragment extends DialogFragment {
                 if(gameStats.isDraw()){
                     this.title.setText("Draw");
                 }else{
-                    this.title.setText("The winner is " + gameStats.getWinnerColor());
+                    if( players.get(0).getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                        players.get(0).getColor().equals(gameStats.getWinnerColor())){
+                        this.title.setText("You Win");
+                    }else if( players.get(1).getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                            players.get(1).getColor().equals(gameStats.getWinnerColor())){
+                        this.title.setText("You Win");
+                    }else{
+                        this.title.setText("You Lose");
+                    }
+
                 }
             });
         }

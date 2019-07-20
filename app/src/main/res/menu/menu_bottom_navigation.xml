@@ -17,11 +17,6 @@
         <!--app:showAsAction="ifRoom" />-->
 
 
-    <item
-        android:id="@+id/action_rank"
-        android:checked="false"
-        android:icon="@drawable/cup"
-        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_main_menu"
@@ -31,9 +26,14 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_shop"
+        android:id="@+id/action_rank"
         android:checked="false"
-        android:icon="@drawable/ic_contact"
         android:title=""
+        android:icon="@drawable/cup"
         app:showAsAction="ifRoom" />
+    <!--<item-->
+        <!--android:id="@+id/action_shop"-->
+        <!--android:checked="false"-->
+        <!--android:title=""-->
+        <!--app:showAsAction="ifRoom" />-->
 </menu>

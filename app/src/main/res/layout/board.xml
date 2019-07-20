@@ -11,7 +11,7 @@
         android:layout_width="461dp"
         android:layout_height="463dp"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/referferff"
+        app:srcCompat="@drawable/board"
         android:id="@+id/boardImageView" />
 
 
