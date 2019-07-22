@@ -6,8 +6,12 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -23,6 +27,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.katiforis.checkers.BuildConfig;
 import com.katiforis.checkers.DTO.PlayerDetailsDto;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.R;
@@ -31,6 +36,7 @@ import com.katiforis.checkers.activities.StartActivity;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.stomp.Client;
+import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.CircleTransform;
 import com.katiforis.checkers.util.LocalCache;
 import com.squareup.picasso.Callback;
@@ -51,21 +57,22 @@ public class HomeFragment extends Fragment {
     public static boolean populated;
     private HomeController homeController;
 
-    private Button logout;
-    private FButton  playButton;
-    private TextView  loginButton;
+    private FButton playButton;
+    private TextView loginButton;
+    private TextView shareButton;
     //private Button playWithFriend;
     private TextView username;
     private TextView pointsTitle;
     private TextView coinsTitle;
     private ProgressBar playLoading;
     private ImageView playerImage;
-    PieChart pieChart;
+    private PieChart pieChart;
+    private Button settingButton;
 
 
     public static HomeFragment getInstance() {
         if (INSTANCE == null) {
-            synchronized(HomeFragment.class) {
+            synchronized (HomeFragment.class) {
                 INSTANCE = new HomeFragment();
             }
         }
@@ -74,23 +81,23 @@ public class HomeFragment extends Fragment {
         return INSTANCE;
     }
 
-    public HomeFragment() {}
+    public HomeFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout,  null);
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout, null);
 
-        logout = v.findViewById(R.id.logout);
-
+        settingButton = v.findViewById(R.id.settingButton);
         loginButton = v.findViewById(R.id.login);
+        shareButton = v.findViewById(R.id.shareButton);
         playButton = (FButton) v.findViewById(R.id.play);
-        logout.setVisibility(View.GONE);
         loginButton.setVisibility(View.GONE);
         //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
         pointsTitle = v.findViewById(R.id.pointsTitle);
         coinsTitle = v.findViewById(R.id.coinsTitle);
-        playerImage =  v.findViewById(R.id.playerImage);
+        playerImage = v.findViewById(R.id.playerImage);
 
         pieChart = v.findViewById(R.id.user_lvl_chart);
         pieChart.getDescription().setEnabled(false);
@@ -100,37 +107,28 @@ public class HomeFragment extends Fragment {
 
         pieChart.setHoleRadius(70);
 
-
-//        playLoading = (ProgressBar)v.findViewById(R.id.playLoading);
-
-
-
         playButton.setButtonColor(getResources().getColor(R.color.fbutton_color_nephritis));
 
 
-
-
         loginButton.setOnClickListener(p -> {
-           signInIntent();
+            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            signInIntent();
         });
 
-        logout.setOnClickListener(p -> {
-            signInClient.signOut()
-                 .addOnSuccessListener((message)->{
-                     Client.getInstance().disconnect();
-                     LocalCache.getInstance().saveString(TOKEN, null);
-                     LocalCache.getInstance().saveString(USER_ID, null);
-                        intentToStartPage();
-                    })
-                .addOnFailureListener((message)->{
-                    //TODO show message
-                });
+        shareButton.setOnClickListener(p -> {
+            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            shareGame();
         });
 
+        settingButton.setOnClickListener(p -> {
+            SettingsFragment settingsFragment = SettingsFragment.getInstance();
+            settingsFragment.show(this.getFragmentManager(), "");
+        });
+
+        buttonEffect(settingButton);
         playButton.setOnClickListener(p -> {
-		   homeController.findGame();
-//            playLoading.setVisibility(View.VISIBLE);
-//            playButton.setVisibility(View.GONE);
+            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            homeController.findGame();
         });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -143,6 +141,43 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
+    public void shareGame() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Checkers Multiplayer");
+        String shareMessage = "Let me recommend you this cool multiplayer checkers game on Google Play: \n\n";
+        shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID + "\n\n Have fun!";
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+        startActivity(Intent.createChooser(shareIntent, "Share"));
+    }
+
+    public void logout() {
+        signInClient.signOut()
+                .addOnSuccessListener((message) -> {
+                    Client.getInstance().disconnect();
+                    LocalCache.getInstance().saveString(TOKEN, null);
+                    LocalCache.getInstance().saveString(USER_ID, null);
+                    intentToStartPage();
+                })
+                .addOnFailureListener((message) -> {
+                    //TODO show message
+                });
+    }
+
+
+    public static void buttonEffect(View button) {
+        button.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.8F);
+                v.startAnimation(buttonClick);
+                final Animation animShake = AnimationUtils.loadAnimation(MenuActivity.INSTANCE, R.anim.shake);
+                v.startAnimation(animShake);
+                return false;
+            }
+        });
+    }
+
+
     private void signInIntent() {
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(intent, 0);
@@ -150,12 +185,12 @@ public class HomeFragment extends Fragment {
 
     private void signInAgain() {
         String token = (String) LocalCache.getInstance().getString(TOKEN);
-        if(token != null){
+        if (token != null) {
             intentToStartPage();
         }
     }
 
-    private void intentToStartPage(){
+    private void intentToStartPage() {
         Intent intent = new Intent();
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setClass(MenuActivity.getAppContext(), StartActivity.class);
@@ -166,15 +201,15 @@ public class HomeFragment extends Fragment {
         Task<GoogleSignInAccount> task = signInClient.silentSignIn();
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
-            if(account != null){
+            if (account != null) {
                 onLogin(account);
-            }else{
+            } else {
                 signInAgain();
             }
         } catch (ApiException e) {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             signInAgain();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.w(TAG, "signInResult:failed ", e);
             signInAgain();
         }
@@ -187,16 +222,16 @@ public class HomeFragment extends Fragment {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                if(account != null){
+                if (account != null) {
                     onLogin(account);
-                }else{
+                } else {
                     //TODO repost exception to usesr
                     loginButton.setVisibility(View.VISIBLE);
                 }
             } catch (ApiException e) {
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 loginButton.setVisibility(View.VISIBLE);
-            }catch (Exception e){
+            } catch (Exception e) {
                 //TODO repost exception to usesr
                 Log.w(TAG, "signInResult:failed ", e);
                 loginButton.setVisibility(View.VISIBLE);
@@ -204,31 +239,31 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void onLogin(GoogleSignInAccount account){
+    private void onLogin(GoogleSignInAccount account) {
         // logout.setVisibility(View.VISIBLE);
         loginButton.setVisibility(View.GONE);
-        LocalCache.getInstance().saveString(TOKEN,account.getIdToken());
-        if(Client.isConnected()){
+        LocalCache.getInstance().saveString(TOKEN, account.getIdToken());
+        if (Client.isConnected()) {
             Client.getInstance().disconnect();
             Client.getInstance();
             getPlayerDetails();
-        }else{
+        } else {
             Client.getInstance();
         }
     }
 
-    public void getPlayerDetails(){
-        if(!populated){
+    public void getPlayerDetails() {
+        if (!populated) {
             homeController.getPlayerDetails();
             populated = true;
-        }else{
+        } else {
             homeController.getPlayerDetailsIfExpired();
         }
     }
 
-    public void populatePlayerDetails(UserDto playerDto){
+    public void populatePlayerDetails(UserDto playerDto) {
         getActivity().runOnUiThread(() -> {
-            if(playerDto.getUserId().startsWith("guest_")){
+            if (playerDto.getUserId().startsWith("guest_")) {
                 loginButton.setVisibility(View.VISIBLE);
             }
             username.setText(playerDto.getUsername());
@@ -241,7 +276,7 @@ public class HomeFragment extends Fragment {
             float maxExp = lvl * 20;
 
             float per = exp / maxExp * 100;
-            if(per < 5){
+            if (per < 5) {
                 per = 5;
             }
             exps.add(new PieEntry(per));
@@ -253,10 +288,10 @@ public class HomeFragment extends Fragment {
             };
             ArrayList<Integer> colors = new ArrayList<>();
 
-            for(int c: MY_COLORS) colors.add(c);
+            for (int c : MY_COLORS) colors.add(c);
             PieDataSet dataSet = new PieDataSet(exps, "");
             dataSet.setColors(colors);
-            PieData data = new PieData( dataSet);
+            PieData data = new PieData(dataSet);
             pieChart.setData(data);
             pieChart.animateXY(1000, 1000);
             coinsTitle.setText(String.valueOf(playerDetailsDto.getCoins()));
@@ -270,7 +305,8 @@ public class HomeFragment extends Fragment {
 
                     .into(playerImage, new Callback() {
                         @Override
-                        public void onSuccess() {     }
+                        public void onSuccess() {
+                        }
 
                         @Override
                         public void onError() {

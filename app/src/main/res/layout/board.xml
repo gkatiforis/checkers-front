@@ -108,8 +108,6 @@
 
         </LinearLayout>
 
-
-
         <LinearLayout
             android:id="@+id/layout_row1"
             android:layout_width="match_parent"
@@ -196,8 +194,6 @@
 
         </LinearLayout>
 
-
-
         <LinearLayout
             android:id="@+id/layout_row2"
             android:layout_width="match_parent"
@@ -283,7 +279,6 @@
                />
 
         </LinearLayout>
-
 
         <LinearLayout
             android:id="@+id/layout_row3"
@@ -541,6 +536,7 @@
                 android:background="@drawable/blank_square" />
 
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/layout_row6"
             android:layout_width="match_parent"
@@ -712,9 +708,6 @@
                 android:background="@drawable/blank_square" />
 
         </LinearLayout>
-
-
-
 
     </LinearLayout>
 

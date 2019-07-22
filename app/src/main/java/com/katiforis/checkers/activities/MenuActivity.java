@@ -13,14 +13,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -33,9 +31,10 @@ import com.katiforis.checkers.adapter.FriendAdapter;
 import com.katiforis.checkers.adapter.ViewPagerAdapter;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.controller.HomeController;
-import com.katiforis.checkers.fragment.LobbyFragment;
 import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.fragment.RankFragment;
+import com.katiforis.checkers.util.AudioPlayer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,6 +97,7 @@ public class MenuActivity extends AppCompatActivity {
 		startActivity(intent);
 	}
 	private void initialize() {
+
 		populated = false;
 		INSTANCE = this;
 		homeController = HomeController.getInstance();
@@ -144,6 +144,7 @@ public class MenuActivity extends AppCompatActivity {
 
 			@Override
 			public void onPageSelected(int position) {
+				AudioPlayer.getInstance(MenuActivity.INSTANCE.getApplicationContext()).playPopup();
 				if (prevMenuItem != null) {
 					prevMenuItem.setChecked(false);
 				}
@@ -225,5 +226,17 @@ public class MenuActivity extends AppCompatActivity {
 	}
 	public static Context getAppContext(){
 		return context;
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+
+	}
+
+    @Override
+	protected void onStart() {
+		super.onStart();
+		AudioPlayer.init(context);
 	}
 }

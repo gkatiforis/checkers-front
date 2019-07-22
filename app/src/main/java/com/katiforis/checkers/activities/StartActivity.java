@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Button;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -16,6 +15,7 @@ import com.google.android.gms.tasks.Task;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.stomp.Client;
+import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.LocalCache;
 
 import info.hoang8f.widget.FButton;
@@ -30,7 +30,7 @@ public class StartActivity extends AppCompatActivity {
 	public static String userId = null;
     private FButton loginWithGoogle;
 	private FButton loginAsGuest;
-	Snackbar snack;
+	private Snackbar snack;
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
@@ -48,11 +48,13 @@ public class StartActivity extends AppCompatActivity {
 		loginWithGoogle.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
 		loginAsGuest.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 		loginAsGuest.setOnClickListener(p -> {
+			AudioPlayer.getInstance(this).playClickButton();
 			LocalCache.getInstance().saveString(TOKEN, null);
 			LocalCache.getInstance().saveString(USER_ID, null);
 			intentToMenuActivity();
 		});
 		loginWithGoogle.setOnClickListener(p -> {
+			AudioPlayer.getInstance(this).playClickButton();
 			signInIntent();
 		});
 	}
@@ -99,5 +101,15 @@ public class StartActivity extends AppCompatActivity {
 			Client.getInstance();
 		}
 		intentToMenuActivity();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 	}
 }

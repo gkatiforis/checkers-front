@@ -1,5 +1,9 @@
 package com.katiforis.checkers.game;
 
+import android.view.animation.TranslateAnimation;
+
+import com.katiforis.checkers.util.AudioPlayer;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;

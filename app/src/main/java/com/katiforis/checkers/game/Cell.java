@@ -1,5 +1,8 @@
 package com.katiforis.checkers.game;
 
+import com.katiforis.checkers.activities.GameActivity;
+import com.katiforis.checkers.util.AudioPlayer;
+
 import java.io.Serializable;
 
 public class Cell implements Serializable {
@@ -49,6 +52,7 @@ public class Cell implements Serializable {
 		if(anotherCell == null){
 			return;
 		}
+		AudioPlayer.getInstance(GameActivity.INSTANCE).playPiece();
 		anotherCell.placePiece(this.placedPiece);
 		this.placedPiece.setCell(anotherCell);
 		this.placedPiece = null;

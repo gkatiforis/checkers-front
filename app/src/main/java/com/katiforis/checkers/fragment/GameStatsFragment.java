@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.katiforis.checkers.DTO.UserDto;
@@ -23,7 +22,7 @@ import com.katiforis.checkers.R;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.adapter.PlayersStatsAdapter;
 import com.katiforis.checkers.controller.GameController;
-import com.katiforis.checkers.game.Piece;
+import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.LocalCache;
 
 import java.util.ArrayList;
@@ -81,15 +80,18 @@ public class GameStatsFragment extends DialogFragment {
         returnToMenu.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 
         returnToMenu.setOnClickListener(c ->{
+            AudioPlayer.getInstance(this.getContext()).playClickButton();
             intentToMenuActivity();
         });
 
         restart.setOnClickListener(c ->{
+            AudioPlayer.getInstance(this.getContext()).playClickButton();
             gameController.restartGame();
             restartGame = true;
         });
 
         newOpponent.setOnClickListener(c ->{
+            AudioPlayer.getInstance(this.getContext()).playClickButton();
             restart.setVisibility(View.GONE);
             gameController.findNewOpponent();
         });

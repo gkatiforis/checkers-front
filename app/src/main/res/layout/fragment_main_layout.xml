@@ -15,6 +15,25 @@
         <!--app:bmb_buttonPlaceEnum="buttonPlace_sc_9_1"-->
         <!--/>-->
 
+    <View
+        android:layout_width="20dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/tab_disable"/>
+
+    <Button
+        android:id="@+id/settingButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+android:layout_margin="5dp"
+        android:background="@drawable/settings2"
+
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
     <TextView
         android:id="@+id/login"
         android:layout_width="match_parent"
@@ -26,12 +45,63 @@
         android:textColor="@color/tab_unchecked"
         android:singleLine="true"
         android:background="@color/fbutton_color_alizarin"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingButton"
 
         android:gravity="center_vertical"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="2dp"
         android:layout_marginBottom="30dp"
         android:text="Login with Google and save your progress"/>
+
+
+    <View
+        android:layout_width="20dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="22dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/sharePanel"
+        android:background="@color/tab_disable"/>
+
+    <LinearLayout
+        android:id="@+id/sharePanel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_panel"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="90dp"
+        android:padding="5dp"
+        >
+
+        <ImageView
+            android:id="@+id/shareImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/share"
+            android:layout_margin="4dp"
+
+            />
+
+        <TextView
+            android:id="@+id/shareButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+        android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="8dp"
+            android:textColor="@color/tab_unchecked"
+            android:singleLine="true"
+            app:layout_constraintTop_toBottomOf="@+id/settingButton"
+
+            android:gravity="center_vertical"
+
+            android:text="Share"/>
+
+    </LinearLayout>
+
 
     <!--<info.hoang8f.widget.FButton-->
         <!--android:id="@+id/login"-->
@@ -57,7 +127,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="50dp"
         />
 
 
@@ -220,7 +290,7 @@
             android:text="logout" />
 
         <!--<Button-->
-            <!--android:id="@+id/play"-->
+            <!--android:id="@+id/playClickButton"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:text="@string/send" />-->
