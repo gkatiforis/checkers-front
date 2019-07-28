@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.RankList;
 import com.katiforis.checkers.R;
@@ -40,6 +42,7 @@ public class RankFragment extends Fragment {
     private TextView rank, username, level, points;
     private TextView lastUpdate;
     private ImageView playerImage;
+    private AdView mAdView;
 //
 //    private TextView rank2, username2, level2, points2;
 //    private ImageView playerImage2;
@@ -65,6 +68,11 @@ public class RankFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_rank_layout,  null);
+
+        mAdView = view.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         rankRecyclerView = (RecyclerView) view.findViewById(R.id.rank_list);
         rankRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 

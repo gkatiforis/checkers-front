@@ -1,33 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fbutton="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:fbutton="http://schemas.android.com/tools">
-
-
-    <!--<com.nightonke.boommenu.BoomMenuButton-->
-        <!--android:id="@+id/bmb"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:bmb_buttonEnum="simpleCircle"-->
-        <!--app:bmb_piecePlaceEnum="piecePlace_ham_2"-->
-        <!--app:bmb_buttonPlaceEnum="buttonPlace_sc_9_1"-->
-        <!--/>-->
+    android:layout_height="match_parent">
 
     <View
         android:layout_width="20dp"
         android:layout_height="5dp"
         android:layout_marginTop="22dp"
+        android:background="@color/tab_disable"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/tab_disable"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/settingButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
-android:layout_margin="5dp"
+        android:layout_margin="5dp"
         android:background="@drawable/settings2"
 
         app:layout_constraintRight_toRightOf="parent"
@@ -39,97 +29,110 @@ android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawableLeft="@drawable/google_icon"
-        android:drawablePadding="5dp"
-        android:padding="10dp"
-        android:textColor="@color/tab_unchecked"
-        android:singleLine="true"
-        android:background="@color/fbutton_color_alizarin"
-        app:layout_constraintTop_toBottomOf="@+id/settingButton"
-
-        android:gravity="center_vertical"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="30dp"
-        android:text="Login with Google and save your progress"/>
+        android:background="@color/fbutton_color_alizarin"
+        android:drawableLeft="@drawable/google_icon"
+        android:drawablePadding="5dp"
+        android:gravity="center_vertical"
+        android:padding="10dp"
 
+        android:singleLine="true"
+        android:text="Login with Google and save your progress"
+        android:textColor="@color/tab_unchecked"
+        app:layout_constraintTop_toBottomOf="@+id/settingButton" />
 
     <View
         android:layout_width="20dp"
         android:layout_height="5dp"
         android:layout_marginTop="22dp"
+        android:background="@color/tab_disable"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/sharePanel"
-        android:background="@color/tab_disable"/>
+        app:layout_constraintTop_toTopOf="@+id/showAdButton" />
 
-    <LinearLayout
-        android:id="@+id/sharePanel"
+    <info.hoang8f.widget.FButton
+        android:id="@+id/showAdButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_margin="10dp"
+
+        android:padding="15dp"
+        android:text="Show Ad \n +100 coins"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/user_panel"
-        android:background="@drawable/rounded_corner"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="90dp"
-        android:padding="5dp"
-        >
+        fbutton:buttonColor="@color/fbutton_color_alizarin"
+        />
 
-        <ImageView
-            android:id="@+id/shareImage"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/share"
-            android:layout_margin="4dp"
+    <View
+        android:layout_width="20dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="22dp"
+        android:background="@color/tab_disable"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/shareButton" />
 
-            />
+    <info.hoang8f.widget.FButton
+        android:id="@+id/shareButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
 
-        <TextView
-            android:id="@+id/shareButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-        android:textSize="16sp"
-            android:textStyle="bold"
-            android:padding="8dp"
-            android:textColor="@color/tab_unchecked"
-            android:singleLine="true"
-            app:layout_constraintTop_toBottomOf="@+id/settingButton"
+        android:padding="15dp"
+        android:text="Share"
+        android:textColor="@android:color/white"
 
-            android:gravity="center_vertical"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showAdButton"
+        fbutton:buttonColor="@color/fbutton_color_alizarin"
+        />
 
-            android:text="Share"/>
 
-    </LinearLayout>
+
+
+    <!--<TextView-->
+    <!--android:id="@+id/showAdButton"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center"-->
+    <!--android:textSize="16sp"-->
+    <!--android:textStyle="bold"-->
+    <!--android:padding="8dp"-->
+    <!--android:textColor="@color/tab_unchecked"-->
+    <!--android:singleLine="true"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/settingButton"-->
+
+    <!--android:gravity="center_vertical"-->
+
+    <!--android:text="Share"/>-->
 
 
     <!--<info.hoang8f.widget.FButton-->
-        <!--android:id="@+id/login"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="30dp"-->
+    <!--android:id="@+id/login"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="30dp"-->
 
 
-        <!--android:drawableLeft="@drawable/google"-->
+    <!--android:drawableLeft="@drawable/google"-->
 
-        <!--android:minHeight="@dimen/demo_button_min_height"-->
-        <!--android:minWidth="@dimen/demo_button_min_width"-->
-        <!--android:text=" Login with Google and save your progress "-->
-        <!--android:textColor="@android:color/white"-->
-        <!--fbutton:buttonColor="@color/fbutton_color_alizarin"-->
-        <!--fbutton:shadowEnabled="true" />-->
+    <!--android:minHeight="@dimen/demo_button_min_height"-->
+    <!--android:minWidth="@dimen/demo_button_min_width"-->
+    <!--android:text=" Login with Google and save your progress "-->
+    <!--android:textColor="@android:color/white"-->
+    <!--fbutton:buttonColor="@color/fbutton_color_alizarin"-->
+    <!--fbutton:shadowEnabled="true" />-->
 
 
     <include
         android:id="@+id/user_panel"
         layout="@layout/item_main_user_panel_layout"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="50dp"
-        />
-
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <LinearLayout
@@ -145,11 +148,10 @@ android:layout_margin="5dp"
         <include
             android:id="@+id/user_elo"
             layout="@layout/item_main_user_elo_layout"
-            app:layout_constraintTop_toBottomOf="@+id/user_panel"
-
             android:layout_width="wrap_content"
+
             android:layout_height="wrap_content"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/user_panel" />
 
 
         <com.github.mikephil.charting.charts.PieChart
@@ -163,48 +165,41 @@ android:layout_margin="5dp"
         <include
             android:id="@+id/user_coins"
             layout="@layout/item_main_user_coins_layout"
-            app:layout_constraintLeft_toRightOf="@+id/user_lvl_chart"
-            app:layout_constraintTop_toBottomOf="@+id/user_panel"
-            android:layout_marginLeft="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="30dp"
+            app:layout_constraintLeft_toRightOf="@+id/user_lvl_chart"
+            app:layout_constraintTop_toBottomOf="@+id/user_panel" />
 
 
     </LinearLayout>
 
 
+    <!--<ImageView-->
+    <!--android:id="@+id/lvlImage"-->
+    <!--android:layout_width="30dp"-->
+    <!--android:layout_height="30dp"-->
+    <!--android:src="@drawable/leaderboard"-->
+    <!--android:layout_marginLeft="60dp"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
+    <!--app:layout_constraintLeft_toRightOf="@+id/playerImage"/>-->
 
+    <!--<TextView-->
+    <!--android:id="@+id/lvlTitle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textSize="20dp"-->
+    <!--android:text=""-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/player_labels"-->
 
-
-
-
-        <!--<ImageView-->
-            <!--android:id="@+id/lvlImage"-->
-            <!--android:layout_width="30dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:src="@drawable/leaderboard"-->
-            <!--android:layout_marginLeft="60dp"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/username"-->
-            <!--app:layout_constraintLeft_toRightOf="@+id/playerImage"/>-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/lvlTitle"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:textSize="20dp"-->
-            <!--android:text=""-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/player_labels"-->
-
-            <!--/>-->
-
+    <!--/>-->
 
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="30dp"
+        android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userPan">
@@ -226,57 +221,60 @@ android:layout_margin="5dp"
         <!--</com.facebook.shimmer.ShimmerFrameLayout>-->
 
 
-
-            <!--<ProgressBar-->
-                <!--android:id="@+id/playLoading"-->
-                <!--style="?android:attr/progressBarStyleLarge"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_gravity="right|top"-->
-                <!--android:layout_margin="10dp"-->
-                <!--android:minHeight="@dimen/demo_button_min_height"-->
-                <!--android:minWidth="@dimen/demo_button_min_width"-->
-                <!--android:visibility="gone"-->
-                <!--android:layout_height="wrap_content">-->
-            <!--</ProgressBar>-->
-
-
+        <!--<ProgressBar-->
+        <!--android:id="@+id/playLoading"-->
+        <!--style="?android:attr/progressBarStyleLarge"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_gravity="right|top"-->
+        <!--android:layout_margin="10dp"-->
+        <!--android:minHeight="@dimen/demo_button_min_height"-->
+        <!--android:minWidth="@dimen/demo_button_min_width"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--</ProgressBar>-->
 
 
         <info.hoang8f.widget.FButton
-            android:id="@+id/play"
+            android:id="@+id/playRanking"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|top"
             android:layout_margin="10dp"
-            android:minHeight="@dimen/demo_button_min_height"
             android:minWidth="@dimen/demo_button_min_width"
-            android:text="Play"
+            android:minHeight="@dimen/demo_button_min_height"
+            android:text="Play Ranking \n -50 coins"
             android:textColor="@android:color/white"
-            fbutton:buttonColor="@color/fbutton_color_alizarin"
-           />
+            fbutton:buttonColor="@color/fbutton_color_alizarin" />
 
-
-
+       <info.hoang8f.widget.FButton
+            android:id="@+id/playFriendly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:minWidth="@dimen/demo_button_min_width"
+            android:minHeight="@dimen/demo_button_min_height"
+            android:text="Play Friendly"
+            android:textColor="@android:color/white"
+            fbutton:buttonColor="@color/fbutton_color_alizarin" />
 
 
         <!--<info.hoang8f.widget.FButton-->
-            <!--android:id="@+id/login"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_centerHorizontal="true"-->
-            <!--android:layout_margin="20dp"-->
-            <!--android:drawableLeft="@drawable/user"-->
-            <!--android:drawablePadding="0dp"-->
-            <!--android:minHeight="80dp"-->
-            <!--android:minWidth="250dp"-->
-            <!--android:paddingLeft="30dp"-->
-            <!--android:paddingRight="20dp"-->
-            <!--android:paddingTop="-5dp"-->
-            <!--android:text="Twitter"-->
-            <!--android:textColor="@android:color/white"-->
-            <!--fbutton:cornerRadius="15dp"-->
-            <!--fbutton:shadowEnabled="true"-->
-            <!--fbutton:shadowHeight="6dp" />-->
+        <!--android:id="@+id/login"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_margin="20dp"-->
+        <!--android:drawableLeft="@drawable/user"-->
+        <!--android:drawablePadding="0dp"-->
+        <!--android:minHeight="80dp"-->
+        <!--android:minWidth="250dp"-->
+        <!--android:paddingLeft="30dp"-->
+        <!--android:paddingRight="20dp"-->
+        <!--android:paddingTop="-5dp"-->
+        <!--android:text="Twitter"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--fbutton:cornerRadius="15dp"-->
+        <!--fbutton:shadowEnabled="true"-->
+        <!--fbutton:shadowHeight="6dp" />-->
 
 
         <!---->
@@ -286,14 +284,14 @@ android:layout_margin="5dp"
             android:id="@+id/logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="logout" />
+            android:text="logout"
+            android:visibility="gone" />
 
         <!--<Button-->
-            <!--android:id="@+id/playClickButton"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/send" />-->
+        <!--android:id="@+id/playClickButton"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/send" />-->
 
         <!--<Button-->
         <!--android:id="@+id/play_with_friend"-->
@@ -304,9 +302,22 @@ android:layout_margin="5dp"
 
     </LinearLayout>
 
+
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
     <!--<TextView-->
-        <!--android:id="@+id/show"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
+    <!--android:id="@+id/show"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

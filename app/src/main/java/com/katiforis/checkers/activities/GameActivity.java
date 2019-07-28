@@ -8,6 +8,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -116,6 +119,7 @@ public class GameActivity extends AppCompatActivity {
     private DialogPlus optionsDialog;
     private ViewGroup optionsDialogView;
     private Animation anim;
+    private AdView mAdView;
 
     public void setGameState(GameState gamestate) {
         runOnUiThread(() -> {
@@ -438,7 +442,12 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_layout);
+       setContentView(R.layout.activity_game_layout);
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         initComponents();
         INSTANCE = this;
         populated = false;

@@ -3,7 +3,9 @@ package com.katiforis.checkers.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.katiforis.checkers.DTO.GameType;
 import com.katiforis.checkers.DTO.PlayerAnswer;
+import com.katiforis.checkers.DTO.request.FindGame;
 import com.katiforis.checkers.DTO.response.GameStats;
 import com.katiforis.checkers.DTO.response.OfferDraw;
 import com.katiforis.checkers.DTO.response.ResponseState;
@@ -54,6 +56,18 @@ public class GameController extends AbstractController{
                 gameStatsFragment.show(gameActivity.getSupportFragmentManager(), "");
                 gameStatsFragment.showPlayerList();
 
+                //TODO: save user details in cache and remove loading from backend
+//                UserDto userDto = LocalCache.getInstance().get(USER_DETAILS, MenuActivity.INSTANCE);
+//
+//                for(UserDto user:gameStats.getPlayers()){
+//                    if(user.getUserId().equals(userDto.getUserId())){
+//                        userDto.getPlayerDetails().setCoins(user.getPlayerDetails().getCoins()+user.getPlayerDetails().getCoinsExtra());
+//                        userDto.getPlayerDetails().setElo(user.getPlayerDetails().getElo()+user.getPlayerDetails().getEloExtra());
+//                        userDto.getPlayerDetails().setLevelPoints(user.getPlayerDetails().getLevelPoints()+user.getPlayerDetails().getLevelExtra());
+//                        userDto.getPlayerDetails().setLevel(user.getPlayerDetails().getLevel());
+//                        LocalCache.getInstance().save(userDto, USER_DETAILS, MenuActivity.INSTANCE);
+//                    }
+//                }
             } else if (messageStatus.equalsIgnoreCase(ResponseState.ANSWER.getState())) {
                 Gson gson = new Gson();
                 PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
@@ -71,7 +85,9 @@ public class GameController extends AbstractController{
     }
 
     public void findNewOpponent() {
-        HomeController.getInstance().findGame();
+        FindGame findGame = new FindGame();
+        findGame.setGameType(GameType.FRIENDLY);
+        HomeController.getInstance().findGame(findGame);
     }
 
     public void sendAnswer(String gameId, Object object ){

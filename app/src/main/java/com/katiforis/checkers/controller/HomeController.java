@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.request.FindGame;
+import com.katiforis.checkers.DTO.request.Reward;
 import com.katiforis.checkers.DTO.response.GameState;
 import com.katiforis.checkers.DTO.response.FriendList;
 import com.katiforis.checkers.DTO.response.ResponseState;
@@ -78,6 +79,7 @@ public class HomeController extends MenuController{
         }else if(messageStatus.equalsIgnoreCase(ResponseState.USER_STATS.getState())){
             UserStats userStats = gson.fromJson(message, UserStats.class);
             LocalCache.getInstance().saveString(USER_ID, userStats.getUserDto().getUserId());
+            LocalCache.getInstance().save(userStats.getUserDto(), USER_DETAILS, MenuActivity.INSTANCE);
             homeFragment.populatePlayerDetails(userStats.getUserDto());
         }
         else if(messageStatus.equalsIgnoreCase(ResponseState.FRIEND_LIST.getState())){
@@ -86,9 +88,9 @@ public class HomeController extends MenuController{
         }
     }
 
-    public void findGame(){
+    public void findGame(FindGame findGame){
+        findGame.setGameId(LocalCache.getInstance().getString(CURRENT_GAME_ID));
         Client.clearTopics(GameController.class.getName());
-        FindGame findGame = new FindGame(LocalCache.getInstance().getString(CURRENT_GAME_ID));
         addTopic(false);
         Client.send(Const.FIND_GAME, gson.toJson(findGame));
     }
@@ -122,5 +124,10 @@ public class HomeController extends MenuController{
             addTopic(false);
             Client.getInstance().send(Const.GET_USER_DETAILS);
         }
+    }
+
+    public void sendReward(Reward reward){
+        addTopic(false);
+        Client.send(Const.SEND_REWARD, gson.toJson(reward));
     }
 }
