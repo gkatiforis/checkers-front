@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -21,6 +22,16 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -53,7 +64,6 @@ import com.katiforis.checkers.activities.StartActivity;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.stomp.Client;
-import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.CircleTransform;
 import com.katiforis.checkers.util.LocalCache;
 import com.squareup.picasso.Callback;
@@ -76,6 +86,7 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_DETAILS;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 public class HomeFragment extends Fragment {
+    private MenuActivity menuActivity;
     public static HomeFragment INSTANCE;
     public static GoogleSignInClient signInClient;
     public static boolean populated;
@@ -98,6 +109,7 @@ public class HomeFragment extends Fragment {
     private InterstitialAd interstitialAd;
     private RewardedAd rewardedAd;
     private final int interstitialPossibility = 10;
+    private BillingClient billingClient;
 
     public static HomeFragment getInstance() {
         if (INSTANCE == null) {
@@ -113,10 +125,26 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
+    AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = billingResult -> {
+        System.out.println("sdfsf");
+    };
+
+    void handlePurchase(Purchase purchase) {
+        if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+            if (!purchase.isAcknowledged()) {
+                AcknowledgePurchaseParams acknowledgePurchaseParams =
+                        AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.getPurchaseToken())
+                                .build();
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
+            }
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout, null);
 
+        menuActivity = (MenuActivity) getActivity();
         MobileAds.initialize(this.getActivity(), APP_AD_ID);
 
         mAdView = v.findViewById(R.id.adView);
@@ -182,17 +210,72 @@ public class HomeFragment extends Fragment {
 
 
         loginButton.setOnClickListener(p -> {
-            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            menuActivity.getAudioPlayer().playClickButton();
             signInIntent();
         });
 
+
+        PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
+            @Override
+            public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
+                purchases = purchases;
+                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK
+                        && purchases != null) {
+                    for (Purchase purchase : purchases) {
+                        handlePurchase(purchase);
+                    }
+                } else if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.USER_CANCELED) {
+                } else {
+                }
+            }
+        };
+
+
+        billingClient = BillingClient.newBuilder(this.getActivity()).setListener(purchasesUpdatedListener).enablePendingPurchases().build();
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                }
+            }
+            @Override
+            public void onBillingServiceDisconnected() {
+            }
+        });
         shareButton.setOnClickListener(p -> {
-            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
-            shareGame();
+//            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+//            shareGame();
+
+
+
+            List<String> skuList = new ArrayList<> ();
+            skuList.add("prov");
+            skuList.add("pro_version");
+            SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+            params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+            billingClient.querySkuDetailsAsync(params.build(),
+                    new SkuDetailsResponseListener() {
+                        @Override
+                        public void onSkuDetailsResponse(BillingResult billingResult,
+                                                         List<SkuDetails> skuDetailsList) {
+                            if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
+                                for (SkuDetails skuDetails : skuDetailsList) {
+                                    String sku = skuDetails.getSku();
+                                    String price = skuDetails.getPrice();
+                                    if ("premium_upgrade".equals(sku)) {
+                                        // premiumUpgradePrice = price;
+                                    } else if ("gas".equals(sku)) {
+                                        //  gasPrice = price;
+                                    }
+                                }
+                            }
+                        }
+                    });
+
         });
 
         showAdButton.setOnClickListener(p -> {
-            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            menuActivity.getAudioPlayer().playClickButton();
             showAdVideo();
         });
 
@@ -204,14 +287,14 @@ public class HomeFragment extends Fragment {
         buttonEffect(settingButton);
 
         playFriendly.setOnClickListener(p -> {
-            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            menuActivity.getAudioPlayer().playClickButton();
             FindGame findGame = new FindGame();
             findGame.setGameType(GameType.FRIENDLY);
             homeController.findGame(findGame);
         });
 
         playRanking.setOnClickListener(p -> {
-            AudioPlayer.getInstance(MenuActivity.INSTANCE).playClickButton();
+            menuActivity.getAudioPlayer().playClickButton();
             UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, this.getActivity());
             if (playerDto.getPlayerDetails().getCoins() < GameType.RANKING.getFee()) {
                 showNotEnoughCoins();

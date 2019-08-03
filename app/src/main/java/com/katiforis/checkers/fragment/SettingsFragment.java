@@ -21,6 +21,7 @@ import info.hoang8f.widget.FButton;
 import static com.katiforis.checkers.util.CachedObjectProperties.SOUND_ENABLED;
 
 public class SettingsFragment extends DialogFragment {
+    private MenuActivity menuActivity;
     private static SettingsFragment INSTANCE = null;
     private Switch soundSwitch;
     private FButton logout;
@@ -40,7 +41,8 @@ public class SettingsFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_settings_layout,  null);
-        AudioPlayer.getInstance(MenuActivity.INSTANCE).playPopup();
+        menuActivity = (MenuActivity) getActivity();
+        menuActivity.getAudioPlayer().playPopup();
         soundSwitch = view.findViewById(R.id.soundSwitch);
         String soundEnabled = LocalCache.getInstance().getString(SOUND_ENABLED);
         if(soundEnabled == null || soundEnabled.equals("true")){
@@ -61,17 +63,17 @@ public class SettingsFragment extends DialogFragment {
                 }else{
                     LocalCache.getInstance().saveString(SOUND_ENABLED, "false");
                 }
-                AudioPlayer.getInstance( MenuActivity.INSTANCE).mute(!isChecked);
+                menuActivity.getAudioPlayer().mute(!isChecked);
             }
         });
 
         logout.setOnClickListener(c ->{
-            AudioPlayer.getInstance( MenuActivity.INSTANCE).playClickButton();
+            menuActivity.getAudioPlayer().playClickButton();
             HomeFragment.getInstance().logout();
         });
 
         closeButton.setOnClickListener(c ->{
-            AudioPlayer.getInstance( MenuActivity.INSTANCE).playPopup();
+            menuActivity.getAudioPlayer().playPopup();
             this.dismiss();
         });
 

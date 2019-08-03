@@ -64,7 +64,8 @@ public class MenuActivity extends AppCompatActivity {
     private RecyclerView friendsRecyclerView;
     private FriendAdapter friendAdapter;
     private List<UserDto> friends = new ArrayList<>();
-	Snackbar snack;
+	private Snackbar snack;
+	private AudioPlayer audioPlayer;
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
@@ -88,6 +89,7 @@ public class MenuActivity extends AppCompatActivity {
 			}
 		});
 
+		audioPlayer = new AudioPlayer(this);
 		initialize();
 	}
 	public void intentToStartPage(){
@@ -98,6 +100,8 @@ public class MenuActivity extends AppCompatActivity {
 	}
 	private void initialize() {
 
+
+
 		populated = false;
 		INSTANCE = this;
 		homeController = HomeController.getInstance();
@@ -105,6 +109,8 @@ public class MenuActivity extends AppCompatActivity {
 		context = this.getApplicationContext();
 		getSupportActionBar().hide();
 		setContentView(R.layout.activity_menu_layout);
+
+
 
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		navigationView = findViewById(R.id.navigation_view);
@@ -144,7 +150,7 @@ public class MenuActivity extends AppCompatActivity {
 
 			@Override
 			public void onPageSelected(int position) {
-				AudioPlayer.getInstance(MenuActivity.INSTANCE.getApplicationContext()).playPopup();
+				audioPlayer.playPopup();
 				if (prevMenuItem != null) {
 					prevMenuItem.setChecked(false);
 				}
@@ -237,6 +243,15 @@ public class MenuActivity extends AppCompatActivity {
     @Override
 	protected void onStart() {
 		super.onStart();
-		AudioPlayer.init(context);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		audioPlayer.release();
+	}
+
+	public AudioPlayer getAudioPlayer() {
+		return audioPlayer;
 	}
 }

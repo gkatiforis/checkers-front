@@ -31,10 +31,11 @@ public class StartActivity extends AppCompatActivity {
     private FButton loginWithGoogle;
 	private FButton loginAsGuest;
 	private Snackbar snack;
-
+    private AudioPlayer audioPlayer;
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		audioPlayer = new AudioPlayer(this);
 		initialize();
 	}
 
@@ -48,13 +49,13 @@ public class StartActivity extends AppCompatActivity {
 		loginWithGoogle.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
 		loginAsGuest.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 		loginAsGuest.setOnClickListener(p -> {
-			AudioPlayer.getInstance(this).playClickButton();
+			audioPlayer.playClickButton();
 			LocalCache.getInstance().saveString(TOKEN, null);
 			LocalCache.getInstance().saveString(USER_ID, null);
 			intentToMenuActivity();
 		});
 		loginWithGoogle.setOnClickListener(p -> {
-			AudioPlayer.getInstance(this).playClickButton();
+			audioPlayer.playClickButton();
 			signInIntent();
 		});
 	}
@@ -111,5 +112,11 @@ public class StartActivity extends AppCompatActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		audioPlayer.release();
 	}
 }

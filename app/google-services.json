@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:794218231402:android:e074b88951369fc9",
+        "mobilesdk_app_id": "1:794218231402:android:1f93811fb88beb6b",
         "android_client_info": {
-          "package_name": "com.katiforis.checkers"
+          "package_name": "com.boardgame.multiplayer.checkers"
         }
       },
       "oauth_client": [
         {
-          "client_id": "794218231402-e5ma9mhsndc5g66mu5rgb86e4uv38bs3.apps.googleusercontent.com",
+          "client_id": "794218231402-kudgnejuv5agonchn70q4o5nbth2llmq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.katiforis.checkers",
+            "package_name": "com.boardgame.multiplayer.checkers",
             "certificate_hash": "9d1b74a960a527a12c6a0e8b1b78241a7311fefc"
           }
         },

@@ -121,6 +121,8 @@ public class GameActivity extends AppCompatActivity {
     private Animation anim;
     private AdView mAdView;
 
+    private AudioPlayer audioPlayer;
+
     public void setGameState(GameState gamestate) {
         runOnUiThread(() -> {
             Log.i(Const.TAG, "GameState：" + gamestate);
@@ -254,12 +256,12 @@ public class GameActivity extends AppCompatActivity {
                 .create();
 
         gameOptionsDialogButton.setOnClickListener(p -> {
-            AudioPlayer.getInstance(this).playPopup();
+            audioPlayer.playPopup();
             optionsDialog.show();
         });
 
         offerDrawButton.setOnClickListener(pa -> {
-            AudioPlayer.getInstance(this).playClickButton();
+            audioPlayer.playClickButton();
             offerDrawButton.setText("Offer Draw");
 
             if (anim != null) {
@@ -270,12 +272,12 @@ public class GameActivity extends AppCompatActivity {
         });
 
         resignButton.setOnClickListener(pa -> {
-            AudioPlayer.getInstance(this).playClickButton();
+            audioPlayer.playClickButton();
             sendResign();
         });
 
         cancel.setOnClickListener(pa -> {
-            AudioPlayer.getInstance(this).playPopup();
+            audioPlayer.playPopup();
             optionsDialog.dismiss();
         });
     }
@@ -448,6 +450,8 @@ public class GameActivity extends AppCompatActivity {
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
+        audioPlayer = new AudioPlayer(this);
+
         initComponents();
         INSTANCE = this;
         populated = false;
@@ -475,6 +479,12 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        audioPlayer.release();
     }
 
     private View.OnClickListener listener = new View.OnClickListener() {
@@ -879,5 +889,9 @@ public class GameActivity extends AppCompatActivity {
         if (show && !snack.isShown()) {
             snack.show();
         }
+    }
+
+    public AudioPlayer getAudioPlayer() {
+        return audioPlayer;
     }
 }

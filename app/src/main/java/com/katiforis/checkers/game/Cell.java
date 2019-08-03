@@ -52,7 +52,8 @@ public class Cell implements Serializable {
 		if(anotherCell == null){
 			return;
 		}
-		AudioPlayer.getInstance(GameActivity.INSTANCE).playPiece();
+
+		GameActivity.INSTANCE.getAudioPlayer().playPiece();
 		anotherCell.placePiece(this.placedPiece);
 		this.placedPiece.setCell(anotherCell);
 		this.placedPiece = null;

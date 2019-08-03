@@ -10,50 +10,19 @@ import static android.content.Context.AUDIO_SERVICE;
 
 
 public class AudioPlayer {
-    private static AudioPlayer INSTANCE;
-    private static SoundPool soundPool;
-    private static float actVolume, maxVolume, volume;
-    private static AudioManager audioManager;
+    private SoundPool soundPool;
+    private float actVolume, maxVolume, volume;
+    private AudioManager audioManager;
 
-    private static boolean loaded;
-    private static boolean plays;
+    private boolean loaded;
+    private boolean plays;
 
-    private static int clickPlayer;
-    private static int piecePlayer;
-    private static int popupPlayer;
+    private int clickPlayer;
+    private int piecePlayer;
+    private int popupPlayer;
 
-    public static AudioPlayer getInstance(Context context) {
 
-        if (INSTANCE == null) {
-            synchronized (AudioPlayer.class) {
-                INSTANCE = new AudioPlayer();
-            }
-        }
-
-        return INSTANCE;
-    }
-
-    public static void playClickButton() {
-        if (loaded && !plays) {
-            soundPool.play(clickPlayer, volume, volume, 1, 0, 1f);
-        }
-    }
-
-    public static void playPiece() {
-
-        if (loaded && !plays) {
-            soundPool.play(piecePlayer, volume, volume, 1, 0, 1f);
-        }
-    }
-
-    public static void playPopup() {
-
-        if (loaded && !plays) {
-            soundPool.play(popupPlayer, volume, volume, 1, 0, 1f);
-        }
-    }
-
-    public static void init(Context context) {
+    public AudioPlayer(Context context) {
         audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
         actVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -72,7 +41,35 @@ public class AudioPlayer {
         popupPlayer = soundPool.load(context, R.raw.popup, 1);
     }
 
-    public static void mute(boolean state) {
+    public void playClickButton() {
+        if (loaded && !plays) {
+            soundPool.play(clickPlayer, volume, volume, 1, 0, 1f);
+        }
+    }
+
+    public void playPiece() {
+
+        if (loaded && !plays) {
+            soundPool.play(piecePlayer, volume, volume, 1, 0, 1f);
+        }
+    }
+
+    public void playPopup() {
+
+        if (loaded && !plays) {
+            soundPool.play(popupPlayer, volume, volume, 1, 0, 1f);
+        }
+    }
+
+    public void release() {
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+            audioManager = null;
+        }
+    }
+
+    public void mute(boolean state) {
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, state);
         actVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);

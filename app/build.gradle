@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.katiforis.checkers"
+        applicationId "com.boardgame.multiplayer.checkers"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 16
@@ -37,7 +37,8 @@ repositories {
 dependencies {
 
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
-    implementation 'com.google.android.gms:play-services-ads:18.1.0'
+    implementation 'com.google.android.gms:play-services-ads:18.1.1'
+    implementation 'com.android.billingclient:billing:2.0.1'
     implementation 'com.google.firebase:firebase-core:17.0.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'

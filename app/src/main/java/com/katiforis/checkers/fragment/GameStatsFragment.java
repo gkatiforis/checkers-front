@@ -19,10 +19,10 @@ import android.widget.TextView;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.GameStats;
 import com.katiforis.checkers.R;
+import com.katiforis.checkers.activities.GameActivity;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.adapter.PlayersStatsAdapter;
 import com.katiforis.checkers.controller.GameController;
-import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.LocalCache;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import info.hoang8f.widget.FButton;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 public class GameStatsFragment extends DialogFragment {
+    private GameActivity gameActivity;
     private static GameStatsFragment INSTANCE = null;
     private GameController gameController;
     private TextView title;
@@ -64,6 +65,7 @@ public class GameStatsFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        gameActivity = (GameActivity) getActivity();
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_game_stats_layout,  null);
         playersStatsRecyclerView = (RecyclerView) view.findViewById(R.id.player_stats_list);
         playersStatsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -80,18 +82,18 @@ public class GameStatsFragment extends DialogFragment {
         returnToMenu.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 
         returnToMenu.setOnClickListener(c ->{
-            AudioPlayer.getInstance(this.getContext()).playClickButton();
+            gameActivity.getAudioPlayer().playClickButton();
             intentToMenuActivity();
         });
 
         restart.setOnClickListener(c ->{
-            AudioPlayer.getInstance(this.getContext()).playClickButton();
+            gameActivity.getAudioPlayer().playClickButton();
             gameController.restartGame();
             restartGame = true;
         });
 
         newOpponent.setOnClickListener(c ->{
-            AudioPlayer.getInstance(this.getContext()).playClickButton();
+            gameActivity.getAudioPlayer().playClickButton();
             restart.setVisibility(View.GONE);
             gameController.findNewOpponent();
         });
