@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.katiforis.checkers.activities.GameActivity;
 import com.katiforis.checkers.activities.MenuActivity;
+import com.katiforis.checkers.activities.StartActivity;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.GameController;
 import com.katiforis.checkers.controller.HomeController;
@@ -36,169 +37,191 @@ public class Client {
     private static final Map<String, String> topicsByControllers = new HashMap<>();
     private static final String HEADER_TOKEN = "TOKEN";
     private static final String HEADER_USER_ID = "USER_ID";
-    private static final int RECONNECT_DELAY_IN_SECONDS = 10;
+    private static final int RECONNECT_DELAY_IN_SECONDS = 2;
     private boolean reconnecting = false;
     private static boolean disconnectedFromUser = false;
-    private Handler handler = new Handler();
+    private Handler reconnectioHandler = new Handler();
     private Handler sendConnectionHandler;
+    private static Handler sendMoveHandler;
+    private static Handler sendGameStateHandler;
 
-    private Client() {}
+
+    private Client() {
+    }
 
     public static Client getInstance() {
         if (CLIENT_INSTANCE == null) {
-            synchronized(Client.class) {
+            synchronized (Client.class) {
                 CLIENT_INSTANCE = new Client();
-                CLIENT_INSTANCE.initializeConnection();
+                CLIENT_INSTANCE.connect();
             }
         }
         return CLIENT_INSTANCE;
     }
 
-    private void initializeConnection(){
-            stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Const.host_stomp);
-            List<StompHeader> headers = new ArrayList<>();
-            String token = LocalCache.getInstance().getString(TOKEN);
-            String userId = LocalCache.getInstance().getString(USER_ID);
-            headers.add(new StompHeader(HEADER_TOKEN, token));
-            headers.add(new StompHeader(HEADER_USER_ID, userId));
 
-            stompClient.connect(headers);
-            stompClient.lifecycle()
-                    .subscribe(lifecycleEvent -> {
-                        switch (lifecycleEvent.getType()) {
-                            case OPENED:
-                                Log.i(TAG, "Connection OPENED");
-                                onReconnected();
-                                break;
-                            case ERROR:
-                                Log.e(TAG, "Connection error", lifecycleEvent.getException());
-                                break;
-                            case CLOSED:
-                                Log.i(TAG, "Connection CLOSED");
-                                if(!disconnectedFromUser){
-                                    onConnectionLose();
-                                }else {
-                                    disconnectedFromUser = false;
-                                }
-                                break;
-                        }
-                    }, throwable -> {
-                        Log.e(TAG, "Error on sending data", throwable);
-                    });
+    private void connect() {
+        stompClient = null;
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Const.host_stomp);
+
+        List<StompHeader> headers = new ArrayList<>();
+        String token = LocalCache.getInstance().getString(TOKEN);
+        String userId = LocalCache.getInstance().getString(USER_ID);
+        headers.add(new StompHeader(HEADER_TOKEN, token));
+        headers.add(new StompHeader(HEADER_USER_ID, userId));
+        stompClient.connect(headers);
+        stompClient.lifecycle()
+                .subscribe(lifecycleEvent -> {
+                    switch (lifecycleEvent.getType()) {
+                        case OPENED:
+                            Log.i(TAG, "Connection OPENED");
+                            onReconnected();
+                            break;
+                        case ERROR:
+                            Log.e(TAG, "Connection error", lifecycleEvent.getException());
+                            break;
+                        case CLOSED:
+                            Log.i(TAG, "Connection CLOSED");
+                            if (!disconnectedFromUser) {
+                                onConnectionLose();
+                            } else {
+                                disconnectedFromUser = false;
+                            }
+                            break;
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "Error on sending data", throwable);
+                });
 
         sendConnectionMessage();
+
+
     }
 
 
-    public void sendConnectionMessage(){
-        if(sendConnectionHandler != null){
+    public void sendConnectionMessage() {
+        if (sendConnectionHandler != null) {
             sendConnectionHandler.removeCallbacksAndMessages(null);
         }
         sendConnectionHandler = new Handler(Looper.getMainLooper());
         sendConnectionHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (stompClient != null) {
                     stompClient.send(Const.KEEP_CONNECTION, "data").subscribe(
                             () -> Log.d(TAG, "Data sent"),
                             throwable -> {
                                 Log.e(TAG, "Error on sending data", throwable);
                             });
+                }
                 sendConnectionHandler.postDelayed(this, 50000);
-
             }
         }, 50000);
     }
 
     public void disconnect() {
         disconnectedFromUser = true;
-            stompClient.disconnect();
-            subscriptionsByTopics.clear();
-            topicsByControllers.clear();
-            NotificationFragment.populated = false;
-            MenuActivity.populated = false;
-            stompClient = null;
-            CLIENT_INSTANCE = null;
+        stompClient.disconnect();
+        subscriptionsByTopics.clear();
+        topicsByControllers.clear();
+        NotificationFragment.populated = false;
+        MenuActivity.populated = false;
+        stompClient = null;
+        CLIENT_INSTANCE = null;
     }
 
     private void onConnectionLose() {
-            subscriptionsByTopics.clear();
-            topicsByControllers.clear();
-            NotificationFragment.populated = false;
-            MenuActivity.populated = false;
-            MenuActivity.INSTANCE.showNoInternetDialog(true);
-            GameActivity.INSTANCE.showNoInternetDialog(true);
-            this.tryToReconnect();
-    }
+        subscriptionsByTopics.clear();
+        topicsByControllers.clear();
+        NotificationFragment.populated = false;
+        MenuActivity.populated = false;
 
-    private void reconnect(){
-        if( stompClient != null){
-            stompClient.connect();
+        if (StartActivity.INSTANCE != null) {
+            StartActivity.INSTANCE.showNoInternetDialog(true);
+        }
+        if (MenuActivity.INSTANCE != null) {
+            MenuActivity.INSTANCE.showNoInternetDialog(true);
+        }
+        if (GameActivity.INSTANCE != null) {
+            GameActivity.INSTANCE.showNoInternetDialog(true);
+        }
+
+        if (!reconnecting) {
+            reconnecting = true;
+            this.tryToReconnect();
         }
     }
 
+
     private void onReconnected() {
-        if(reconnecting){
+        reconnectioHandler.removeCallbacksAndMessages(null);
+        if (reconnecting) {
             reconnecting = false;
-            handler.removeCallbacks(this::reconnect);
-            MenuActivity.INSTANCE.showNoInternetDialog(false);
-            GameActivity.INSTANCE.showNoInternetDialog(false);
-            HomeController.getInstance().addTopic(true);
-            GameController.getInstance().getGameState();
+            if (StartActivity.INSTANCE != null) {
+                StartActivity.INSTANCE.handleReconnection();
+            }
+            if (MenuActivity.INSTANCE != null) {
+                MenuActivity.INSTANCE.handleReconnection();
+            }
+            if (GameActivity.INSTANCE != null) {
+                GameActivity.INSTANCE.handleReconnection();
+            }
         }
     }
 
     private void tryToReconnect() {
-        reconnecting = true;
-        handler.postDelayed(this::reconnect, RECONNECT_DELAY_IN_SECONDS * 1000);
+//        if(!reconnecting){
+
+        connect();
+        reconnectioHandler.postDelayed(this::tryToReconnect, RECONNECT_DELAY_IN_SECONDS * 1000);
+//        }
     }
 
-    public static Flowable<StompMessage> addTopic(final String controllerId, final String topicId, final boolean force){
-        if(controllerId == null || topicId == null){
+    public static Flowable<StompMessage> addTopic(final String controllerId, final String topicId, final boolean force) {
+        if (controllerId == null || topicId == null) {
             return null;
         }
 
         if (subscriptionsByTopics.get(topicId) == null || force) {
-            subscriptionsByTopics.put(topicId,stompClient.topic(topicId));
+            subscriptionsByTopics.put(topicId, stompClient.topic(topicId));
         }
 
-        if(topicsByControllers.get(controllerId) == null || force) {
+        if (topicsByControllers.get(controllerId) == null || force) {
             topicsByControllers.put(controllerId, topicId);
             return subscriptionsByTopics.get(topicId);
-        }else{
+        } else {
             return null;
         }
     }
 
-    public static void clearTopics(final String controllerId){
+    public static void clearTopics(final String controllerId) {
         topicsByControllers.remove(controllerId);
     }
 
     public static void send(String destination, String data) {
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(!isConnected()) {
-                    handler.postDelayed(this, 1000);
-                }else{
-                    stompClient.send(destination, data).subscribe(
-                            () -> Log.d(TAG, "Data sent"),
-                            throwable -> {
-                                Log.e(TAG, "Error on sending data", throwable);
-                            });
-                }
-            }
-        }, 0);
+        stompClient.send(destination, data).subscribe(
+                () -> Log.d(TAG, "Data sent"),
+                throwable -> {
+                    Log.e(TAG, "Error on sending data", throwable);
+                });
     }
 
     public static void send(String destination) {
+        stompClient.send(destination).subscribe(
+                () -> Log.d(TAG, "Data sent"),
+                throwable -> {
+                    Log.e(TAG, "Error on sending data", throwable);
+                });
+    }
+
+    public static void sendAndRety(String destination) {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(!isConnected()) {
+                if (!isConnected()) {
                     handler.postDelayed(this, 1000);
-                }else{
+                } else {
                     stompClient.send(destination).subscribe(
                             () -> Log.d(TAG, "Data sent"),
                             throwable -> {
@@ -210,10 +233,10 @@ public class Client {
         }, 0);
     }
 
-    public static boolean isConnected(){
-        if(stompClient == null){
+    public static boolean isConnected() {
+        if (stompClient == null) {
             return false;
         }
-       return stompClient.isConnected();
+        return stompClient.isConnected();
     }
 }

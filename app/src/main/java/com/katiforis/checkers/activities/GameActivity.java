@@ -2,6 +2,7 @@ package com.katiforis.checkers.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -38,6 +39,8 @@ import com.katiforis.checkers.DTO.response.OfferDraw;
 import com.katiforis.checkers.R;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.GameController;
+import com.katiforis.checkers.controller.HomeController;
+import com.katiforis.checkers.fragment.GameStatsFragment;
 import com.katiforis.checkers.game.Board;
 import com.katiforis.checkers.game.Cell;
 import com.katiforis.checkers.game.Move;
@@ -56,8 +59,10 @@ import info.hoang8f.widget.FButton;
 import me.itangqi.waveloadingview.WaveLoadingView;
 import tyrantgit.explosionfield.ExplosionField;
 
+import static com.katiforis.checkers.conf.Const.OFFER_DRAW_TIME_IN_SECONDS;
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
+import static com.katiforis.checkers.util.Utils.getDiffInSeconds;
 import static com.katiforis.checkers.util.Utils.twoDigits;
 
 public class GameActivity extends AppCompatActivity {
@@ -123,53 +128,82 @@ public class GameActivity extends AppCompatActivity {
 
     private AudioPlayer audioPlayer;
 
+    private void intentToMenuActivity(){
+        Intent intent = new Intent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setClass(this, MenuActivity.class);
+        startActivity(intent);
+    }
+
+
     public void setGameState(GameState gamestate) {
         runOnUiThread(() -> {
             Log.i(Const.TAG, "GameState：" + gamestate);
             initComponents();
-            setPlayerList(gamestate.getPlayers());
-            dateStarted = gamestate.getDateStarted().getTime();
-            dateCurrent = gamestate.getCurrentDate().getTime();
-            gameMaxTime = gamestate.getGameMaxTime();
 
-            final Handler someHandler = new Handler(getMainLooper());
+            if(gamestate.getGameStatus() == GameState.Status.PLAYERS_SELECTION){
+                GameStatsFragment gameStatsFragment = GameStatsFragment.getInstance();
+                gameStatsFragment.setGameStats(gamestate.getGameStats());
+                gameStatsFragment.show(getSupportFragmentManager(), "");
+                gameStatsFragment.showPlayerList();
+            }else if(gamestate.getGameStatus() == GameState.Status.TERMINATED){
+                intentToMenuActivity();
+            }else{
+                setPlayerList(gamestate.getPlayers());
+                dateStarted = gamestate.getDateStarted().getTime();
+                dateCurrent = gamestate.getCurrentDate().getTime();
+                gameMaxTime = gamestate.getGameMaxTime();
 
-            someHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Date date = new Date(dateCurrent);
-                    date.setTime(date.getTime() + 1000);
-                    dateCurrent = date.getTime();
+                final Handler someHandler = new Handler(getMainLooper());
 
-                    someHandler.postDelayed(this, 1000);
+                someHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Date date = new Date(dateCurrent);
+                        date.setTime(date.getTime() + 1000);
+                        dateCurrent = date.getTime();
+
+                        someHandler.postDelayed(this, 1000);
+                    }
+                }, 10);
+
+                this.player1 = gamestate.getWhitePlayer();
+                this.player2 = gamestate.getDarkPlayer();
+                this.currentPlayer = gamestate.getCurrentPlayer();
+
+
+                long remainingTime = currentPlayer.getSecondsRemaining() -
+                        Utils.getDiffInSeconds(gamestate.getLastMoveDate(), gamestate.getCurrentDate());
+                currentPlayer.setSecondsRemaining(remainingTime);
+
+                setPlayerTime(gamestate.getPrevPlayer(), this.currentPlayer);
+
+                updateTurnTracker();
+
+                setBoard(gamestate.getBoard());
+
+                if (this.player1.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                        player1.getColor().equals(Piece.LIGHT)) {
+                    FrameLayout mView = findViewById(R.id.gameboard);
+                    mView.setRotation(180);
+                    ViewGroup.LayoutParams lp = mView.getLayoutParams();
+                } else if (this.player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                        player2.getColor().equals(Piece.LIGHT)) {
+                    FrameLayout mView = findViewById(R.id.gameboard);
+                    mView.setRotation(180);
+                    ViewGroup.LayoutParams lp = mView.getLayoutParams();
                 }
-            }, 10);
-
-            this.player1 = gamestate.getWhitePlayer();
-            this.player2 = gamestate.getDarkPlayer();
-            this.currentPlayer = gamestate.getCurrentPlayer();
 
 
-            long remainingTime = currentPlayer.getSecondsRemaining() -
-                    Utils.getDiffInSeconds(gamestate.getLastMoveDate(), gamestate.getCurrentDate());
-            currentPlayer.setSecondsRemaining(remainingTime);
-
-            setPlayerTime(gamestate.getPrevPlayer(), this.currentPlayer);
-
-            updateTurnTracker();
-
-            setBoard(gamestate.getBoard());
-
-            if (this.player1.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
-                    player1.getColor().equals(Piece.LIGHT)) {
-                FrameLayout mView = findViewById(R.id.gameboard);
-                mView.setRotation(180);
-                ViewGroup.LayoutParams lp = mView.getLayoutParams();
-            } else if (this.player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
-                    player2.getColor().equals(Piece.LIGHT)) {
-                FrameLayout mView = findViewById(R.id.gameboard);
-                mView.setRotation(180);
-                ViewGroup.LayoutParams lp = mView.getLayoutParams();
+                if(gamestate.getOfferDrawUserId() != null &&
+                        !gamestate.getOfferDrawUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                     getDiffInSeconds(gamestate.getOfferDrawDate(), gamestate.getCurrentDate()) <= OFFER_DRAW_TIME_IN_SECONDS){
+                    this.runOnUiThread(() -> {
+                        OfferDraw offerDraw = new OfferDraw();
+                        offerDraw.setByUser(gamestate.getOfferDrawUserId());
+                        showOfferDraw(offerDraw);
+                    });
+                }
             }
         });
     }
@@ -893,5 +927,11 @@ public class GameActivity extends AppCompatActivity {
 
     public AudioPlayer getAudioPlayer() {
         return audioPlayer;
+    }
+
+    public void handleReconnection() {
+        showNoInternetDialog(false);
+        HomeController.getInstance().addTopic(true);
+        gameController.getGameState();
     }
 }

@@ -1,7 +1,9 @@
 package com.katiforis.checkers.activities;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +13,6 @@ import androidx.annotation.Nullable;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.viewpager.widget.ViewPager;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,7 +24,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.FriendList;
@@ -38,6 +38,7 @@ import com.katiforis.checkers.util.AudioPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.fabric.sdk.android.Fabric;
 
 import static com.katiforis.checkers.conf.Const.TAG;
@@ -64,8 +65,8 @@ public class MenuActivity extends AppCompatActivity {
     private RecyclerView friendsRecyclerView;
     private FriendAdapter friendAdapter;
     private List<UserDto> friends = new ArrayList<>();
-	private Snackbar snack;
 	private AudioPlayer audioPlayer;
+	private SweetAlertDialog noInternetDialog;
 
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
@@ -88,7 +89,10 @@ public class MenuActivity extends AppCompatActivity {
 				System.exit(2);
 			}
 		});
-
+		 noInternetDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+				.setTitleText("No Internet Connection!")
+				.setContentText("Trying to reconnect. . . ");
+		 noInternetDialog.setCanceledOnTouchOutside(false);
 		audioPlayer = new AudioPlayer(this);
 		initialize();
 	}
@@ -175,13 +179,6 @@ public class MenuActivity extends AppCompatActivity {
 		});
 
 		initViewPager(viewPager);
-
-		snack = Snackbar.make(findViewById(R.id.drawer_layout), "No internet connection. ", Snackbar.LENGTH_INDEFINITE);
-		View view = snack.getView();
-		FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
-		params.gravity = Gravity.TOP;
-		view.setLayoutParams(params);
-		HomeFragment.getInstance().getPlayerDetails();
 	}
 
 	private void initViewPager(ViewPager viewPager) {
@@ -222,14 +219,18 @@ public class MenuActivity extends AppCompatActivity {
 		populated = true;
     }
 
-    public void showNoInternetDialog(boolean show){
-		if(!show){
-			snack.dismiss();
-		}
-		if(show && !snack.isShown()){
-			snack.show();
-		}
+
+	public void showNoInternetDialog(boolean show) {
+		this.runOnUiThread(() -> {
+			if(!show){
+				noInternetDialog.dismiss();
+			}
+			else if(show && !noInternetDialog.isShowing()){
+				noInternetDialog.show();
+			}
+		});
 	}
+
 	public static Context getAppContext(){
 		return context;
 	}
@@ -253,5 +254,11 @@ public class MenuActivity extends AppCompatActivity {
 
 	public AudioPlayer getAudioPlayer() {
 		return audioPlayer;
+	}
+
+	public void handleReconnection(){
+	    showNoInternetDialog(false);
+		homeController.addTopic(true);
+	    homeController.getPlayerDetails();
 	}
 }

@@ -14,7 +14,17 @@ public class GameState extends GameResponse {
     private Date currentDate;
     private Date lastMoveDate;
     private Integer gameMaxTime;
+    private String offerDrawUserId;
+    private Date offerDrawDate;
     private boolean draw;
+    private int gameStatus;
+    private GameStats gameStats;
+
+    public static class Status {
+        public static final int PLAYERS_SELECTION = 1;
+        public static final int IN_PROGRESS = 2;
+        public static final int TERMINATED = 3;
+    }
 
     public GameState(){
         super();
@@ -67,6 +77,30 @@ public class GameState extends GameResponse {
         this.gameMaxTime = gameMaxTime;
     }
 
+    public int getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus(int gameStatus) {
+        this.gameStatus = gameStatus;
+    }
+
+    public GameStats getGameStats() {
+        return gameStats;
+    }
+
+    public void setGameStats(GameStats gameStats) {
+        this.gameStats = gameStats;
+    }
+
+    public Date getOfferDrawDate() {
+        return offerDrawDate;
+    }
+
+    public void setOfferDrawDate(Date offerDrawDate) {
+        this.offerDrawDate = offerDrawDate;
+    }
+
     public UserDto getCurrentPlayer(){
         if(players.get(0).getCurrent()){
             return players.get(0);
@@ -105,5 +139,13 @@ public class GameState extends GameResponse {
 
     public void setDraw(boolean draw) {
         this.draw = draw;
+    }
+
+    public String getOfferDrawUserId() {
+        return offerDrawUserId;
+    }
+
+    public void setOfferDrawUserId(String offerDrawUserId) {
+        this.offerDrawUserId = offerDrawUserId;
     }
 }

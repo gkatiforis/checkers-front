@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "794218231402-i2nr18tb4d603eoi2k5l54lpbj74n74g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.boardgame.multiplayer.checkers",
+            "certificate_hash": "832d39b689a8f72e0e51cdf7f37c0a7d6dc1093b"
+          }
+        },
+        {
           "client_id": "794218231402-kudgnejuv5agonchn70q4o5nbth2llmq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -41,7 +49,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-4642562250660220~3506267101"
     }
   ],
   "configuration_version": "1"

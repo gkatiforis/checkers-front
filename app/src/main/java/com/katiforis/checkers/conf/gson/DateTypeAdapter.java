@@ -20,17 +20,13 @@ public final class DateTypeAdapter
     }
 
     @Override
-    public Date read(final JsonReader in)
-            throws IOException {
-        // this is where the conversion is performed
+    public Date read(final JsonReader in) throws IOException {
         return new Date(in.nextLong());
     }
 
     @Override
     @SuppressWarnings("resource")
-    public void write(final JsonWriter out, final Date value)
-            throws IOException {
-        // write back if necessary or throw UnsupportedOperationException
+    public void write(final JsonWriter out, final Date value) throws IOException {
         out.value(value.getTime());
     }
 

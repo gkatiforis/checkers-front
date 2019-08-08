@@ -5,7 +5,9 @@ public class OfferDraw extends GameResponse {
         public OfferDraw(String gameId) {
         super(ResponseState.OFFER_DRAW.getState(), gameId);
     }
-
+    public OfferDraw() {
+        super();
+    }
     public String getByUser() {
         return byUser;
     }

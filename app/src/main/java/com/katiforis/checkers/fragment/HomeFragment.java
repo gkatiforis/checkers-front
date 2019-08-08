@@ -50,6 +50,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.katiforis.checkers.BuildConfig;
 import com.katiforis.checkers.DTO.GameType;
@@ -88,7 +89,7 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 public class HomeFragment extends Fragment {
     private MenuActivity menuActivity;
     public static HomeFragment INSTANCE;
-    public static GoogleSignInClient signInClient;
+
     public static boolean populated;
     private HomeController homeController;
 
@@ -110,6 +111,8 @@ public class HomeFragment extends Fragment {
     private RewardedAd rewardedAd;
     private final int interstitialPossibility = 10;
     private BillingClient billingClient;
+    public static GoogleSignInClient signInClient;
+    private GoogleSignInAccount account = null;
 
     public static HomeFragment getInstance() {
         if (INSTANCE == null) {
@@ -309,9 +312,15 @@ public class HomeFragment extends Fragment {
                 .requestIdToken(Const.android_web_id)
                 .requestEmail()
                 .build();
-        signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
 
-        silentSignIn();
+        if(signInClient == null){
+            signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
+            silentSignIn();
+        }else{
+          getPlayerDetailsForce();
+        }
+
+
         return v;
     }
 
@@ -447,6 +456,8 @@ public class HomeFragment extends Fragment {
         String token = (String) LocalCache.getInstance().getString(TOKEN);
         if (token != null) {
             intentToStartPage();
+        }else{
+            getPlayerDetailsForce();
         }
     }
 
@@ -458,21 +469,21 @@ public class HomeFragment extends Fragment {
     }
 
     private void silentSignIn() {
-        Task<GoogleSignInAccount> task = signInClient.silentSignIn();
-        try {
-            GoogleSignInAccount account = task.getResult(ApiException.class);
-            if (account != null) {
-                onLogin(account);
-            } else {
-                signInAgain();
-            }
-        } catch (ApiException e) {
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            signInAgain();
-        } catch (Exception e) {
-            Log.w(TAG, "signInResult:failed ", e);
-            signInAgain();
-        }
+
+        signInClient.silentSignIn().addOnCompleteListener(this.getActivity(),
+                new OnCompleteListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "signInSilently(): success");
+                            onLogin(task.getResult());
+                        } else {
+                            Log.d(TAG, "signInSilently(): failure", task.getException());
+                           signInAgain();
+                            //signInIntent();
+                        }
+                    }
+                });
     }
 
     @Override
@@ -481,7 +492,7 @@ public class HomeFragment extends Fragment {
         if (requestCode == 0) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
+                account = task.getResult(ApiException.class);
                 if (account != null) {
                     onLogin(account);
                 } else {
@@ -506,11 +517,11 @@ public class HomeFragment extends Fragment {
         if (Client.isConnected()) {
             Client.getInstance().disconnect();
             Client.getInstance();
-            getPlayerDetailsForce();
 //            getPlayerDetails();
         } else {
             Client.getInstance();
         }
+        getPlayerDetailsForce();
     }
 
     public void getPlayerDetailsForce() {

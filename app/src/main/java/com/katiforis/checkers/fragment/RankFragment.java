@@ -39,16 +39,11 @@ public class RankFragment extends Fragment {
     private RankAdapter rankAdapter;
     private List<UserDto> rankList = new ArrayList<>();
     private UserDto currentPlayer;
+    private RankList currentRankList;
     private TextView rank, username, level, points;
     private TextView lastUpdate;
     private ImageView playerImage;
     private AdView mAdView;
-//
-//    private TextView rank2, username2, level2, points2;
-//    private ImageView playerImage2;
-//
-//    private TextView rank3, username3, level3, points3;
-//    private ImageView playerImage3;
 
     public static RankFragment getInstance() {
         if (INSTANCE == null) {
@@ -91,18 +86,9 @@ public class RankFragment extends Fragment {
 
         lastUpdate = (TextView) view.findViewById(R.id.lastUpdate);
 
-//
-//        playerImage2 = (ImageView) view.findViewById(R.id.secondImage);
-//        username2 = (TextView) view.findViewById(R.id.secondUsername);
-//        rank2 = (TextView) view.findViewById(R.id.rank);
-//        level2 = (TextView) view.findViewById(R.id.level);
-//        points2 = (TextView) view.findViewById(R.id.points);
-//
-//        playerImage3 = (ImageView) view.findViewById(R.id.thirdImage);
-//        username3 = (TextView) view.findViewById(R.id.thirdUsername);
-//        rank3 = (TextView) view.findViewById(R.id.rank);
-//        level3 = (TextView) view.findViewById(R.id.level);
-//        points3 = (TextView) view.findViewById(R.id.points);
+        if(currentRankList != null){
+            setRankList(currentRankList);
+        }
 
        return view;
     }
@@ -118,10 +104,11 @@ public class RankFragment extends Fragment {
 
     public void setRankList(RankList rankList){
         Activity activity = getActivity();
+        currentRankList = rankList;
         if(activity != null){
             activity.runOnUiThread(() -> {
-               List<UserDto> players = rankList.getPlayers();
-               currentPlayer = rankList.getCurrentPlayer();
+               List<UserDto> players = currentRankList.getPlayers();
+               currentPlayer = currentRankList.getCurrentPlayer();
 
                 Picasso.with(MenuActivity.getAppContext())
                         .load(currentPlayer.getPictureUrl())
@@ -144,7 +131,7 @@ public class RankFragment extends Fragment {
 //                           .error(R.mipmap.ic_launcher)
 //                           .into(playerImage);
                    username.setText(currentPlayer.getUsername());
-                rank.setText(rankList.getCurrentPlayerPosition() + ".");
+                rank.setText(currentRankList.getCurrentPlayerPosition() + ".");
                 level.setText(String.valueOf(currentPlayer.getPlayerDetails().getLevel()));
                 points.setText(String.valueOf(currentPlayer.getPlayerDetails().getElo()));
 
@@ -180,7 +167,7 @@ public class RankFragment extends Fragment {
                 rankAdapter.notifyDataSetChanged();
 
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                String now = sdf.format(new Date());
+                String now = sdf.format(currentRankList.getTimestamp());
                 lastUpdate.setText("Last update: " + now);
             });
         }

@@ -12,6 +12,8 @@ import com.katiforis.checkers.fragment.RankFragment;
 import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.LocalCache;
 
+import java.util.Date;
+
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.RANK_LIST;
@@ -50,6 +52,7 @@ public class RankController extends MenuController {
         Log.i(Const.TAG, "Receive: " + messageStatus);
          if(messageStatus.equalsIgnoreCase(ResponseState.RANK_LIST.getState())){
             RankList rankList = gson.fromJson(message, RankList.class);
+            rankList.setTimestamp(new Date());
             rankList = LocalCache.getInstance().save(rankList, RANK_LIST, rankFragment.getActivity());
             rankFragment.setRankList(rankList);
         }

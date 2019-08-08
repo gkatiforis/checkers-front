@@ -18,6 +18,7 @@ import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.LocalCache;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import info.hoang8f.widget.FButton;
 
 import static android.content.ContentValues.TAG;
@@ -32,6 +33,8 @@ public class StartActivity extends AppCompatActivity {
 	private FButton loginAsGuest;
 	private Snackbar snack;
     private AudioPlayer audioPlayer;
+	private SweetAlertDialog noInternetDialog;
+
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -58,6 +61,14 @@ public class StartActivity extends AppCompatActivity {
 			audioPlayer.playClickButton();
 			signInIntent();
 		});
+		noInternetDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+				.setTitleText("No Internet Connection!")
+				.setContentText("Trying to reconnect. . . ");
+		noInternetDialog.setCanceledOnTouchOutside(false);
+	}
+
+	public void handleReconnection(){
+		showNoInternetDialog(false);
 	}
 
 	private void intentToMenuActivity(){
@@ -102,6 +113,18 @@ public class StartActivity extends AppCompatActivity {
 			Client.getInstance();
 		}
 		intentToMenuActivity();
+	}
+
+	public void showNoInternetDialog(boolean show) {
+		this.runOnUiThread(() -> {
+			if(noInternetDialog == null)return;
+			if(!show){
+				noInternetDialog.dismiss();
+			}
+			else if(show && !noInternetDialog.isShowing()){
+				noInternetDialog.show();
+			}
+		});
 	}
 
 	@Override
