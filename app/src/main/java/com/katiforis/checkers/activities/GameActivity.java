@@ -518,7 +518,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        audioPlayer.release();
+//        audioPlayer.release();
     }
 
     private View.OnClickListener listener = new View.OnClickListener() {

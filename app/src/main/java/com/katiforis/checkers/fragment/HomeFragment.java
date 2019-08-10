@@ -299,6 +299,8 @@ public class HomeFragment extends Fragment {
         playRanking.setOnClickListener(p -> {
             menuActivity.getAudioPlayer().playClickButton();
             UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, this.getActivity());
+
+            if(playerDto == null)return;
             if (playerDto.getPlayerDetails().getCoins() < GameType.RANKING.getFee()) {
                 showNotEnoughCoins();
             } else {
