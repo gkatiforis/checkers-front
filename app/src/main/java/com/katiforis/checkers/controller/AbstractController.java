@@ -19,10 +19,11 @@ public abstract class AbstractController {
     protected final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Date.class, DateTypeAdapter.getAdapter())
             .create();
+
     public void addTopic(String topicId, final boolean force) {
         if(topicId == null || topicId.isEmpty())
             return;
-        Flowable<StompMessage> messageFlowable = Client.getInstance().addTopic(getControllerId(), topicId, force);
+        Flowable<StompMessage> messageFlowable = Client.getInstance().addTopic(topicId, force);
         if(messageFlowable != null)
             messageFlowable.subscribe(this::onReceive, throwable ->
                 Log.e(TAG, "Error on subscribe topic", throwable)
@@ -30,8 +31,4 @@ public abstract class AbstractController {
     }
 
     protected abstract void onReceive(StompMessage stompMessage);
-
-    protected String getControllerId(){
-        return this.getClass().getSimpleName();
-    }
 }

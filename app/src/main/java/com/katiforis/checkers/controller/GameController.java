@@ -59,9 +59,9 @@ public class GameController extends AbstractController {
             Gson gson = new Gson();
             GameStats gameStats = gson.fromJson(message, GameStats.class);
 
-            gameStatsFragment = GameStatsFragment.getInstance();
+            gameStatsFragment = new GameStatsFragment(this);
             gameStatsFragment.setGameStats(gameStats);
-            gameStatsFragment.show(gameActivity.getSupportFragmentManager(), "");
+            gameStatsFragment.show(gameActivity.getSupportFragmentManager(), GameStatsFragment.class.getName());
             gameStatsFragment.showPlayerList();
 
             //TODO: save user details in cache and remove loading from backend
@@ -89,8 +89,11 @@ public class GameController extends AbstractController {
         }
     }
 
-    public void restartGame() {
-        HomeController.getInstance().restartGame();
+    public void restartGame(){
+        FindGame findGame = new FindGame(LocalCache.getInstance().getString(CURRENT_GAME_ID, gameActivity));
+        findGame.setRestart(true);
+//        addTopic(false);
+        Client.send(Const.FIND_GAME, gson.toJson(findGame));
     }
 
     public void findNewOpponent() {
@@ -107,9 +110,9 @@ public class GameController extends AbstractController {
     }
 
     public void getGameState() {
-        String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID);
+        String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID, this.getGameActivity());
         if (gameId != null || gameId.length() > 0) {
-            addTopic(gameId, true);
+            addTopic(gameId, false);
             Client.getInstance().send(Const.GET_GAME_STATE,  gameId);
         }
     }

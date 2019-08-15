@@ -17,21 +17,18 @@ import com.google.android.gms.ads.AdView;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.RankList;
 import com.katiforis.checkers.R;
-import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.adapter.RankAdapter;
-import com.katiforis.checkers.controller.RankController;
+import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.util.CircleTransform;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class RankFragment extends Fragment {
-    private static RankFragment INSTANCE;
-    RankController rankController;
+    private HomeController homeController;
 
     public static boolean populated;
 
@@ -45,19 +42,13 @@ public class RankFragment extends Fragment {
     private ImageView playerImage;
     private AdView mAdView;
 
-    public static RankFragment getInstance() {
-        if (INSTANCE == null) {
-            synchronized(RankFragment.class) {
-                INSTANCE = new RankFragment();
-            }
-        }
-        INSTANCE.rankController = RankController.getInstance();
-        INSTANCE.rankController.setRankFragment(INSTANCE);
-        return INSTANCE;
-    }
-
     public RankFragment() {
         populated = false;
+    }
+
+    public RankFragment(HomeController homeController) {
+        populated = false;
+        this.homeController = homeController;
     }
 
     @Override
@@ -72,7 +63,7 @@ public class RankFragment extends Fragment {
         rankRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         rankRecyclerView.addItemDecoration(new DividerItemDecoration(rankRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        rankAdapter = new RankAdapter(rankList);
+        rankAdapter = new RankAdapter(this.getActivity(), rankList);
 
         rankRecyclerView.smoothScrollToPosition(0);
         rankAdapter.notifyDataSetChanged();
@@ -95,10 +86,10 @@ public class RankFragment extends Fragment {
 
     public void getRankList(){
         if(!populated){
-            rankController.getRankList();
+            homeController.getRankList();
             populated = true;
         }else{
-            rankController.getRankListIfExpired();
+            homeController.getRankListIfExpired();
         }
     }
 
@@ -110,9 +101,9 @@ public class RankFragment extends Fragment {
                List<UserDto> players = currentRankList.getPlayers();
                currentPlayer = currentRankList.getCurrentPlayer();
 
-                Picasso.with(MenuActivity.getAppContext())
+                Picasso.with(this.getActivity())
                         .load(currentPlayer.getPictureUrl())
-                        .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
+                        .placeholder(this.getActivity().getResources().getDrawable(R.drawable.user))
                         .error(R.mipmap.ic_launcher)
                         .transform(new CircleTransform())
                         .into(playerImage, new Callback() {

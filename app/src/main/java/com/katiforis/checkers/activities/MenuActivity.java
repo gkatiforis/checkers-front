@@ -1,12 +1,12 @@
 package com.katiforis.checkers.activities;
 
-import android.app.ActivityManager;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -20,11 +20,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.FriendList;
@@ -34,104 +36,97 @@ import com.katiforis.checkers.R;
 import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.fragment.RankFragment;
+import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.AudioPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.fabric.sdk.android.Fabric;
 
 import static com.katiforis.checkers.conf.Const.TAG;
 
-public class MenuActivity extends AppCompatActivity {
-	public static MenuActivity INSTANCE;
-	private static Context context;
+public class MenuActivity extends AppCompatActivity implements Observer {
+    private static final int MAIN_MENU_TAB_INDEX = 0;
+    private static final int RANK_TAB_INDEX = 1;
+    private static final int SHOP_TAB_INDEX = 2;
 
-	private static final int MAIN_MENU_TAB_INDEX = 0;
-	private static final int RANK_TAB_INDEX = 1;
-	private static final int SHOP_TAB_INDEX = 2;
+    public static boolean populated;
 
-	public static boolean populated;
+    private HomeController homeController;
 
-	private HomeController homeController;
+    private BottomNavigationView bottomNavigationView;
+    private ViewPager viewPager;
+    private MenuItem prevMenuItem;
 
-	private BottomNavigationView bottomNavigationView;
-	private ViewPager viewPager;
-	private MenuItem prevMenuItem;
-
-	public DrawerLayout drawerLayout;
-	public NavigationView navigationView;
+    public DrawerLayout drawerLayout;
+    public NavigationView navigationView;
 
     private RecyclerView friendsRecyclerView;
     private FriendAdapter friendAdapter;
     private List<UserDto> friends = new ArrayList<>();
-	private AudioPlayer audioPlayer;
-	private SweetAlertDialog noInternetDialog;
+    private AudioPlayer audioPlayer;
+    private SweetAlertDialog noInternetDialog;
 
-	@Override
-	protected void onCreate(@Nullable Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
-		Fabric.with(this, new Crashlytics());
-		PendingIntent intent = PendingIntent.getActivity(
-				this.getApplication().getBaseContext(),
-				0,
-				new Intent(getIntent()),
-				getIntent().getFlags());
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
+        PendingIntent intent = PendingIntent.getActivity(
+                this.getApplication().getBaseContext(),
+                0,
+                new Intent(getIntent()),
+                getIntent().getFlags());
 
-		Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) ->{
-			Log.e(TAG, "Error: ", e);
-			if(e instanceof io.reactivex.exceptions.OnErrorNotImplementedException){
-				intentToStartPage();
-			}else{
-				Crashlytics.logException(e);
-				AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-				mgr.set(AlarmManager.RTC, System.currentTimeMillis(), intent);
-				System.exit(2);
-			}
-		});
-		 noInternetDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
-				.setTitleText("No Internet Connection!")
-				.setContentText("Trying to reconnect. . . ");
-		 noInternetDialog.setCanceledOnTouchOutside(false);
-		audioPlayer = new AudioPlayer(this);
-		initialize();
-	}
-	public void intentToStartPage(){
-		Intent intent = new Intent();
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		intent.setClass(this, StartActivity.class);
-		startActivity(intent);
-	}
-	private void initialize() {
+        Thread.setDefaultUncaughtExceptionHandler((Thread thread, Throwable e) -> {
+            Log.e(TAG, "Error: ", e);
+            if (e instanceof io.reactivex.exceptions.OnErrorNotImplementedException) {
+                intentToStartPage();
+            } else {
+                Crashlytics.logException(e);
+                AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis(), intent);
+                System.exit(2);
+            }
+        });
+        noInternetDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+                .setTitleText("No Internet Connection!")
+                .setContentText("Trying to reconnect. . . ");
+        noInternetDialog.setCanceledOnTouchOutside(false);
+        audioPlayer = new AudioPlayer(this);
+        initialize();
+    }
 
+    public void intentToStartPage() {
+        Intent intent = new Intent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setClass(this, StartActivity.class);
+        startActivity(intent);
+    }
 
+    private void initialize() {
+        populated = false;
+        getSupportActionBar().hide();
+        setContentView(R.layout.activity_menu_layout);
 
-		populated = false;
-		INSTANCE = this;
-		homeController = HomeController.getInstance();
-		homeController.setMenuActivity(this);
-		context = this.getApplicationContext();
-		getSupportActionBar().hide();
-		setContentView(R.layout.activity_menu_layout);
-
-
-
-		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		navigationView = findViewById(R.id.navigation_view);
-		viewPager = (ViewPager) findViewById(R.id.viewpager);
-		bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottom_navigation);
-		bottomNavigationView.setOnNavigationItemSelectedListener(
-				new BottomNavigationView.OnNavigationItemSelectedListener() {
-					@Override
-					public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-						switch (item.getItemId()) {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
 //							case R.id.action_notification:
 //								NotificationFragment notificationFragment =	NotificationFragment.getInstance();
 //								notificationFragment.show(getSupportFragmentManager(), "dialog");
-							case R.id.action_main_menu:
-								viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
-								break;
+                            case R.id.action_main_menu:
+                                viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
+                                break;
 //							case R.id.action_friend_list:
 //								drawerLayout.openDrawer(Gravity.RIGHT);
 //								INSTANCE.openFriendListDialog();
@@ -139,60 +134,75 @@ public class MenuActivity extends AppCompatActivity {
 //							case R.id.action_shop:
 //								viewPager.setCurrentItem(SHOP_TAB_INDEX);
 //							    break;
-							case R.id.action_rank:
-								viewPager.setCurrentItem(RANK_TAB_INDEX);
-								break;
-						}
-						return false;
-					}
-				});
+                            case R.id.action_rank:
+                                viewPager.setCurrentItem(RANK_TAB_INDEX);
+                                break;
+                        }
+                        return false;
+                    }
+                });
 
-		viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-			}
+            }
 
-			@Override
-			public void onPageSelected(int position) {
-				audioPlayer.playPopup();
-				if (prevMenuItem != null) {
-					prevMenuItem.setChecked(false);
-				}
-				else
-				{
-					bottomNavigationView.getMenu().getItem(MAIN_MENU_TAB_INDEX).setChecked(false);
-				}
-				bottomNavigationView.getMenu().getItem(position).setChecked(true);
-				prevMenuItem = bottomNavigationView.getMenu().getItem(position);
+            @Override
+            public void onPageSelected(int position) {
+                audioPlayer.playPopup();
+                if (prevMenuItem != null) {
+                    prevMenuItem.setChecked(false);
+                } else {
+                    bottomNavigationView.getMenu().getItem(MAIN_MENU_TAB_INDEX).setChecked(false);
+                }
+                bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                prevMenuItem = bottomNavigationView.getMenu().getItem(position);
 
-				if(position == RANK_TAB_INDEX){
-					RankFragment.getInstance().getRankList();
-				}else if(position == MAIN_MENU_TAB_INDEX){
-					HomeFragment.getInstance().getPlayerDetails();
-				}
-			}
+                if (position == RANK_TAB_INDEX) {
+                    getRankFragment().getRankList();
+                } else if (position == MAIN_MENU_TAB_INDEX) {
+                    getHomeFragment().getPlayerDetails();
+                }
+            }
 
-			@Override
-			public void onPageScrollStateChanged(int state) {
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
-			}
-		});
+            }
+        });
 
-		initViewPager(viewPager);
-	}
+        initViewPager(viewPager);
+    }
 
-	private void initViewPager(ViewPager viewPager) {
-		ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-		adapter.addFragment(HomeFragment.getInstance());
-		adapter.addFragment(RankFragment.getInstance());
+    public HomeFragment getHomeFragment() {
+        return (HomeFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + MAIN_MENU_TAB_INDEX);
+    }
+
+    public RankFragment getRankFragment() {
+        return (RankFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + RANK_TAB_INDEX);
+    }
+
+    private void initViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        homeController = HomeController.getInstance();
+        homeController.setMenuActivity(this);
+        Fragment homeFragment = new HomeFragment(homeController);
+        adapter.addFragment(homeFragment);
+
+        HomeController homeController = HomeController.getInstance();
+        homeController.setMenuActivity(this);
+        Fragment rankFragment = new RankFragment(homeController);
+        adapter.addFragment(rankFragment);
+
 //		adapter.addFragment(new Fragment());
 //		adapter.addFragment(LobbyFragment.getInstance());
-		viewPager.setAdapter(adapter);
-		viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
-	}
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(MAIN_MENU_TAB_INDEX);
+    }
 
-    private void openFriendListDialog(){
+    private void openFriendListDialog() {
 
         View view = LayoutInflater.from(this)
                 .inflate(R.layout.fragment_friend_list_layout, null, false);
@@ -205,61 +215,70 @@ public class MenuActivity extends AppCompatActivity {
         friendsRecyclerView.setAdapter(friendAdapter);
         drawerLayout.openDrawer(Gravity.RIGHT);
 
-        if(!populated){
-			homeController.getFriendList();
-		}
+        if (!populated) {
+            homeController.getFriendList();
+        }
     }
 
-    public void populateFriendListDialog(FriendList friendList){
-        runOnUiThread(()->{
+    public void populateFriendListDialog(FriendList friendList) {
+        runOnUiThread(() -> {
             friends.clear();
             friends.addAll(friendList.getPlayers());
             friendsRecyclerView.smoothScrollToPosition(0);
             friendAdapter.notifyDataSetChanged();
         });
-		populated = true;
+        populated = true;
     }
 
+    public void handleConnectionLose() {
+        showNoInternetDialog(true);
+    }
 
-	public void showNoInternetDialog(boolean show) {
-		this.runOnUiThread(() -> {
-			if(!show){
-				noInternetDialog.dismiss();
-			}
-			else if(show && !noInternetDialog.isShowing()){
-				noInternetDialog.show();
-			}
-		});
-	}
+    public void handleReconnection() {
+        showNoInternetDialog(false);
+        homeController.addTopic(true);
+        homeController.getPlayerDetails();
+    }
 
-	public static Context getAppContext(){
-		return context;
-	}
+    public void showNoInternetDialog(boolean show) {
+        this.runOnUiThread(() -> {
+            if (!show) {
+                noInternetDialog.dismiss();
+            } else if (show && !noInternetDialog.isShowing()) {
+                noInternetDialog.show();
+            }
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-
-	}
+        });
+    }
 
     @Override
-	protected void onStart() {
-		super.onStart();
-	}
+    protected void onStop() {
+        super.onStop();
+    }
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 //		audioPlayer.release();
-	}
+    }
 
-	public AudioPlayer getAudioPlayer() {
-		return audioPlayer;
-	}
+    public AudioPlayer getAudioPlayer() {
+        return audioPlayer;
+    }
 
-	public void handleReconnection(){
-	    showNoInternetDialog(false);
-		homeController.addTopic(true);
-	    homeController.getPlayerDetails();
-	}
+    @Override
+    public void update(Observable o, Object args) {
+        if (o instanceof Client) {
+            if ((Boolean) args) {
+                handleReconnection();
+            } else {
+                handleConnectionLose();
+            }
+        }
+    }
 }

@@ -34,10 +34,8 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 public class GameStatsFragment extends DialogFragment {
     private GameActivity gameActivity;
-    private static GameStatsFragment INSTANCE = null;
     private GameController gameController;
     private TextView title;
-    public static boolean populated;
 
     private RecyclerView playersStatsRecyclerView;
     private PlayersStatsAdapter playersStatsAdapter;
@@ -49,17 +47,11 @@ public class GameStatsFragment extends DialogFragment {
     private CountDownTimer countDownTimer;
     private boolean restartGame = false;
 
-    public static GameStatsFragment getInstance() {
-            synchronized(GameStatsFragment.class) {
-                INSTANCE = new GameStatsFragment();
-            }
-        INSTANCE.gameController = GameController.getInstance();
-        INSTANCE.gameController.setGameStatsFragment(INSTANCE);
-        return INSTANCE;
+    public GameStatsFragment() {
     }
 
-    public GameStatsFragment() {
-        populated = false;
+    public GameStatsFragment(GameController gameController) {
+        this.gameController = gameController;
     }
 
     @NonNull
@@ -71,7 +63,7 @@ public class GameStatsFragment extends DialogFragment {
         playersStatsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         playersStatsRecyclerView.addItemDecoration(new DividerItemDecoration(playersStatsRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        playersStatsAdapter = new PlayersStatsAdapter(players);
+        playersStatsAdapter = new PlayersStatsAdapter(players, this.getContext());
         returnToMenu = (FButton) view.findViewById(R.id.returnToMenu);
         restart = (FButton) view.findViewById(R.id.restartGame);
         newOpponent = (FButton) view.findViewById(R.id.newOpponent);
@@ -111,10 +103,10 @@ public class GameStatsFragment extends DialogFragment {
                 if(gameStats.isDraw()){
                     this.title.setText("Draw");
                 }else{
-                    if( players.get(0).getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                    if( players.get(0).getUserId().equals(LocalCache.getInstance().getString(USER_ID, this.getContext())) &&
                         players.get(0).getColor().equals(gameStats.getWinnerColor())){
                         this.title.setText("You Win");
-                    }else if( players.get(1).getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                    }else if( players.get(1).getUserId().equals(LocalCache.getInstance().getString(USER_ID, this.getContext())) &&
                             players.get(1).getColor().equals(gameStats.getWinnerColor())){
                         this.title.setText("You Win");
                     }else{

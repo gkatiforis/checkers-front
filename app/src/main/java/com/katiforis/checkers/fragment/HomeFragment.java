@@ -88,7 +88,6 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 public class HomeFragment extends Fragment {
     private MenuActivity menuActivity;
-    public static HomeFragment INSTANCE;
 
     public static boolean populated;
     private HomeController homeController;
@@ -114,18 +113,10 @@ public class HomeFragment extends Fragment {
     public static GoogleSignInClient signInClient;
     private GoogleSignInAccount account = null;
 
-    public static HomeFragment getInstance() {
-        if (INSTANCE == null) {
-            synchronized (HomeFragment.class) {
-                INSTANCE = new HomeFragment();
-            }
-        }
-        INSTANCE.homeController = HomeController.getInstance();
-        INSTANCE.homeController.setHomeFragment(INSTANCE);
-        return INSTANCE;
-    }
-
     public HomeFragment() {
+    }
+    public HomeFragment(HomeController homeController) {
+        this.homeController = homeController;
     }
 
     AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = billingResult -> {
@@ -287,8 +278,6 @@ public class HomeFragment extends Fragment {
             settingsFragment.show(this.getFragmentManager(), "");
         });
 
-        buttonEffect(settingButton);
-
         playFriendly.setOnClickListener(p -> {
             menuActivity.getAudioPlayer().playClickButton();
             FindGame findGame = new FindGame();
@@ -322,7 +311,7 @@ public class HomeFragment extends Fragment {
           getPlayerDetailsForce();
         }
 
-
+        Client.getInstance().addObserver((MenuActivity)this.getActivity());
         return v;
     }
 
@@ -364,9 +353,9 @@ public class HomeFragment extends Fragment {
                     reward.setType(rewardItem.getType());
                     reward.setAmount(RewardEnum.VIDEO.getCoinsPrize());
                     homeController.sendReward(reward);
-                    UserDto userDto = LocalCache.getInstance().get(USER_DETAILS, MenuActivity.INSTANCE);
+                    UserDto userDto = LocalCache.getInstance().get(USER_DETAILS, menuActivity);
                     userDto.getPlayerDetails().setCoins(userDto.getPlayerDetails().getCoins() + reward.getAmount());
-                    LocalCache.getInstance().save(userDto, USER_DETAILS, MenuActivity.INSTANCE);
+                    LocalCache.getInstance().save(userDto, USER_DETAILS, menuActivity);
                     homeController.getPlayerDetails();
                 }
 
@@ -375,7 +364,7 @@ public class HomeFragment extends Fragment {
                     showAdRewardFailDialog();
                 }
             };
-            rewardedAd.show(MenuActivity.INSTANCE, adCallback);
+            rewardedAd.show(menuActivity, adCallback);
         } else {
             Log.d("TAG", "The rewarded ad wasn't loaded yet.");
         }
@@ -383,21 +372,21 @@ public class HomeFragment extends Fragment {
 
 
     public void showAdRewardSuccessDialog() {
-        new SweetAlertDialog(MenuActivity.INSTANCE, SweetAlertDialog.SUCCESS_TYPE)
+        new SweetAlertDialog(menuActivity, SweetAlertDialog.SUCCESS_TYPE)
                 .setTitleText("Congratulations!")
                 .setContentText("You have earned " + RewardEnum.VIDEO.getCoinsPrize() + " coins!")
                 .show();
     }
 
     public void showAdRewardFailDialog() {
-        new SweetAlertDialog(MenuActivity.INSTANCE, SweetAlertDialog.ERROR_TYPE)
+        new SweetAlertDialog(menuActivity, SweetAlertDialog.ERROR_TYPE)
                 .setTitleText("Error")
                 .setContentText("Please try again later.")
                 .show();
     }
 
     public void showNotEnoughCoins() {
-        new SweetAlertDialog(MenuActivity.INSTANCE, SweetAlertDialog.ERROR_TYPE)
+        new SweetAlertDialog(menuActivity, SweetAlertDialog.ERROR_TYPE)
                 .setTitleText("Not enough coins!")
                 .setContentText("Watch an ad and earn more coins!!")
                 .show();
@@ -426,8 +415,8 @@ public class HomeFragment extends Fragment {
         signInClient.signOut()
                 .addOnSuccessListener((message) -> {
                     Client.getInstance().disconnect();
-                    LocalCache.getInstance().saveString(TOKEN, null);
-                    LocalCache.getInstance().saveString(USER_ID, null);
+                    LocalCache.getInstance().saveString(TOKEN, null, this.getActivity());
+                    LocalCache.getInstance().saveString(USER_ID, null, this.getActivity());
                     intentToStartPage();
                 })
                 .addOnFailureListener((message) -> {
@@ -435,27 +424,13 @@ public class HomeFragment extends Fragment {
                 });
     }
 
-
-    public static void buttonEffect(View button) {
-        button.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.8F);
-                v.startAnimation(buttonClick);
-                final Animation animShake = AnimationUtils.loadAnimation(MenuActivity.INSTANCE, R.anim.shake);
-                v.startAnimation(animShake);
-                return false;
-            }
-        });
-    }
-
-
     private void signInIntent() {
         Intent intent = signInClient.getSignInIntent();
         startActivityForResult(intent, 0);
     }
 
     private void signInAgain() {
-        String token = (String) LocalCache.getInstance().getString(TOKEN);
+        String token = (String) LocalCache.getInstance().getString(TOKEN, menuActivity);
         if (token != null) {
             intentToStartPage();
         }else{
@@ -466,7 +441,7 @@ public class HomeFragment extends Fragment {
     private void intentToStartPage() {
         Intent intent = new Intent();
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.setClass(MenuActivity.getAppContext(), StartActivity.class);
+        intent.setClass(menuActivity, StartActivity.class);
         startActivity(intent);
     }
 
@@ -515,14 +490,11 @@ public class HomeFragment extends Fragment {
     private void onLogin(GoogleSignInAccount account) {
         // logout.setVisibility(View.VISIBLE);
         loginButton.setVisibility(View.GONE);
-        LocalCache.getInstance().saveString(TOKEN, account.getIdToken());
+        LocalCache.getInstance().saveString(TOKEN, account.getIdToken(), menuActivity);
         if (Client.isConnected()) {
             Client.getInstance().disconnect();
-            Client.getInstance();
-//            getPlayerDetails();
-        } else {
-            Client.getInstance();
         }
+        Client.getInstance().addObserver((MenuActivity)this.getActivity());
         getPlayerDetailsForce();
     }
 

@@ -1,6 +1,8 @@
 package com.katiforis.checkers.adapter;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import java.util.List;
 public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder> {
 
     private List<UserDto> rankList;
+    private Context context;
 
     public class RankViewHolder extends RecyclerView.ViewHolder {
         public TextView rank, username, level, points;
@@ -34,8 +37,9 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
         }
     }
 
-    public RankAdapter(List<UserDto> rankList) {
+    public RankAdapter(Context context, List<UserDto> rankList) {
         this.rankList = rankList;
+        this.context = context;
     }
 
     @Override
@@ -50,9 +54,9 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
 
         UserDto player = rankList.get(position);
 
-        Picasso.with(MenuActivity.getAppContext())
+        Picasso.with(this.context)
                 .load(player.getPictureUrl())
-                .placeholder(MenuActivity.getAppContext().getResources().getDrawable(R.drawable.user))
+                .placeholder(this.context.getResources().getDrawable(R.drawable.user))
                 .error(R.mipmap.ic_launcher)
                 .transform(new CircleTransform())
                 .into(holder.playerImage, new Callback() {

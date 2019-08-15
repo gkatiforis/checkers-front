@@ -32,6 +32,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.GameState;
 import com.katiforis.checkers.DTO.PlayerAnswer;
@@ -45,6 +48,7 @@ import com.katiforis.checkers.game.Board;
 import com.katiforis.checkers.game.Cell;
 import com.katiforis.checkers.game.Move;
 import com.katiforis.checkers.game.Piece;
+import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.CircleTransform;
 import com.katiforis.checkers.util.LocalCache;
@@ -65,9 +69,7 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 import static com.katiforis.checkers.util.Utils.getDiffInSeconds;
 import static com.katiforis.checkers.util.Utils.twoDigits;
 
-public class GameActivity extends AppCompatActivity {
-
-    public static GameActivity INSTANCE;
+public class GameActivity extends AppCompatActivity implements Observer {
     private static final int DARK_PIECE_ICON = R.drawable.redpf;
     private static final int DARK_KING_PIECE_ICON = R.drawable.redpk;
     private static final int DARK_PIECE_PRESSED = R.drawable.redpf;
@@ -106,6 +108,8 @@ public class GameActivity extends AppCompatActivity {
 
 
     private GameController gameController;
+    private HomeController homeController;
+
     public static boolean populated;
 
     private Integer gameMaxTime;
@@ -121,8 +125,13 @@ public class GameActivity extends AppCompatActivity {
     private FButton resignButton;
     private FButton offerDrawButton;
     private ImageView cancel;
+
     private DialogPlus optionsDialog;
     private ViewGroup optionsDialogView;
+
+    private DialogPlus noInternetDialog;
+    private ViewGroup noInternetDialogView;
+
     private Animation anim;
     private AdView mAdView;
 
@@ -142,9 +151,9 @@ public class GameActivity extends AppCompatActivity {
             initComponents();
 
             if(gamestate.getGameStatus() == GameState.Status.PLAYERS_SELECTION){
-                GameStatsFragment gameStatsFragment = GameStatsFragment.getInstance();
+                GameStatsFragment gameStatsFragment = new GameStatsFragment(gameController);
                 gameStatsFragment.setGameStats(gamestate.getGameStats());
-                gameStatsFragment.show(getSupportFragmentManager(), "");
+                gameStatsFragment.show(getSupportFragmentManager(), GameStatsFragment.class.getName());
                 gameStatsFragment.showPlayerList();
             }else if(gamestate.getGameStatus() == GameState.Status.TERMINATED){
                 intentToMenuActivity();
@@ -182,12 +191,12 @@ public class GameActivity extends AppCompatActivity {
 
                 setBoard(gamestate.getBoard());
 
-                if (this.player1.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                if (this.player1.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this)) &&
                         player1.getColor().equals(Piece.LIGHT)) {
                     FrameLayout mView = findViewById(R.id.gameboard);
                     mView.setRotation(180);
                     ViewGroup.LayoutParams lp = mView.getLayoutParams();
-                } else if (this.player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                } else if (this.player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this)) &&
                         player2.getColor().equals(Piece.LIGHT)) {
                     FrameLayout mView = findViewById(R.id.gameboard);
                     mView.setRotation(180);
@@ -196,7 +205,7 @@ public class GameActivity extends AppCompatActivity {
 
 
                 if(gamestate.getOfferDrawUserId() != null &&
-                        !gamestate.getOfferDrawUserId().equals(LocalCache.getInstance().getString(USER_ID)) &&
+                        !gamestate.getOfferDrawUserId().equals(LocalCache.getInstance().getString(USER_ID, this)) &&
                      getDiffInSeconds(gamestate.getOfferDrawDate(), gamestate.getCurrentDate()) <= OFFER_DRAW_TIME_IN_SECONDS){
                     this.runOnUiThread(() -> {
                         OfferDraw offerDraw = new OfferDraw();
@@ -210,6 +219,7 @@ public class GameActivity extends AppCompatActivity {
 
     void initComponents() {
         getSupportActionBar().hide();
+        Client.getInstance().addObserver(this);
         explosionField = ExplosionField.attach2Window(this);
         View user1 = findViewById(R.id.user1);
         playerImage = user1.findViewById(R.id.playerImage);
@@ -249,12 +259,6 @@ public class GameActivity extends AppCompatActivity {
         player2Time.cancelAnimation();
         player2Time.startAnimation();
 
-
-        snack = Snackbar.make(findViewById(R.id.gameActivity), "No internet connection. ", Snackbar.LENGTH_INDEFINITE);
-        View view = snack.getView();
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-        params.gravity = Gravity.TOP;
-        view.setLayoutParams(params);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             this.resizeBoardToScreenSizePortrait();
@@ -314,12 +318,27 @@ public class GameActivity extends AppCompatActivity {
             audioPlayer.playPopup();
             optionsDialog.dismiss();
         });
+
+
+        noInternetDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_connection_lost_layout, null);
+
+        noInternetDialog = DialogPlus.newDialog(this)
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        System.out.println(item);
+                    }
+                }).setContentHolder(new ViewHolder(noInternetDialogView))
+                .setGravity(Gravity.TOP)
+                .setCancelable(false)
+                .create();
+
     }
 
     public void showOfferDraw(OfferDraw offerDraw) {
         runOnUiThread(() -> {
 
-            if (!offerDraw.getByUser().equals(LocalCache.getInstance().getString(USER_ID))) {
+            if (!offerDraw.getByUser().equals(LocalCache.getInstance().getString(USER_ID, this))) {
                 if (!optionsDialog.isShowing()) {
                     optionsDialog.show();
                 }
@@ -346,13 +365,13 @@ public class GameActivity extends AppCompatActivity {
     public void sendResign() {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setResign(true);
-        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer);
     }
 
     public void sendOfferDraw() {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setOfferDraw(true);
-        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer);
     }
 
     private void updatePlayerScore(String username, String points) {
@@ -370,7 +389,7 @@ public class GameActivity extends AppCompatActivity {
         UserDto player = players.get(0);
         UserDto player2 = players.get(1);
 
-        if (player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID))) {
+        if (player2.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
 
             Picasso.with(this)
                     .load(player2.getPictureUrl())
@@ -451,7 +470,7 @@ public class GameActivity extends AppCompatActivity {
     public void sendMove(Move move) {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setMove(move);
-        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID), playerAnswer);
+        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer);
     }
 
 
@@ -487,11 +506,13 @@ public class GameActivity extends AppCompatActivity {
         audioPlayer = new AudioPlayer(this);
 
         initComponents();
-        INSTANCE = this;
         populated = false;
+
         gameController = GameController.getInstance();
         gameController.setGameActivity(this);
 
+        homeController = HomeController.getInstance();
+        homeController.setGameActivity(this);
     }
 
     @Override
@@ -503,7 +524,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID);
+        String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID, this);
         if (gameId == null || gameId.length() == 0) {
             return;
         }
@@ -521,18 +542,14 @@ public class GameActivity extends AppCompatActivity {
 //        audioPlayer.release();
     }
 
-    private View.OnClickListener listener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
+    private View.OnClickListener listener = (View v) -> {
             int tag = (Integer) v.getTag();
             int xCord = tag / 10;
             int yCord = tag % 10;
-
-            if (currentPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))) {
+            if (currentPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
                 playerTurn(xCord, yCord);
             }
-        }
-    };
+        };
 
     public void playerTurn(int xCord, int yCord) {
 
@@ -759,7 +776,7 @@ public class GameActivity extends AppCompatActivity {
         Long fromPlayerSeconds = fromPlayer.getSecondsRemaining() - fromPlayerMinutes * 60;
 
 
-        if (fromPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))) {
+        if (fromPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
             player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
             player2Time.setCenterTitle(fromPlayerMinutes.toString() + ":" + twoDigits(fromPlayerSeconds.toString()));
         } else {
@@ -768,7 +785,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         Integer progress = 100 * fromPlayer.getSecondsRemaining().intValue() / (gameMaxTime * 60);
-        if (toPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))) {
+        if (toPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
             player1Time.setProgressValue(progress);
         } else {
             player2Time.setProgressValue(progress);
@@ -780,22 +797,26 @@ public class GameActivity extends AppCompatActivity {
         }
         countDownTimer = new CountDownTimer(toPlayer.getSecondsRemaining() * 1000, 1000) {
             public void onTick(long millisUntilFinished) {
-                Long remainingSeconds = millisUntilFinished / 1000;
-                Long toPlayerMinutes = remainingSeconds / 60;
-                Long toPlayerSeconds = remainingSeconds - toPlayerMinutes * 60;
-                Integer progress = 100 * remainingSeconds.intValue() / (gameMaxTime * 60);
-                if (fromPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID))) {
-                    player1Time.setProgressValue(progress);
-                    player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
-                } else {
-                    player2Time.setProgressValue(progress);
-                    player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
-                }
+                onTimerTick(millisUntilFinished, fromPlayer);
             }
 
             public void onFinish() {
             }
         }.start();
+    }
+
+    public void onTimerTick(long millisUntilFinished, UserDto fromPlayer){
+        Long remainingSeconds = millisUntilFinished / 1000;
+        Long toPlayerMinutes = remainingSeconds / 60;
+        Long toPlayerSeconds = remainingSeconds - toPlayerMinutes * 60;
+        Integer progress = 100 * remainingSeconds.intValue() / (gameMaxTime * 60);
+        if (fromPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
+            player1Time.setProgressValue(progress);
+            player1Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
+        } else {
+            player2Time.setProgressValue(progress);
+            player2Time.setCenterTitle(toPlayerMinutes.toString() + ":" + twoDigits(toPlayerSeconds.toString()));
+        }
     }
 
     public void unHighlightPieces() {
@@ -912,26 +933,45 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public boolean isMe(UserDto player) {
-        return this.currentPlayer != null && player.getUserId().equals(LocalCache.getInstance().getString(USER_ID));
-    }
-
-    public void showNoInternetDialog(boolean show) {
-        if (snack == null) return;
-        if (!show) {
-            snack.dismiss();
-        }
-        if (show && !snack.isShown()) {
-            snack.show();
-        }
+        return this.currentPlayer != null && player.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this));
     }
 
     public AudioPlayer getAudioPlayer() {
         return audioPlayer;
     }
 
+    public void showNoInternetDialog(boolean show) {
+        runOnUiThread(() -> {
+
+                if (noInternetDialog == null) return;
+                if (!show) {
+                    noInternetDialog.dismiss();
+                }
+                if (show && !noInternetDialog.isShowing()) {
+                    noInternetDialog.show();
+                }
+
+
+        });
+    }
     public void handleReconnection() {
         showNoInternetDialog(false);
         HomeController.getInstance().addTopic(true);
         gameController.getGameState();
+    }
+
+    public void handleConnectionLose() {
+        showNoInternetDialog(true);
+    }
+
+    @Override
+    public void update(Observable o, Object args) {
+        if(o instanceof Client){
+            if((Boolean)args){
+                handleReconnection();
+            }else{
+                handleConnectionLose();
+            }
+        }
     }
 }

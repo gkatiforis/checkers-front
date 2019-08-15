@@ -93,15 +93,15 @@ public class LocalCache {
         return new HashMap<>();
     }
 
-    public void saveString(CachedObjectProperties properties, String value) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
+    public void saveString(CachedObjectProperties properties, String value, Context context ) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(properties.getKey(),value);
         editor.commit();
     }
 
-    public String getString(CachedObjectProperties properties) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(MenuActivity.getAppContext());
+    public String getString(CachedObjectProperties properties, Context context) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String value = sharedPref.getString(properties.getKey(), null);
         return value;
     }

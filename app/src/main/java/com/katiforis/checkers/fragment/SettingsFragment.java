@@ -44,7 +44,7 @@ public class SettingsFragment extends DialogFragment {
         menuActivity = (MenuActivity) getActivity();
         menuActivity.getAudioPlayer().playPopup();
         soundSwitch = view.findViewById(R.id.soundSwitch);
-        String soundEnabled = LocalCache.getInstance().getString(SOUND_ENABLED);
+        String soundEnabled = LocalCache.getInstance().getString(SOUND_ENABLED, this.getActivity());
         if(soundEnabled == null || soundEnabled.equals("true")){
             soundSwitch.setChecked(true);
         }else{
@@ -55,21 +55,19 @@ public class SettingsFragment extends DialogFragment {
         logout.setButtonColor(getResources().getColor(R.color.fbutton_color_silver2));
 
 
-        soundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+        soundSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked)-> {
                 if(isChecked){
-                    LocalCache.getInstance().saveString(SOUND_ENABLED, "true");
+                    LocalCache.getInstance().saveString(SOUND_ENABLED, "true", this.getActivity());
                 }else{
-                    LocalCache.getInstance().saveString(SOUND_ENABLED, "false");
+                    LocalCache.getInstance().saveString(SOUND_ENABLED, "false", this.getActivity());
                 }
                 menuActivity.getAudioPlayer().mute(!isChecked);
-            }
-        });
+            });
+
 
         logout.setOnClickListener(c ->{
             menuActivity.getAudioPlayer().playClickButton();
-            HomeFragment.getInstance().logout();
+            menuActivity.getHomeFragment().logout();
         });
 
         closeButton.setOnClickListener(c ->{

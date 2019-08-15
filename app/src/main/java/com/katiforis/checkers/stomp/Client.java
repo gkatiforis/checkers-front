@@ -4,19 +4,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.katiforis.checkers.activities.GameActivity;
+import com.katiforis.checkers.activities.CheckersApplication;
 import com.katiforis.checkers.activities.MenuActivity;
-import com.katiforis.checkers.activities.StartActivity;
 import com.katiforis.checkers.conf.Const;
-import com.katiforis.checkers.controller.GameController;
-import com.katiforis.checkers.controller.HomeController;
-import com.katiforis.checkers.fragment.NotificationFragment;
 import com.katiforis.checkers.util.LocalCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
 import io.reactivex.Flowable;
 import ua.naiksoftware.stomp.Stomp;
@@ -29,7 +26,7 @@ import static com.katiforis.checkers.util.CachedObjectProperties.TOKEN;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 
-public class Client {
+public class Client extends Observable {
     private static Client CLIENT_INSTANCE = null;
     private static StompClient stompClient;
 
@@ -65,8 +62,8 @@ public class Client {
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Const.host_stomp);
 
         List<StompHeader> headers = new ArrayList<>();
-        String token = LocalCache.getInstance().getString(TOKEN);
-        String userId = LocalCache.getInstance().getString(USER_ID);
+        String token = LocalCache.getInstance().getString(TOKEN, CheckersApplication.getAppContext());
+        String userId = LocalCache.getInstance().getString(USER_ID, CheckersApplication.getAppContext());
         headers.add(new StompHeader(HEADER_TOKEN, token));
         headers.add(new StompHeader(HEADER_USER_ID, userId));
         stompClient.connect(headers);
@@ -124,7 +121,7 @@ public class Client {
         stompClient.disconnect();
         subscriptionsByTopics.clear();
         topicsByControllers.clear();
-        NotificationFragment.populated = false;
+//        NotificationFragment.populated = false;
         MenuActivity.populated = false;
         stompClient = null;
         CLIENT_INSTANCE = null;
@@ -133,18 +130,11 @@ public class Client {
     private void onConnectionLose() {
         subscriptionsByTopics.clear();
         topicsByControllers.clear();
-        NotificationFragment.populated = false;
+//        NotificationFragment.populated = false;
         MenuActivity.populated = false;
 
-        if (StartActivity.INSTANCE != null) {
-            StartActivity.INSTANCE.showNoInternetDialog(true);
-        }
-        if (MenuActivity.INSTANCE != null) {
-            MenuActivity.INSTANCE.showNoInternetDialog(true);
-        }
-        if (GameActivity.INSTANCE != null) {
-            GameActivity.INSTANCE.showNoInternetDialog(true);
-        }
+        setChanged();
+        notifyObservers(false);
 
         if (!reconnecting) {
             reconnecting = true;
@@ -152,46 +142,36 @@ public class Client {
         }
     }
 
-
     private void onReconnected() {
         reconnectioHandler.removeCallbacksAndMessages(null);
         if (reconnecting) {
             reconnecting = false;
-            if (StartActivity.INSTANCE != null) {
-                StartActivity.INSTANCE.handleReconnection();
-            }
-            if (MenuActivity.INSTANCE != null) {
-                MenuActivity.INSTANCE.handleReconnection();
-            }
-            if (GameActivity.INSTANCE != null) {
-                GameActivity.INSTANCE.handleReconnection();
-            }
+            setChanged();
+            notifyObservers(true);
         }
     }
 
     private void tryToReconnect() {
-//        if(!reconnecting){
-
         connect();
         reconnectioHandler.postDelayed(this::tryToReconnect, RECONNECT_DELAY_IN_SECONDS * 1000);
-//        }
     }
 
-    public static Flowable<StompMessage> addTopic(final String controllerId, final String topicId, final boolean force) {
-        if (controllerId == null || topicId == null) {
+    public static Flowable<StompMessage> addTopic(final String topicId, final boolean force) {
+        if (topicId == null) {
             return null;
         }
-
         if (subscriptionsByTopics.get(topicId) == null || force) {
             subscriptionsByTopics.put(topicId, stompClient.topic(topicId));
-        }
-
-        if (topicsByControllers.get(controllerId) == null || force) {
-            topicsByControllers.put(controllerId, topicId);
             return subscriptionsByTopics.get(topicId);
-        } else {
-            return null;
         }
+        return null;
+    }
+
+    public static boolean isConnected() {
+        if (stompClient == null) {
+            return false;
+        }
+        return stompClient.isConnected();
     }
 
     public static void clearTopics(final String controllerId) {
@@ -200,7 +180,9 @@ public class Client {
 
     public static void send(String destination, String data) {
         stompClient.send(destination, data).subscribe(
-                () -> Log.d(TAG, "Data sent"),
+                () -> {
+                    Log.d(TAG, "Data sent");
+                },
                 throwable -> {
                     Log.e(TAG, "Error on sending data", throwable);
                 });
@@ -212,31 +194,5 @@ public class Client {
                 throwable -> {
                     Log.e(TAG, "Error on sending data", throwable);
                 });
-    }
-
-    public static void sendAndRety(String destination) {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isConnected()) {
-                    handler.postDelayed(this, 1000);
-                } else {
-                    stompClient.send(destination).subscribe(
-                            () -> Log.d(TAG, "Data sent"),
-                            throwable -> {
-                                handler.postDelayed(this, 1000);
-                                Log.e(TAG, "Error on sending data", throwable);
-                            });
-                }
-            }
-        }, 0);
-    }
-
-    public static boolean isConnected() {
-        if (stompClient == null) {
-            return false;
-        }
-        return stompClient.isConnected();
     }
 }

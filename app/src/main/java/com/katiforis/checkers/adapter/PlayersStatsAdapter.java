@@ -1,6 +1,8 @@
 package com.katiforis.checkers.adapter;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapter.PlayersStatsViewHolder> {
-
+    private Context context;
     private List<UserDto> players;
 
     public class PlayersStatsViewHolder extends RecyclerView.ViewHolder {
@@ -35,8 +37,9 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
         }
     }
 
-    public PlayersStatsAdapter(List<UserDto> players) {
+    public PlayersStatsAdapter(List<UserDto> players, Context context) {
         this.players = players;
+        this.context = context;
     }
 
     @Override
@@ -83,10 +86,10 @@ public class PlayersStatsAdapter extends RecyclerView.Adapter<PlayersStatsAdapte
             holder.coinsExtra.setText(" +" + coinsExtra);
         }
 
-        Picasso.with(GameActivity.INSTANCE)
+        Picasso.with(context)
                 .load(playerDto.getPictureUrl())
                 .error(R.mipmap.ic_launcher)
-                .placeholder(GameActivity.INSTANCE.getResources().getDrawable(R.drawable.user))
+                .placeholder(context.getResources().getDrawable(R.drawable.user))
                 .transform(new CircleTransform())
                 .into(holder.userImage, new Callback() {
                     @Override

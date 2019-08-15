@@ -7,20 +7,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.request.FindGame;
+import com.katiforis.checkers.DTO.request.GetRank;
 import com.katiforis.checkers.DTO.request.Reward;
 import com.katiforis.checkers.DTO.response.GameState;
 import com.katiforis.checkers.DTO.response.FriendList;
+import com.katiforis.checkers.DTO.response.RankList;
 import com.katiforis.checkers.DTO.response.ResponseState;
 import com.katiforis.checkers.DTO.response.UserStats;
 import com.katiforis.checkers.activities.GameActivity;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.conf.Const;
-import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.LocalCache;
+
+import java.util.Date;
+
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
+import static com.katiforis.checkers.util.CachedObjectProperties.RANK_LIST;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_DETAILS;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
@@ -29,9 +34,9 @@ public class HomeController extends MenuController{
 
     private static HomeController INSTANCE = null;
 
-    private HomeFragment homeFragment;
-
     private MenuActivity menuActivity;
+
+    private GameActivity gameActivity;
 
     private HomeController(){}
 
@@ -52,8 +57,12 @@ public class HomeController extends MenuController{
         this.menuActivity = menuActivity;
     }
 
-    public void setHomeFragment(HomeFragment homeFragment) {
-        this.homeFragment = homeFragment;
+    public GameActivity getGameActivity() {
+        return gameActivity;
+    }
+
+    public void setGameActivity(GameActivity gameActivity) {
+        this.gameActivity = gameActivity;
     }
 
     @Override
@@ -69,35 +78,34 @@ public class HomeController extends MenuController{
         Log.i(Const.TAG, "Receive: " + messageStatus);
         if(messageStatus.equalsIgnoreCase(ResponseState.START_GAME.getState())){
             Intent intent = new Intent();
-            LocalCache.getInstance().saveString(CURRENT_GAME_ID, message.get("gameId").getAsString());
+            LocalCache.getInstance().saveString(CURRENT_GAME_ID, message.get("gameId").getAsString(), this.getMenuActivity());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setClass( MenuActivity.getAppContext(), GameActivity.class);
-            MenuActivity.getAppContext().startActivity(intent);
+            intent.setClass( menuActivity, GameActivity.class);
+            menuActivity.startActivity(intent);
         }else if(messageStatus.equalsIgnoreCase(ResponseState.GAME_STATE.getState())){
            GameState gameState = gson.fromJson(message, GameState.class);
-            GameActivity.INSTANCE.setGameState(gameState);
+            gameActivity.setGameState(gameState);
         }else if(messageStatus.equalsIgnoreCase(ResponseState.USER_STATS.getState())){
             UserStats userStats = gson.fromJson(message, UserStats.class);
-            LocalCache.getInstance().saveString(USER_ID, userStats.getUserDto().getUserId());
-            LocalCache.getInstance().save(userStats.getUserDto(), USER_DETAILS, MenuActivity.INSTANCE);
-            homeFragment.populatePlayerDetails(userStats.getUserDto());
+            LocalCache.getInstance().saveString(USER_ID, userStats.getUserDto().getUserId(), this.getMenuActivity());
+            LocalCache.getInstance().save(userStats.getUserDto(), USER_DETAILS, menuActivity);
+            menuActivity.getHomeFragment().populatePlayerDetails(userStats.getUserDto());
         }
         else if(messageStatus.equalsIgnoreCase(ResponseState.FRIEND_LIST.getState())){
             FriendList friendList = gson.fromJson(message,FriendList.class);
             getMenuActivity().populateFriendListDialog(friendList);
         }
+        else if(messageStatus.equalsIgnoreCase(ResponseState.RANK_LIST.getState())){
+            RankList rankList = gson.fromJson(message, RankList.class);
+            rankList.setTimestamp(new Date());
+            rankList = LocalCache.getInstance().save(rankList, RANK_LIST, menuActivity);
+            menuActivity.getRankFragment().setRankList(rankList);
+        }
     }
 
     public void findGame(FindGame findGame){
-        findGame.setGameId(LocalCache.getInstance().getString(CURRENT_GAME_ID));
+        findGame.setGameId(LocalCache.getInstance().getString(CURRENT_GAME_ID, this.getMenuActivity()));
         Client.clearTopics(GameController.class.getName());
-        addTopic(false);
-        Client.send(Const.FIND_GAME, gson.toJson(findGame));
-    }
-
-    public void restartGame(){
-        FindGame findGame = new FindGame(LocalCache.getInstance().getString(CURRENT_GAME_ID));
-        findGame.setRestart(true);
         addTopic(false);
         Client.send(Const.FIND_GAME, gson.toJson(findGame));
     }
@@ -108,9 +116,9 @@ public class HomeController extends MenuController{
     }
 
     public void getPlayerDetails(){
-        UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, homeFragment.getActivity());
+        UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, menuActivity);
         if(playerDto != null){
-            homeFragment.populatePlayerDetails(playerDto);
+            menuActivity.getHomeFragment().populatePlayerDetails(playerDto);
         }
         else{
             addTopic(false);
@@ -119,7 +127,7 @@ public class HomeController extends MenuController{
     }
 
     public void getPlayerDetailsIfExpired(){
-        UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, homeFragment.getActivity());
+        UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, menuActivity);
         if(playerDto == null){
             addTopic(false);
             Client.getInstance().send(Const.GET_USER_DETAILS);
@@ -129,5 +137,26 @@ public class HomeController extends MenuController{
     public void sendReward(Reward reward){
         addTopic(false);
         Client.send(Const.SEND_REWARD, gson.toJson(reward));
+    }
+
+    public void getRankList(){
+        RankList rankList = LocalCache.getInstance().get(RANK_LIST, menuActivity);
+        if(rankList != null){
+            menuActivity.getRankFragment().setRankList(rankList);
+        }
+        else{
+            addTopic(false);
+            GetRank get = new GetRank();
+            Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
+        }
+    }
+
+    public void getRankListIfExpired(){
+        RankList rankList = LocalCache.getInstance().get(RANK_LIST, menuActivity);
+        if(rankList == null){
+            addTopic(false);
+            GetRank get = new GetRank();
+            Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
+        }
     }
 }
