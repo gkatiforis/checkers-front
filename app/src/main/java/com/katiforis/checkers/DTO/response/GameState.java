@@ -13,6 +13,7 @@ public class GameState extends GameResponse {
     private Date dateStarted;
     private Date currentDate;
     private Date lastMoveDate;
+    private Date gameEndDate;
     private Integer gameMaxTime;
     private String offerDrawUserId;
     private Date offerDrawDate;
@@ -67,6 +68,14 @@ public class GameState extends GameResponse {
 
     public void setLastMoveDate(Date lastMoveDate) {
         this.lastMoveDate = lastMoveDate;
+    }
+
+    public Date getGameEndDate() {
+        return gameEndDate;
+    }
+
+    public void setGameEndDate(Date gameEndDate) {
+        this.gameEndDate = gameEndDate;
     }
 
     public Integer getGameMaxTime() {

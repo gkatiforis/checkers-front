@@ -32,8 +32,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.GameState;
@@ -43,11 +41,11 @@ import com.katiforis.checkers.R;
 import com.katiforis.checkers.conf.Const;
 import com.katiforis.checkers.controller.GameController;
 import com.katiforis.checkers.controller.HomeController;
-import com.katiforis.checkers.fragment.GameStatsFragment;
 import com.katiforis.checkers.game.Board;
 import com.katiforis.checkers.game.Cell;
 import com.katiforis.checkers.game.Move;
 import com.katiforis.checkers.game.Piece;
+import com.katiforis.checkers.observer.ConnectionObserver;
 import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.AudioPlayer;
 import com.katiforis.checkers.util.CircleTransform;
@@ -69,7 +67,7 @@ import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 import static com.katiforis.checkers.util.Utils.getDiffInSeconds;
 import static com.katiforis.checkers.util.Utils.twoDigits;
 
-public class GameActivity extends AppCompatActivity implements Observer {
+public class GameActivity extends AppCompatActivity implements ConnectionObserver {
     private static final int DARK_PIECE_ICON = R.drawable.redpf;
     private static final int DARK_KING_PIECE_ICON = R.drawable.redpk;
     private static final int DARK_PIECE_PRESSED = R.drawable.redpf;
@@ -137,7 +135,9 @@ public class GameActivity extends AppCompatActivity implements Observer {
 
     private AudioPlayer audioPlayer;
 
-    private void intentToMenuActivity(){
+    public boolean isConnected = true;
+
+    private void intentToMenuActivity() {
         Intent intent = new Intent();
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setClass(this, MenuActivity.class);
@@ -150,14 +150,12 @@ public class GameActivity extends AppCompatActivity implements Observer {
             Log.i(Const.TAG, "GameState：" + gamestate);
             initComponents();
 
-            if(gamestate.getGameStatus() == GameState.Status.PLAYERS_SELECTION){
-                GameStatsFragment gameStatsFragment = new GameStatsFragment(gameController);
-                gameStatsFragment.setGameStats(gamestate.getGameStats());
-                gameStatsFragment.show(getSupportFragmentManager(), GameStatsFragment.class.getName());
-                gameStatsFragment.showPlayerList();
-            }else if(gamestate.getGameStatus() == GameState.Status.TERMINATED){
+            if (gamestate.getGameStatus() == GameState.Status.PLAYERS_SELECTION) {
+                gameController.openGameStatsDialog(gamestate.getGameStats());
+            } else if (gamestate.getGameStatus() == GameState.Status.TERMINATED) {
                 intentToMenuActivity();
-            }else{
+            } else {
+                gameController.closeGameStatsDialog();
                 setPlayerList(gamestate.getPlayers());
                 dateStarted = gamestate.getDateStarted().getTime();
                 dateCurrent = gamestate.getCurrentDate().getTime();
@@ -204,9 +202,9 @@ public class GameActivity extends AppCompatActivity implements Observer {
                 }
 
 
-                if(gamestate.getOfferDrawUserId() != null &&
+                if (gamestate.getOfferDrawUserId() != null &&
                         !gamestate.getOfferDrawUserId().equals(LocalCache.getInstance().getString(USER_ID, this)) &&
-                     getDiffInSeconds(gamestate.getOfferDrawDate(), gamestate.getCurrentDate()) <= OFFER_DRAW_TIME_IN_SECONDS){
+                        getDiffInSeconds(gamestate.getOfferDrawDate(), gamestate.getCurrentDate()) <= OFFER_DRAW_TIME_IN_SECONDS) {
                     this.runOnUiThread(() -> {
                         OfferDraw offerDraw = new OfferDraw();
                         offerDraw.setByUser(gamestate.getOfferDrawUserId());
@@ -219,7 +217,6 @@ public class GameActivity extends AppCompatActivity implements Observer {
 
     void initComponents() {
         getSupportActionBar().hide();
-        Client.getInstance().addObserver(this);
         explosionField = ExplosionField.attach2Window(this);
         View user1 = findViewById(R.id.user1);
         playerImage = user1.findViewById(R.id.playerImage);
@@ -274,73 +271,14 @@ public class GameActivity extends AppCompatActivity implements Observer {
         buttonBoard = new Button[8][8];
         fillButtonBoard(listener);
         this.moves = new ArrayList<>();
-
-        optionsDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_options_layout, null);
-
-        offerDrawButton = optionsDialogView.findViewById(R.id.offerDraw);
-        resignButton = optionsDialogView.findViewById(R.id.resign);
-        cancel = optionsDialogView.findViewById(R.id.cancel);
-
-        resignButton.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
-        offerDrawButton.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
-
-        optionsDialog = DialogPlus.newDialog(this)
-                .setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                        System.out.println(item);
-                    }
-                }).setContentHolder(new ViewHolder(optionsDialogView))
-                .create();
-
-        gameOptionsDialogButton.setOnClickListener(p -> {
-            audioPlayer.playPopup();
-            optionsDialog.show();
-        });
-
-        offerDrawButton.setOnClickListener(pa -> {
-            audioPlayer.playClickButton();
-            offerDrawButton.setText("Offer Draw");
-
-            if (anim != null) {
-                anim.cancel();
-            }
-
-            sendOfferDraw();
-        });
-
-        resignButton.setOnClickListener(pa -> {
-            audioPlayer.playClickButton();
-            sendResign();
-        });
-
-        cancel.setOnClickListener(pa -> {
-            audioPlayer.playPopup();
-            optionsDialog.dismiss();
-        });
-
-
-        noInternetDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_connection_lost_layout, null);
-
-        noInternetDialog = DialogPlus.newDialog(this)
-                .setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                        System.out.println(item);
-                    }
-                }).setContentHolder(new ViewHolder(noInternetDialogView))
-                .setGravity(Gravity.TOP)
-                .setCancelable(false)
-                .create();
-
     }
 
     public void showOfferDraw(OfferDraw offerDraw) {
         runOnUiThread(() -> {
 
             if (!offerDraw.getByUser().equals(LocalCache.getInstance().getString(USER_ID, this))) {
-                if (!optionsDialog.isShowing()) {
-                    optionsDialog.show();
+                if (optionsDialog == null || !optionsDialog.isShowing()) {
+                    showGameOptionsDialog(true);
                 }
 
                 anim = new AlphaAnimation(0.4f, 1.0f);
@@ -365,13 +303,27 @@ public class GameActivity extends AppCompatActivity implements Observer {
     public void sendResign() {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setResign(true);
-        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer);
+        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer)
+                .subscribe(
+                        () -> {
+                            audioPlayer.playPopup();
+                            showGameOptionsDialog(false);
+                        },
+                        throwable -> {
+                        });
     }
 
     public void sendOfferDraw() {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setOfferDraw(true);
-        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer);
+        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer)
+                .subscribe(
+                        () -> {
+                            audioPlayer.playPopup();
+                            showGameOptionsDialog(false);
+                        },
+                        throwable -> {
+                        });
     }
 
     private void updatePlayerScore(String username, String points) {
@@ -470,7 +422,11 @@ public class GameActivity extends AppCompatActivity implements Observer {
     public void sendMove(Move move) {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setMove(move);
-        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer);
+        gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer)
+                .subscribe(() -> {
+                        },
+                        throwable -> {
+                        });
     }
 
 
@@ -497,13 +453,14 @@ public class GameActivity extends AppCompatActivity implements Observer {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_game_layout);
+        setContentView(R.layout.activity_game_layout);
 
         mAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
         audioPlayer = new AudioPlayer(this);
+        Client.getInstance().registerObserver(this);
 
         initComponents();
         populated = false;
@@ -513,6 +470,75 @@ public class GameActivity extends AppCompatActivity implements Observer {
 
         homeController = HomeController.getInstance();
         homeController.setGameActivity(this);
+
+        optionsDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_options_layout, null);
+        offerDrawButton = optionsDialogView.findViewById(R.id.offerDraw);
+        resignButton = optionsDialogView.findViewById(R.id.resign);
+        cancel = optionsDialogView.findViewById(R.id.cancel);
+        resignButton.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+        offerDrawButton.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
+
+
+        gameOptionsDialogButton.setOnClickListener(p -> {
+            showGameOptionsDialog(true);
+        });
+
+
+        noInternetDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_connection_lost_layout, null);
+
+        noInternetDialog = DialogPlus.newDialog(this)
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        System.out.println(item);
+                    }
+                }).setContentHolder(new ViewHolder(noInternetDialogView))
+                .setGravity(Gravity.TOP)
+                .setCancelable(false)
+                .create();
+    }
+
+
+    public void showGameOptionsDialog(boolean show) {
+
+        if (show) {
+            optionsDialog = DialogPlus.newDialog(this)
+                    .setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                            System.out.println(item);
+                        }
+                    }).setContentHolder(new ViewHolder(optionsDialogView))
+                    .setCancelable(true)
+                    .create();
+
+            offerDrawButton.setOnClickListener(pa -> {
+                audioPlayer.playClickButton();
+                offerDrawButton.setText("Offer Draw");
+
+                if (anim != null) {
+                    anim.cancel();
+                }
+
+                sendOfferDraw();
+            });
+
+            resignButton.setOnClickListener(pa -> {
+                audioPlayer.playClickButton();
+                sendResign();
+            });
+
+            cancel.setOnClickListener(pa -> {
+                audioPlayer.playPopup();
+                optionsDialog.dismiss();
+            });
+
+            audioPlayer.playPopup();
+            optionsDialog.show();
+        } else {
+            optionsDialog.dismiss();
+            optionsDialog = null;
+        }
     }
 
     @Override
@@ -543,13 +569,13 @@ public class GameActivity extends AppCompatActivity implements Observer {
     }
 
     private View.OnClickListener listener = (View v) -> {
-            int tag = (Integer) v.getTag();
-            int xCord = tag / 10;
-            int yCord = tag % 10;
-            if (currentPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
-                playerTurn(xCord, yCord);
-            }
-        };
+        int tag = (Integer) v.getTag();
+        int xCord = tag / 10;
+        int yCord = tag % 10;
+        if (currentPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
+            playerTurn(xCord, yCord);
+        }
+    };
 
     public void playerTurn(int xCord, int yCord) {
 
@@ -805,7 +831,7 @@ public class GameActivity extends AppCompatActivity implements Observer {
         }.start();
     }
 
-    public void onTimerTick(long millisUntilFinished, UserDto fromPlayer){
+    public void onTimerTick(long millisUntilFinished, UserDto fromPlayer) {
         Long remainingSeconds = millisUntilFinished / 1000;
         Long toPlayerMinutes = remainingSeconds / 60;
         Long toPlayerSeconds = remainingSeconds - toPlayerMinutes * 60;
@@ -943,20 +969,22 @@ public class GameActivity extends AppCompatActivity implements Observer {
     public void showNoInternetDialog(boolean show) {
         runOnUiThread(() -> {
 
-                if (noInternetDialog == null) return;
-                if (!show) {
-                    noInternetDialog.dismiss();
-                }
-                if (show && !noInternetDialog.isShowing()) {
-                    noInternetDialog.show();
-                }
-
-
+            if (noInternetDialog == null) return;
+            if (!show) {
+                noInternetDialog.dismiss();
+            }
+            if (show && optionsDialog != null && optionsDialog.isShowing()) {
+                showGameOptionsDialog(false);
+            }
+            if (show && !noInternetDialog.isShowing()) {
+                noInternetDialog.show();
+            }
         });
     }
+
     public void handleReconnection() {
         showNoInternetDialog(false);
-        HomeController.getInstance().addTopic(true);
+//        HomeController.getInstance().addTopic(true);
         gameController.getGameState();
     }
 
@@ -965,13 +993,13 @@ public class GameActivity extends AppCompatActivity implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object args) {
-        if(o instanceof Client){
-            if((Boolean)args){
-                handleReconnection();
-            }else{
-                handleConnectionLose();
-            }
+    public void onConnectionStatusChange(boolean isConnected) {
+        this.isConnected = isConnected;
+        gameController.setConnected(isConnected);
+        if (isConnected) {
+            handleReconnection();
+        } else {
+            handleConnectionLose();
         }
     }
 }

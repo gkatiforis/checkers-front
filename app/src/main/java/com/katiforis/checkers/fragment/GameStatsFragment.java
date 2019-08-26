@@ -31,6 +31,7 @@ import java.util.List;
 import info.hoang8f.widget.FButton;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
+import static com.katiforis.checkers.util.Utils.getDiffInSeconds;
 
 public class GameStatsFragment extends DialogFragment {
     private GameActivity gameActivity;
@@ -80,14 +81,22 @@ public class GameStatsFragment extends DialogFragment {
 
         restart.setOnClickListener(c ->{
             gameActivity.getAudioPlayer().playClickButton();
-            gameController.restartGame();
-            restartGame = true;
+            gameController.restartGame().subscribe(
+                    () -> {
+                        restart.setEnabled(false);
+                        restartGame = true;
+                    },
+                    throwable -> {});
         });
 
         newOpponent.setOnClickListener(c ->{
             gameActivity.getAudioPlayer().playClickButton();
-            restart.setVisibility(View.GONE);
-            gameController.findNewOpponent();
+            gameController.findNewOpponent()
+                    .subscribe(
+                    () -> {
+                        restart.setVisibility(View.GONE);
+                    },
+                    throwable -> {});
         });
 
         playersStatsRecyclerView.smoothScrollToPosition(0);
@@ -121,21 +130,26 @@ public class GameStatsFragment extends DialogFragment {
             countDownTimer.cancel();
         }
 
-        countDownTimer = new CountDownTimer(30 * 1000, 1000) {
-            public void onTick(long millisUntilFinished) {
-                Long remainingSeconds = millisUntilFinished / 1000;
-                if(restartGame){
-                    restart.setText("Waiting for your opponent (" + remainingSeconds + ")");
-                }else {
-                    restart.setText("Play again(" + remainingSeconds + ")");
+        long seconds = 30 - getDiffInSeconds(gameStats.getCurrentDate(), gameStats.getGameEndDate());
+        if(seconds >0){
+            countDownTimer = new CountDownTimer(seconds * 1000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                    Long remainingSeconds = millisUntilFinished / 1000;
+                    if(restartGame){
+                        restart.setText("Waiting for your opponent (" + remainingSeconds + ")");
+                    }else {
+                        restart.setText("Play again(" + remainingSeconds + ")");
+                    }
                 }
-            }
-            public void onFinish() {
-                restartGame = false;
-                restart.setVisibility(View.GONE);
-            }
-        }.start();
-
+                public void onFinish() {
+                    restartGame = false;
+                    restart.setVisibility(View.GONE);
+                }
+            }.start();
+        }else{
+            restartGame = false;
+            restart.setVisibility(View.GONE);
+        }
         return dialog;
     }
 

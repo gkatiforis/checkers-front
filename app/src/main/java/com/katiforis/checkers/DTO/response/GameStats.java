@@ -2,12 +2,15 @@ package com.katiforis.checkers.DTO.response;
 
 import com.katiforis.checkers.DTO.UserDto;
 
+import java.util.Date;
 import java.util.List;
 
 public class GameStats extends GameResponse {
     private String winnerColor;
     private List<UserDto> players;
     private boolean draw;
+    private Date gameEndDate;
+    private Date currentDate;
 
     public GameStats(String gameId) {
         super(ResponseState.END_GAME.getState(), gameId);
@@ -50,5 +53,21 @@ public class GameStats extends GameResponse {
 
     public void setDraw(boolean draw) {
         this.draw = draw;
+    }
+
+    public Date getGameEndDate() {
+        return gameEndDate;
+    }
+
+    public void setGameEndDate(Date gameEndDate) {
+        this.gameEndDate = gameEndDate;
+    }
+
+    public Date getCurrentDate() {
+        return currentDate;
+    }
+
+    public void setCurrentDate(Date currentDate) {
+        this.currentDate = currentDate;
     }
 }

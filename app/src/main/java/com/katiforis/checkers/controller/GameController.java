@@ -17,6 +17,7 @@ import com.katiforis.checkers.fragment.GameStatsFragment;
 import com.katiforis.checkers.stomp.Client;
 import com.katiforis.checkers.util.LocalCache;
 
+import io.reactivex.Completable;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
@@ -29,6 +30,8 @@ public class GameController extends AbstractController {
     private GameActivity gameActivity;
 
     private GameStatsFragment gameStatsFragment;
+
+    public boolean isConnected = true;
 
     private Handler sendMoveHandler;
     private Handler gameStateHandler;
@@ -56,13 +59,10 @@ public class GameController extends AbstractController {
         if (messageStatus.equalsIgnoreCase(ResponseState.END_GAME.getState())) {
             // Client.clearTopics(this.getClass().getName());
 //            LocalCache.getInstance().saveString(CURRENT_GAME_ID, null);
-            Gson gson = new Gson();
-            GameStats gameStats = gson.fromJson(message, GameStats.class);
 
-            gameStatsFragment = new GameStatsFragment(this);
-            gameStatsFragment.setGameStats(gameStats);
-            gameStatsFragment.show(gameActivity.getSupportFragmentManager(), GameStatsFragment.class.getName());
-            gameStatsFragment.showPlayerList();
+            GameStats gameStats = gson.fromJson(message, GameStats.class);
+            openGameStatsDialog(gameStats);
+
 
             //TODO: save user details in cache and remove loading from backend
 //                UserDto userDto = LocalCache.getInstance().get(USER_DETAILS, MenuActivity.INSTANCE);
@@ -77,43 +77,48 @@ public class GameController extends AbstractController {
 //                    }
 //                }
         } else if (messageStatus.equalsIgnoreCase(ResponseState.ANSWER.getState())) {
-            Gson gson = new Gson();
             PlayerAnswer playerAnswer = gson.fromJson(message, PlayerAnswer.class);
             if (playerAnswer.getMove().isValid()) {
                 gameActivity.makeMove(playerAnswer);
             }
         } else if (messageStatus.equalsIgnoreCase(ResponseState.OFFER_DRAW.getState())) {
-            Gson gson = new Gson();
             OfferDraw offerDraw = gson.fromJson(message, OfferDraw.class);
             gameActivity.showOfferDraw(offerDraw);
         }
     }
 
-    public void restartGame(){
+    public Completable restartGame() {
+        if (!isConnected()) {
+            return Completable.never();
+        }
         FindGame findGame = new FindGame(LocalCache.getInstance().getString(CURRENT_GAME_ID, gameActivity));
         findGame.setRestart(true);
+        findGame.setGameType(GameType.FRIENDLY);
 //        addTopic(false);
-        Client.send(Const.FIND_GAME, gson.toJson(findGame));
+        return HomeController.getInstance().findGame(findGame);
     }
 
-    public void findNewOpponent() {
+    public Completable findNewOpponent() {
+        if (!isConnected()) {
+            return Completable.never();
+        }
         FindGame findGame = new FindGame();
         findGame.setGameType(GameType.FRIENDLY);
-        HomeController.getInstance().findGame(findGame);
+        return HomeController.getInstance().findGame(findGame);
     }
 
-    public void sendAnswer(String gameId, Object object) {
+    public Completable sendAnswer(String gameId, Object object) {
         //addTopic(LocalCache.getInstance().getString(CURRENT_GAME_ID));
-        Gson gson = new Gson();
         String jsonInString = gson.toJson(object);
-        Client.getInstance().send( Const.SEND_WORD.replace("placeholder", gameId), jsonInString);
+        return Client.getInstance().sendAndSubscribe(Const.SEND_WORD.replace("placeholder", gameId), jsonInString);
     }
 
     public void getGameState() {
         String gameId = LocalCache.getInstance().getString(CURRENT_GAME_ID, this.getGameActivity());
         if (gameId != null || gameId.length() > 0) {
-            addTopic(gameId, false);
-            Client.getInstance().send(Const.GET_GAME_STATE,  gameId);
+            addTopic(gameId);
+            HomeController.getInstance().addTopic();
+            Client.getInstance().send(Const.GET_GAME_STATE, gameId);
         }
     }
 
@@ -129,8 +134,31 @@ public class GameController extends AbstractController {
         this.gameStatsFragment = gameStatsFragment;
     }
 
-    public void addTopic(String gameId, final boolean force) {
+    public void addTopic(String gameId) {
         if (gameId == null) return;
-        super.addTopic(Const.GAME_RESPONSE.replace("placeholder", gameId), force);
+        super.addTopic(Const.GAME_RESPONSE.replace("placeholder", gameId));
+    }
+
+    public void openGameStatsDialog(GameStats gameStats) {
+        closeGameStatsDialog();
+        gameStatsFragment = new GameStatsFragment(this);
+        gameStatsFragment.setGameStats(gameStats);
+        gameStatsFragment.show(gameActivity.getSupportFragmentManager(), GameStatsFragment.class.getName());
+        gameStatsFragment.showPlayerList();
+    }
+
+    public void closeGameStatsDialog() {
+        if (gameStatsFragment != null) {
+            gameStatsFragment.dismiss();
+            gameStatsFragment = null;
+        }
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 }

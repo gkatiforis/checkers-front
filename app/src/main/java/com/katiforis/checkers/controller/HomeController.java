@@ -22,6 +22,7 @@ import com.katiforis.checkers.util.LocalCache;
 
 import java.util.Date;
 
+import io.reactivex.Completable;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
@@ -103,15 +104,14 @@ public class HomeController extends MenuController{
         }
     }
 
-    public void findGame(FindGame findGame){
+    public Completable findGame(FindGame findGame){
         findGame.setGameId(LocalCache.getInstance().getString(CURRENT_GAME_ID, this.getMenuActivity()));
-        Client.clearTopics(GameController.class.getName());
-        addTopic(false);
-        Client.send(Const.FIND_GAME, gson.toJson(findGame));
+        addTopic();
+       return Client.sendAndSubscribe(Const.FIND_GAME, gson.toJson(findGame));
     }
 
     public void getFriendList() {
-        addTopic(false);
+        addTopic();
         Client.send(Const.GET_FRIEND_LIST);
     }
 
@@ -121,7 +121,7 @@ public class HomeController extends MenuController{
             menuActivity.getHomeFragment().populatePlayerDetails(playerDto);
         }
         else{
-            addTopic(false);
+            addTopic();
             Client.getInstance().send(Const.GET_USER_DETAILS);
         }
     }
@@ -129,13 +129,13 @@ public class HomeController extends MenuController{
     public void getPlayerDetailsIfExpired(){
         UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, menuActivity);
         if(playerDto == null){
-            addTopic(false);
+            addTopic();
             Client.getInstance().send(Const.GET_USER_DETAILS);
         }
     }
 
     public void sendReward(Reward reward){
-        addTopic(false);
+        addTopic();
         Client.send(Const.SEND_REWARD, gson.toJson(reward));
     }
 
@@ -145,7 +145,7 @@ public class HomeController extends MenuController{
             menuActivity.getRankFragment().setRankList(rankList);
         }
         else{
-            addTopic(false);
+            addTopic();
             GetRank get = new GetRank();
             Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
         }
@@ -154,7 +154,7 @@ public class HomeController extends MenuController{
     public void getRankListIfExpired(){
         RankList rankList = LocalCache.getInstance().get(RANK_LIST, menuActivity);
         if(rankList == null){
-            addTopic(false);
+            addTopic();
             GetRank get = new GetRank();
             Client.getInstance().send(Const.GET_RANK, gson.toJson(get));
         }

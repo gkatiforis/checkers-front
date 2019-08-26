@@ -11,12 +11,8 @@ import androidx.fragment.app.Fragment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -282,7 +278,12 @@ public class HomeFragment extends Fragment {
             menuActivity.getAudioPlayer().playClickButton();
             FindGame findGame = new FindGame();
             findGame.setGameType(GameType.FRIENDLY);
-            homeController.findGame(findGame);
+            homeController.findGame(findGame)
+                    .subscribe(
+                            () -> {
+                                //TODO
+                            },
+                            throwable -> {});
         });
 
         playRanking.setOnClickListener(p -> {
@@ -295,7 +296,12 @@ public class HomeFragment extends Fragment {
             } else {
                 FindGame findGame = new FindGame();
                 findGame.setGameType(GameType.RANKING);
-                homeController.findGame(findGame);
+                homeController.findGame(findGame)
+                        .subscribe(
+                        () -> {
+                          //TODO
+                        },
+                        throwable -> {});
             }
         });
 
@@ -311,7 +317,7 @@ public class HomeFragment extends Fragment {
           getPlayerDetailsForce();
         }
 
-        Client.getInstance().addObserver((MenuActivity)this.getActivity());
+        Client.getInstance().registerObserver((MenuActivity)this.getActivity());
         return v;
     }
 
@@ -494,7 +500,7 @@ public class HomeFragment extends Fragment {
         if (Client.isConnected()) {
             Client.getInstance().disconnect();
         }
-        Client.getInstance().addObserver((MenuActivity)this.getActivity());
+        Client.getInstance().registerObserver((MenuActivity)this.getActivity());
         getPlayerDetailsForce();
     }
 

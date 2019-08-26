@@ -1,5 +1,8 @@
 package com.katiforis.checkers.stomp;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -7,14 +10,18 @@ import android.util.Log;
 import com.katiforis.checkers.activities.CheckersApplication;
 import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.conf.Const;
+import com.katiforis.checkers.controller.AbstractController;
+import com.katiforis.checkers.observer.ConnectionObserver;
+import com.katiforis.checkers.observer.Observable;
 import com.katiforis.checkers.util.LocalCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
@@ -26,12 +33,11 @@ import static com.katiforis.checkers.util.CachedObjectProperties.TOKEN;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
 
 
-public class Client extends Observable {
+public class Client implements Observable {
     private static Client CLIENT_INSTANCE = null;
     private static StompClient stompClient;
 
     private static final Map<String, Flowable<StompMessage>> subscriptionsByTopics = new HashMap<>();
-    private static final Map<String, String> topicsByControllers = new HashMap<>();
     private static final String HEADER_TOKEN = "TOKEN";
     private static final String HEADER_USER_ID = "USER_ID";
     private static final int RECONNECT_DELAY_IN_SECONDS = 2;
@@ -41,8 +47,8 @@ public class Client extends Observable {
     private Handler sendConnectionHandler;
     private static Handler sendMoveHandler;
     private static Handler sendGameStateHandler;
-
-
+    boolean connectionAttempt = false;
+    private List<ConnectionObserver> observers = new ArrayList<>();
     private Client() {
     }
 
@@ -56,8 +62,11 @@ public class Client extends Observable {
         return CLIENT_INSTANCE;
     }
 
-
-    private void connect() {
+    private synchronized void connect() {
+        if(connectionAttempt){
+           return;
+        }
+        connectionAttempt = true;
         stompClient = null;
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Const.host_stomp);
 
@@ -73,9 +82,11 @@ public class Client extends Observable {
                         case OPENED:
                             Log.i(TAG, "Connection OPENED");
                             onReconnected();
+                            connectionAttempt = false;
                             break;
                         case ERROR:
                             Log.e(TAG, "Connection error", lifecycleEvent.getException());
+                            connectionAttempt = false;
                             break;
                         case CLOSED:
                             Log.i(TAG, "Connection CLOSED");
@@ -84,6 +95,7 @@ public class Client extends Observable {
                             } else {
                                 disconnectedFromUser = false;
                             }
+                            connectionAttempt = false;
                             break;
                     }
                 }, throwable -> {
@@ -94,7 +106,6 @@ public class Client extends Observable {
 
 
     }
-
 
     public void sendConnectionMessage() {
         if (sendConnectionHandler != null) {
@@ -120,7 +131,8 @@ public class Client extends Observable {
         disconnectedFromUser = true;
         stompClient.disconnect();
         subscriptionsByTopics.clear();
-        topicsByControllers.clear();
+//        topicsByControllers.clear();
+        AbstractController.disposeAll();
 //        NotificationFragment.populated = false;
         MenuActivity.populated = false;
         stompClient = null;
@@ -129,11 +141,10 @@ public class Client extends Observable {
 
     private void onConnectionLose() {
         subscriptionsByTopics.clear();
-        topicsByControllers.clear();
+        AbstractController.disposeAll();
 //        NotificationFragment.populated = false;
         MenuActivity.populated = false;
 
-        setChanged();
         notifyObservers(false);
 
         if (!reconnecting) {
@@ -142,11 +153,10 @@ public class Client extends Observable {
         }
     }
 
-    private void onReconnected() {
+    private synchronized void onReconnected() {
         reconnectioHandler.removeCallbacksAndMessages(null);
         if (reconnecting) {
             reconnecting = false;
-            setChanged();
             notifyObservers(true);
         }
     }
@@ -156,11 +166,11 @@ public class Client extends Observable {
         reconnectioHandler.postDelayed(this::tryToReconnect, RECONNECT_DELAY_IN_SECONDS * 1000);
     }
 
-    public static Flowable<StompMessage> addTopic(final String topicId, final boolean force) {
+    public static Flowable<StompMessage> addTopic(final String topicId) {
         if (topicId == null) {
             return null;
         }
-        if (subscriptionsByTopics.get(topicId) == null || force) {
+        if (subscriptionsByTopics.get(topicId) == null) {
             subscriptionsByTopics.put(topicId, stompClient.topic(topicId));
             return subscriptionsByTopics.get(topicId);
         }
@@ -174,11 +184,8 @@ public class Client extends Observable {
         return stompClient.isConnected();
     }
 
-    public static void clearTopics(final String controllerId) {
-        topicsByControllers.remove(controllerId);
-    }
-
     public static void send(String destination, String data) {
+//        if(!isConnected())return;
         stompClient.send(destination, data).subscribe(
                 () -> {
                     Log.d(TAG, "Data sent");
@@ -189,10 +196,37 @@ public class Client extends Observable {
     }
 
     public static void send(String destination) {
+       // if(!isConnected())return;
         stompClient.send(destination).subscribe(
                 () -> Log.d(TAG, "Data sent"),
                 throwable -> {
                     Log.e(TAG, "Error on sending data", throwable);
                 });
+    }
+
+    public static Completable sendAndSubscribe(String destination, String data) {
+        if(!isConnected())return Completable.never();
+        return stompClient.send(destination, data);
+    }
+
+    @Override
+    public synchronized void registerObserver(ConnectionObserver connectionObserver) {
+        Iterator<ConnectionObserver> iterator = observers.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getClass().getName().equals(connectionObserver.getClass().getName())) {
+                iterator.remove();
+            }
+        }
+        observers.add(connectionObserver);
+    }
+    @Override
+    public synchronized void notifyObservers(boolean isConnected) {
+        ActivityManager am = (ActivityManager)CheckersApplication.getAppContext().getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+        for (ConnectionObserver observer : observers) {
+            if(cn.getClassName().equals(observer.getClass().getName())){
+                observer.onConnectionStatusChange(isConnected);
+            }
+        }
     }
 }

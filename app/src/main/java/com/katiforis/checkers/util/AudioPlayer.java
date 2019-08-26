@@ -23,22 +23,22 @@ public class AudioPlayer {
 
 
     public AudioPlayer(Context context) {
-        audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
-        actVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        volume = actVolume / maxVolume;
-
-        soundPool = new SoundPool(10, AudioManager.USE_DEFAULT_STREAM_TYPE, 0);
-        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                loaded = true;
-            }
-        });
-
-        clickPlayer = soundPool.load(context, R.raw.click2, 1);
-        piecePlayer = soundPool.load(context, R.raw.piece, 1);
-        popupPlayer = soundPool.load(context, R.raw.popup, 1);
+//        audioManager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+//        actVolume = (float) audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+//        maxVolume = (float) audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+//        volume = actVolume / maxVolume;
+//
+//        soundPool = new SoundPool(10, AudioManager.USE_DEFAULT_STREAM_TYPE, 0);
+//        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+//            @Override
+//            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+//                loaded = true;
+//            }
+//        });
+//
+//        clickPlayer = soundPool.load(context, R.raw.click2, 1);
+//        piecePlayer = soundPool.load(context, R.raw.piece, 1);
+//        popupPlayer = soundPool.load(context, R.raw.popup, 1);
     }
 
     public void playClickButton() {

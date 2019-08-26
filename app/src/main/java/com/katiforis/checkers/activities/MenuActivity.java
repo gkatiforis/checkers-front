@@ -26,7 +26,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.FriendList;
@@ -36,20 +35,18 @@ import com.katiforis.checkers.R;
 import com.katiforis.checkers.controller.HomeController;
 import com.katiforis.checkers.fragment.HomeFragment;
 import com.katiforis.checkers.fragment.RankFragment;
-import com.katiforis.checkers.stomp.Client;
+import com.katiforis.checkers.observer.ConnectionObserver;
 import com.katiforis.checkers.util.AudioPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import io.fabric.sdk.android.Fabric;
 
 import static com.katiforis.checkers.conf.Const.TAG;
 
-public class MenuActivity extends AppCompatActivity implements Observer {
+public class MenuActivity extends AppCompatActivity implements ConnectionObserver {
     private static final int MAIN_MENU_TAB_INDEX = 0;
     private static final int RANK_TAB_INDEX = 1;
     private static final int SHOP_TAB_INDEX = 2;
@@ -236,18 +233,21 @@ public class MenuActivity extends AppCompatActivity implements Observer {
 
     public void handleReconnection() {
         showNoInternetDialog(false);
-        homeController.addTopic(true);
+        homeController.addTopic();
         homeController.getPlayerDetails();
     }
 
     public void showNoInternetDialog(boolean show) {
         this.runOnUiThread(() -> {
-            if (!show) {
-                noInternetDialog.dismiss();
-            } else if (show && !noInternetDialog.isShowing()) {
-                noInternetDialog.show();
+            try {
+                if (!show) {
+                    noInternetDialog.dismiss();
+                } else if (show && !noInternetDialog.isShowing()) {
+                    noInternetDialog.show();
+                }
+            } catch (Exception e) {
+                //ignore
             }
-
         });
     }
 
@@ -272,13 +272,11 @@ public class MenuActivity extends AppCompatActivity implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object args) {
-        if (o instanceof Client) {
-            if ((Boolean) args) {
-                handleReconnection();
-            } else {
-                handleConnectionLose();
-            }
+    public void onConnectionStatusChange(boolean isConnected) {
+        if (isConnected) {
+            handleReconnection();
+        } else {
+            handleConnectionLose();
         }
     }
 }
