@@ -9,7 +9,7 @@
         android:layout_width="20dp"
         android:layout_height="5dp"
         android:layout_marginTop="22dp"
-        android:background="@color/tab_disable"
+        android:background="@color/tab_disable2"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,24 +23,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
-        android:id="@+id/login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="30dp"
-        android:background="@color/fbutton_color_alizarin"
-        android:drawableLeft="@drawable/google_icon"
-        android:drawablePadding="5dp"
-        android:gravity="center_vertical"
-        android:padding="10dp"
-
-        android:singleLine="true"
-        android:text="Login with Google and save your progress"
-        android:textColor="@color/tab_unchecked"
-        app:layout_constraintTop_toBottomOf="@+id/settingButton" />
 
     <View
         android:layout_width="20dp"
@@ -61,7 +43,7 @@
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_panel"
+        app:layout_constraintTop_toBottomOf="@+id/userPanelWrapper"
         fbutton:buttonColor="@color/fbutton_color_alizarin"
         />
 
@@ -124,55 +106,42 @@
     <!--fbutton:shadowEnabled="true" />-->
 
 
-    <include
-        android:id="@+id/user_panel"
-        layout="@layout/item_main_user_panel_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    <!--<ProgressBar-->
+        <!--android:id="@+id/loadingUserPanel"-->
+        <!--style="?android:attr/progress"-->
+        <!--android:indeterminateTint="@color/fbutton_color_clouds"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/buttonsPanel"-->
+        <!--android:padding="10dp"-->
+        <!--/>-->
 
     <LinearLayout
-        android:id="@+id/userPan"
-        android:layout_width="wrap_content"
+        android:id="@+id/userPanelWrapper"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_panel">
+        app:layout_constraintTop_toBottomOf="@+id/settingButton">
 
         <include
-            android:id="@+id/user_elo"
-            layout="@layout/item_main_user_elo_layout"
-            android:layout_width="wrap_content"
-
+            android:id="@+id/user_panel"
+            layout="@layout/item_main_user_panel_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/user_panel" />
-
-
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/user_lvl_chart"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginLeft="30dp"
-            app:layout_constraintLeft_toRightOf="@+id/user_elo"
-            app:layout_constraintTop_toBottomOf="@+id/user_panel" />
-
-        <include
-            android:id="@+id/user_coins"
-            layout="@layout/item_main_user_coins_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            app:layout_constraintLeft_toRightOf="@+id/user_lvl_chart"
-            app:layout_constraintTop_toBottomOf="@+id/user_panel" />
-
-
+            android:visibility="invisible"
+        />
     </LinearLayout>
+
+
+
+
 
 
     <!--<ImageView-->
@@ -196,13 +165,14 @@
 
 
     <LinearLayout
+        android:id="@+id/buttonsPanel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userPan">
+        app:layout_constraintTop_toBottomOf="@+id/userPanelWrapper">
 
         <!--<com.facebook.shimmer.ShimmerFrameLayout-->
         <!--android:id="@+id/shimmer_view_container"-->

@@ -1,6 +1,5 @@
 package com.katiforis.checkers.activities;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -93,6 +92,8 @@ public class MenuActivity extends AppCompatActivity implements ConnectionObserve
                 .setTitleText("No Internet Connection!")
                 .setContentText("Trying to reconnect. . . ");
         noInternetDialog.setCanceledOnTouchOutside(false);
+        noInternetDialog.setCancelable(false);
+
         audioPlayer = new AudioPlayer(this);
         initialize();
     }

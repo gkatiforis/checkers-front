@@ -98,6 +98,7 @@ public class HomeFragment extends Fragment {
     private TextView pointsTitle;
     private TextView coinsTitle;
     private ProgressBar playLoading;
+    private View userPanel;
     private ImageView playerImage;
     private PieChart pieChart;
     private Button settingButton;
@@ -108,6 +109,7 @@ public class HomeFragment extends Fragment {
     private BillingClient billingClient;
     public static GoogleSignInClient signInClient;
     private GoogleSignInAccount account = null;
+    boolean rewardEarned = false;
 
     public HomeFragment() {
     }
@@ -173,6 +175,7 @@ public class HomeFragment extends Fragment {
 
         rewardedAd = createAndLoadRewardedAd(REWARD_AD_ID);
 
+        userPanel = v.findViewById(R.id.user_panel);
         settingButton = v.findViewById(R.id.settingButton);
         loginButton = v.findViewById(R.id.login);
         shareButton = v.findViewById(R.id.shareButton);
@@ -331,7 +334,7 @@ public class HomeFragment extends Fragment {
         startActivity(Intent.createChooser(shareIntent, "Share"));
     }
 
-    boolean rewardEarned = false;
+
 
     public void showAdVideo() {
 
@@ -546,6 +549,7 @@ public class HomeFragment extends Fragment {
     public void populatePlayerDetails(UserDto playerDto) {
         getActivity().runOnUiThread(() -> {
 
+            userPanel.setVisibility(View.VISIBLE);
             showInterstitial();
 
             if (playerDto.getUserId().startsWith("guest_")) {
