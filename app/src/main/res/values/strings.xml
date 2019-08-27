@@ -55,4 +55,10 @@
     <string name="text_ham_button_sub_text_highlighted">Ham Button Sub Text(Highlighted)</string>
     <string name="text_ham_button_sub_text_unable">Ham Button Sub Text(Unable)</string>
 
+
+        <string-array name="planets_array">
+            <item>ELO</item>
+            <item>LVL</item>
+        </string-array>
+
 </resources>

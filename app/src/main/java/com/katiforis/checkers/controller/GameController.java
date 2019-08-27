@@ -148,7 +148,7 @@ public class GameController extends AbstractController {
     }
 
     public void closeGameStatsDialog() {
-        if (gameStatsFragment != null) {
+        if (gameStatsFragment != null &&  gameStatsFragment.isVisible() && gameStatsFragment.isAdded()) {
             gameStatsFragment.dismiss();
             gameStatsFragment = null;
         }

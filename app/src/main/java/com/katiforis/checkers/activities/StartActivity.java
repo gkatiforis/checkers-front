@@ -53,7 +53,6 @@ public class StartActivity extends AppCompatActivity {
         loginAsGuest.setOnClickListener(p -> {
             audioPlayer.playClickButton();
             LocalCache.getInstance().saveString(TOKEN, null, this);
-            LocalCache.getInstance().saveString(USER_ID, null, this);
             intentToMenuActivity();
         });
         loginWithGoogle.setOnClickListener(p -> {

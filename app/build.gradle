@@ -71,6 +71,7 @@ dependencies {
     implementation 'com.orhanobut:dialogplus:1.11@aar'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.github.f0ris.sweetalert:library:1.5.1'
+    implementation 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

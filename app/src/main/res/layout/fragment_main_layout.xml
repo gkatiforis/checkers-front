@@ -163,6 +163,36 @@
 
     <!--/>-->
 
+    <info.hoang8f.widget.FButton
+        android:id="@+id/playRanking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:minWidth="@dimen/demo_button_min_width"
+        android:minHeight="@dimen/demo_button_min_height"
+        android:text="Play"
+        android:textColor="@android:color/white"
+        fbutton:buttonColor="@color/fbutton_color_alizarin"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userPanelWrapper"
+        />
+
+    <info.hoang8f.widget.FButton
+        android:id="@+id/searchingForOpponent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:minWidth="@dimen/demo_button_min_width"
+        android:minHeight="@dimen/demo_button_min_height"
+        android:text="Searching for opponent. . ."
+        android:textColor="@android:color/white"
+        fbutton:buttonColor="@color/fbutton_color_alizarin"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userPanelWrapper"
+        android:visibility="gone"
+        />
 
     <LinearLayout
         android:id="@+id/buttonsPanel"
@@ -202,29 +232,6 @@
         <!--android:visibility="gone"-->
         <!--android:layout_height="wrap_content">-->
         <!--</ProgressBar>-->
-
-
-        <info.hoang8f.widget.FButton
-            android:id="@+id/playRanking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:minWidth="@dimen/demo_button_min_width"
-            android:minHeight="@dimen/demo_button_min_height"
-            android:text="Play Ranking \n -50 coins"
-            android:textColor="@android:color/white"
-            fbutton:buttonColor="@color/fbutton_color_alizarin" />
-
-       <info.hoang8f.widget.FButton
-            android:id="@+id/playFriendly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:minWidth="@dimen/demo_button_min_width"
-            android:minHeight="@dimen/demo_button_min_height"
-            android:text="Play Friendly"
-            android:textColor="@android:color/white"
-            fbutton:buttonColor="@color/fbutton_color_alizarin" />
 
 
         <!--<info.hoang8f.widget.FButton-->

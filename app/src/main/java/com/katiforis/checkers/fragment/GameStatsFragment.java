@@ -95,6 +95,7 @@ public class GameStatsFragment extends DialogFragment {
                     .subscribe(
                     () -> {
                         restart.setVisibility(View.GONE);
+                        newOpponent.setText("Searching for opponent...");
                     },
                     throwable -> {});
         });

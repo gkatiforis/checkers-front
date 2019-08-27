@@ -22,18 +22,19 @@
         android:id="@+id/action_main_menu"
         android:checked="true"
         android:icon="@drawable/home"
-        android:title=""
+        android:title="Home"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_rank"
         android:checked="false"
-        android:title=""
+        android:title="Leaderboard"
         android:icon="@drawable/cup"
         app:showAsAction="ifRoom" />
-    <!--<item-->
-        <!--android:id="@+id/action_shop"-->
-        <!--android:checked="false"-->
-        <!--android:title=""-->
-        <!--app:showAsAction="ifRoom" />-->
+    <item
+        android:id="@+id/action_shop"
+        android:checked="false"
+        android:title="Shop"
+        android:icon="@drawable/cup"
+        app:showAsAction="ifRoom" />
 </menu>

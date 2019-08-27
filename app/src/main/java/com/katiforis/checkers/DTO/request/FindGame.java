@@ -5,6 +5,7 @@ import com.katiforis.checkers.DTO.GameType;
 public class FindGame extends BaseRequest {
 	private String gameId;
 	private boolean restart;
+	private boolean cancelSearching;
 	private GameType gameType;
 
 	public FindGame() {
@@ -38,5 +39,13 @@ public class FindGame extends BaseRequest {
 
 	public void setGameType(GameType gameType) {
 		this.gameType = gameType;
+	}
+
+	public boolean isCancelSearching() {
+		return cancelSearching;
+	}
+
+	public void setCancelSearching(boolean cancelSearching) {
+		this.cancelSearching = cancelSearching;
 	}
 }

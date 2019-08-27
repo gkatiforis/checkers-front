@@ -16,6 +16,7 @@
     <color name="tab_enable">#FFFFFF</color>
     <color name="tab_checked">#F3CD70</color>
     <color name="tab_unchecked">#FFFFFF</color>
+    <color name="grayBack">#33000000</color>
 
     //Color Swatches provided by http://designmodo.github.io/Flat-UI/
     <color name="fbutton_color_turquoise">#1abc9c</color>

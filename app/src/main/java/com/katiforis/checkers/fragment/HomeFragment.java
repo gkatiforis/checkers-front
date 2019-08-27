@@ -89,7 +89,7 @@ public class HomeFragment extends Fragment {
     private HomeController homeController;
 
     private FButton playRanking;
-    private FButton playFriendly;
+    private FButton searchingForOpponent;
     private TextView loginButton;
     private FButton shareButton;
     private FButton showAdButton;
@@ -113,6 +113,7 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment() {
     }
+
     public HomeFragment(HomeController homeController) {
         this.homeController = homeController;
     }
@@ -132,6 +133,7 @@ public class HomeFragment extends Fragment {
             }
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_main_layout, null);
@@ -181,8 +183,7 @@ public class HomeFragment extends Fragment {
         shareButton = v.findViewById(R.id.shareButton);
         showAdButton = v.findViewById(R.id.showAdButton);
         playRanking = (FButton) v.findViewById(R.id.playRanking);
-        playFriendly = (FButton) v.findViewById(R.id.playFriendly);
-
+        searchingForOpponent = (FButton) v.findViewById(R.id.searchingForOpponent);
         loginButton.setVisibility(View.GONE);
         //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
@@ -199,7 +200,7 @@ public class HomeFragment extends Fragment {
         pieChart.setHoleRadius(70);
 
         playRanking.setButtonColor(getResources().getColor(R.color.fbutton_color_nephritis));
-        playFriendly.setButtonColor(getResources().getColor(R.color.fbutton_default_shadow_color));
+        searchingForOpponent.setButtonColor(getResources().getColor(R.color.fbutton_color_nephritis));
 
 
         loginButton.setOnClickListener(p -> {
@@ -212,12 +213,12 @@ public class HomeFragment extends Fragment {
             @Override
             public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
                 purchases = purchases;
-                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
                         && purchases != null) {
                     for (Purchase purchase : purchases) {
                         handlePurchase(purchase);
                     }
-                } else if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.USER_CANCELED) {
+                } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
                 } else {
                 }
             }
@@ -231,6 +232,7 @@ public class HomeFragment extends Fragment {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                 }
             }
+
             @Override
             public void onBillingServiceDisconnected() {
             }
@@ -240,8 +242,7 @@ public class HomeFragment extends Fragment {
 //            shareGame();
 
 
-
-            List<String> skuList = new ArrayList<> ();
+            List<String> skuList = new ArrayList<>();
             skuList.add("prov");
             skuList.add("pro_version");
             SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
@@ -251,7 +252,7 @@ public class HomeFragment extends Fragment {
                         @Override
                         public void onSkuDetailsResponse(BillingResult billingResult,
                                                          List<SkuDetails> skuDetailsList) {
-                            if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && skuDetailsList != null) {
                                 for (SkuDetails skuDetails : skuDetailsList) {
                                     String sku = skuDetails.getSku();
                                     String price = skuDetails.getPrice();
@@ -277,23 +278,11 @@ public class HomeFragment extends Fragment {
             settingsFragment.show(this.getFragmentManager(), "");
         });
 
-        playFriendly.setOnClickListener(p -> {
-            menuActivity.getAudioPlayer().playClickButton();
-            FindGame findGame = new FindGame();
-            findGame.setGameType(GameType.FRIENDLY);
-            homeController.findGame(findGame)
-                    .subscribe(
-                            () -> {
-                                //TODO
-                            },
-                            throwable -> {});
-        });
-
         playRanking.setOnClickListener(p -> {
             menuActivity.getAudioPlayer().playClickButton();
             UserDto playerDto = LocalCache.getInstance().get(USER_DETAILS, this.getActivity());
 
-            if(playerDto == null)return;
+            if (playerDto == null) return;
             if (playerDto.getPlayerDetails().getCoins() < GameType.RANKING.getFee()) {
                 showNotEnoughCoins();
             } else {
@@ -301,11 +290,31 @@ public class HomeFragment extends Fragment {
                 findGame.setGameType(GameType.RANKING);
                 homeController.findGame(findGame)
                         .subscribe(
-                        () -> {
-                          //TODO
-                        },
-                        throwable -> {});
+                                () -> {
+//                            explosionField.explode(playRanking);
+                                    // explosionField.clear();
+                                    playRanking.setVisibility(View.GONE);
+                                    searchingForOpponent.setVisibility(View.VISIBLE);
+                                    //TODO
+                                },
+                                throwable -> {
+                                });
             }
+        });
+
+        searchingForOpponent.setOnClickListener(p -> {
+            menuActivity.getAudioPlayer().playClickButton();
+            FindGame findGame = new FindGame();
+            findGame.setCancelSearching(true);
+            homeController.findGame(findGame)
+                    .subscribe(
+                            () -> {
+                                playRanking.setVisibility(View.VISIBLE);
+                                searchingForOpponent.setVisibility(View.GONE);
+                            },
+                            throwable -> {
+                            });
+
         });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -313,14 +322,14 @@ public class HomeFragment extends Fragment {
                 .requestEmail()
                 .build();
 
-        if(signInClient == null){
+        if (signInClient == null) {
             signInClient = GoogleSignIn.getClient(this.getActivity(), gso);
             silentSignIn();
-        }else{
-          getPlayerDetailsForce();
+        } else {
+            getPlayerDetailsForce();
         }
 
-        Client.getInstance().registerObserver((MenuActivity)this.getActivity());
+        Client.getInstance().registerObserver((MenuActivity) this.getActivity());
         return v;
     }
 
@@ -333,7 +342,6 @@ public class HomeFragment extends Fragment {
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
         startActivity(Intent.createChooser(shareIntent, "Share"));
     }
-
 
 
     public void showAdVideo() {
@@ -424,8 +432,12 @@ public class HomeFragment extends Fragment {
         signInClient.signOut()
                 .addOnSuccessListener((message) -> {
                     Client.getInstance().disconnect();
+                    if(!LocalCache.getInstance().getString(USER_ID, this.getActivity()).startsWith("guest_")){
                     LocalCache.getInstance().saveString(TOKEN, null, this.getActivity());
-                    LocalCache.getInstance().saveString(USER_ID, null, this.getActivity());
+
+                        LocalCache.getInstance().saveString(USER_ID, null, this.getActivity());
+                    }
+
                     intentToStartPage();
                 })
                 .addOnFailureListener((message) -> {
@@ -442,7 +454,7 @@ public class HomeFragment extends Fragment {
         String token = (String) LocalCache.getInstance().getString(TOKEN, menuActivity);
         if (token != null) {
             intentToStartPage();
-        }else{
+        } else {
             getPlayerDetailsForce();
         }
     }
@@ -465,7 +477,7 @@ public class HomeFragment extends Fragment {
                             onLogin(task.getResult());
                         } else {
                             Log.d(TAG, "signInSilently(): failure", task.getException());
-                           signInAgain();
+                            signInAgain();
                             //signInIntent();
                         }
                     }
@@ -503,7 +515,7 @@ public class HomeFragment extends Fragment {
         if (Client.isConnected()) {
             Client.getInstance().disconnect();
         }
-        Client.getInstance().registerObserver((MenuActivity)this.getActivity());
+        Client.getInstance().registerObserver((MenuActivity) this.getActivity());
         getPlayerDetailsForce();
     }
 
