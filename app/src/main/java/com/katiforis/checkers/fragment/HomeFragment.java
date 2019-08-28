@@ -205,6 +205,8 @@ public class HomeFragment extends Fragment {
 
         loginButton.setOnClickListener(p -> {
             menuActivity.getAudioPlayer().playClickButton();
+            playRanking.setVisibility(View.VISIBLE);
+            searchingForOpponent.setVisibility(View.GONE);
             signInIntent();
         });
 
@@ -595,8 +597,8 @@ public class HomeFragment extends Fragment {
             PieData data = new PieData(dataSet);
             pieChart.setData(data);
             pieChart.animateXY(1000, 1000);
-            coinsTitle.setText(String.valueOf(playerDetailsDto.getCoins()));
-            pointsTitle.setText(String.valueOf(playerDetailsDto.getElo()));
+            coinsTitle.setText(String.valueOf(playerDetailsDto.getCoins() + " coins"));
+            pointsTitle.setText(String.valueOf(playerDetailsDto.getElo() + " elo"));
             Picasso.with(getActivity())
                     .load(playerDto.getPictureUrl())
                     .placeholder(getResources().getDrawable(R.drawable.user))

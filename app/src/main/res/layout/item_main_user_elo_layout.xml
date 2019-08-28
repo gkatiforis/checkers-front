@@ -7,26 +7,29 @@
 
     xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/pointsTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="1999"
-        android:textSize="20dp"
 
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
 
     <ImageView
         android:id="@+id/pointsImage"
         android:layout_width="30dp"
         android:layout_height="30dp"
 
-        android:src="@drawable/points"
+        android:src="@drawable/level1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/pointsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="1999"
+        android:textSize="15dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pointsTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/pointsImage"
+       />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

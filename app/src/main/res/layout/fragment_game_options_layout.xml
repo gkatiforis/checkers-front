@@ -57,6 +57,17 @@
 
             />
 
+        <info.hoang8f.widget.FButton
+            android:id="@+id/mainMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Main menu"
+            android:textColor="@android:color/black"
+            app:layout_constraintLeft_toLeftOf="parent"
+            fbutton:buttonColor="@color/fbutton_color_alizarin"
+            fbutton:shadowEnabled="true"
+            />
 
 
         <!--<info.hoang8f.widget.FButton-->

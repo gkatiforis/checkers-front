@@ -122,6 +122,7 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
 
     private FButton resignButton;
     private FButton offerDrawButton;
+    private FButton mainMenuButton;
     private ImageView cancel;
 
     private DialogPlus optionsDialog;
@@ -300,14 +301,18 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         });
     }
 
-    public void sendResign() {
+    public void sendResign(boolean goMainMenu) {
         PlayerAnswer playerAnswer = new PlayerAnswer();
         playerAnswer.setResign(true);
         gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer)
                 .subscribe(
                         () -> {
-                            audioPlayer.playPopup();
-                            showGameOptionsDialog(false);
+                            if(goMainMenu){
+                                intentToMenuActivity();
+                            }else{
+                                audioPlayer.playPopup();
+                                showGameOptionsDialog(false);
+                            }
                         },
                         throwable -> {
                         });
@@ -474,9 +479,11 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         optionsDialogView = (ViewGroup) getLayoutInflater().inflate(R.layout.fragment_game_options_layout, null);
         offerDrawButton = optionsDialogView.findViewById(R.id.offerDraw);
         resignButton = optionsDialogView.findViewById(R.id.resign);
+        mainMenuButton = optionsDialogView.findViewById(R.id.mainMenu);
         cancel = optionsDialogView.findViewById(R.id.cancel);
         resignButton.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
         offerDrawButton.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
+        mainMenuButton.setButtonColor(getResources().getColor(R.color.fbutton_color_clouds));
 
 
         gameOptionsDialogButton.setOnClickListener(p -> {
@@ -525,7 +532,12 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
 
             resignButton.setOnClickListener(pa -> {
                 audioPlayer.playClickButton();
-                sendResign();
+                sendResign(false);
+            });
+
+            mainMenuButton.setOnClickListener(pa -> {
+                audioPlayer.playClickButton();
+                sendResign(true);
             });
 
             cancel.setOnClickListener(pa -> {

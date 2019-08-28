@@ -9,14 +9,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.katiforis.checkers.DTO.LevelEnum;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.R;
-import com.katiforis.checkers.activities.MenuActivity;
 import com.katiforis.checkers.util.CircleTransform;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_1;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_2;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_3;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_4;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_5;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_6;
+import static com.katiforis.checkers.DTO.LevelEnum.mapPointsToLevel;
 
 public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder> {
 
@@ -25,11 +33,12 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
 
     public class RankViewHolder extends RecyclerView.ViewHolder {
         public TextView rank, username, level, points;
-        ImageView playerImage;
+        ImageView playerImage, playerLvlImage;
 
         public RankViewHolder(View view) {
             super(view);
             playerImage = (ImageView) view.findViewById(R.id.playerImage);
+            playerLvlImage = (ImageView) view.findViewById(R.id.playerLvlImage);
             username = (TextView) view.findViewById(R.id.username);
             rank = (TextView) view.findViewById(R.id.rank);
             level = (TextView) view.findViewById(R.id.level);
@@ -71,10 +80,26 @@ public class RankAdapter extends RecyclerView.Adapter<RankAdapter.RankViewHolder
                 });
         holder.username.setText(player.getUsername());
         holder.rank.setText(position + 1 + ".");
-        holder.level.setText(String.valueOf(player.getPlayerDetails().getLevel()));
-        holder.points.setText(String.valueOf(player.getPlayerDetails().getElo()));
-    }
+        holder.level.setText("level " + String.valueOf(player.getPlayerDetails().getLevel()));
 
+
+        int elo = player.getPlayerDetails().getElo();
+        holder.points.setText(String.valueOf(elo));
+
+        LevelEnum level = mapPointsToLevel(elo);
+        if (level == LEVEL_1)
+            holder.playerLvlImage.setImageResource(R.drawable.level1);
+        else if (level == LEVEL_2)
+            holder.playerLvlImage.setImageResource(R.drawable.level2);
+        else if (level == LEVEL_3)
+            holder.playerLvlImage.setImageResource(R.drawable.level3);
+        else if (level == LEVEL_4)
+            holder.playerLvlImage.setImageResource(R.drawable.level4);
+        else if (level == LEVEL_5)
+            holder.playerLvlImage.setImageResource(R.drawable.level5);
+        else if (level == LEVEL_6)
+            holder.playerLvlImage.setImageResource(R.drawable.level6);
+    }
 
     @Override
     public int getItemCount() {
