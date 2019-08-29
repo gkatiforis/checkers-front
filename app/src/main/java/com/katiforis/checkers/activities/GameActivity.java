@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.katiforis.checkers.DTO.LevelEnum;
 import com.katiforis.checkers.DTO.UserDto;
 import com.katiforis.checkers.DTO.response.GameState;
 import com.katiforis.checkers.DTO.PlayerAnswer;
@@ -61,6 +62,13 @@ import info.hoang8f.widget.FButton;
 import me.itangqi.waveloadingview.WaveLoadingView;
 import tyrantgit.explosionfield.ExplosionField;
 
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_1;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_2;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_3;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_4;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_5;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_6;
+import static com.katiforis.checkers.DTO.LevelEnum.mapPointsToLevel;
 import static com.katiforis.checkers.conf.Const.OFFER_DRAW_TIME_IN_SECONDS;
 import static com.katiforis.checkers.util.CachedObjectProperties.CURRENT_GAME_ID;
 import static com.katiforis.checkers.util.CachedObjectProperties.USER_ID;
@@ -88,12 +96,14 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
     private ImageView playerImage;
     private TextView username;
     private TextView elo;
+    private ImageView eloImage;
     private TextView lvl;
     private WaveLoadingView player1Time;
 
     private ImageView playerImage2;
     private TextView username2;
     private TextView elo2;
+    private ImageView eloImage2;
     private TextView lvl2;
     private WaveLoadingView player2Time;
 
@@ -223,6 +233,7 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         playerImage = user1.findViewById(R.id.playerImage);
         username = user1.findViewById(R.id.username);
         elo = user1.findViewById(R.id.elo);
+        eloImage = user1.findViewById(R.id.eloImage);
         lvl = user1.findViewById(R.id.lvl);
         gameOptionsDialogButton = findViewById(R.id.gameOptionsDialogButton);
 
@@ -242,6 +253,7 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         View user2 = findViewById(R.id.user2);
         playerImage2 = user2.findViewById(R.id.playerImage);
         elo2 = user2.findViewById(R.id.elo);
+        eloImage2 = user2.findViewById(R.id.eloImage);
         lvl2 = user2.findViewById(R.id.lvl);
         username2 = user2.findViewById(R.id.username);
 
@@ -380,9 +392,12 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
                     });
             username.setText(player.getUsername());
             elo.setText(String.valueOf(player.getPlayerDetails().getElo()));
+            setEloImage(player.getPlayerDetails().getElo(), eloImage);
             lvl.setText(String.valueOf(player.getPlayerDetails().getLevel()));
+
             username2.setText(player2.getUsername());
             elo2.setText(String.valueOf(player2.getPlayerDetails().getElo()));
+            setEloImage(player2.getPlayerDetails().getElo(), eloImage2);
             lvl2.setText(String.valueOf(player2.getPlayerDetails().getLevel()));
         } else {
             Picasso.with(this)
@@ -417,11 +432,30 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
                     });
             username.setText(player2.getUsername());
             elo.setText(String.valueOf(player2.getPlayerDetails().getElo()));
+            setEloImage(player2.getPlayerDetails().getElo(), eloImage);
             lvl.setText(String.valueOf(player2.getPlayerDetails().getLevel()));
+
             username2.setText(player.getUsername());
             elo2.setText(String.valueOf(player.getPlayerDetails().getElo()));
+            setEloImage(player.getPlayerDetails().getElo(), eloImage2);
             lvl2.setText(String.valueOf(player.getPlayerDetails().getLevel()));
         }
+    }
+
+    public void setEloImage(int elo, ImageView pointsImage){
+        LevelEnum level = mapPointsToLevel(elo);
+        if (level == LEVEL_1)
+            pointsImage.setImageResource(R.drawable.level1);
+        else if (level == LEVEL_2)
+            pointsImage.setImageResource(R.drawable.level2);
+        else if (level == LEVEL_3)
+            pointsImage.setImageResource(R.drawable.level3);
+        else if (level == LEVEL_4)
+            pointsImage.setImageResource(R.drawable.level4);
+        else if (level == LEVEL_5)
+            pointsImage.setImageResource(R.drawable.level5);
+        else if (level == LEVEL_6)
+            pointsImage.setImageResource(R.drawable.level6);
     }
 
     public void sendMove(Move move) {

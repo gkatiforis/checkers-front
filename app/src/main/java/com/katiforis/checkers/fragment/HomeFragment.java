@@ -50,6 +50,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.katiforis.checkers.BuildConfig;
 import com.katiforis.checkers.DTO.GameType;
+import com.katiforis.checkers.DTO.LevelEnum;
 import com.katiforis.checkers.DTO.PlayerDetailsDto;
 import com.katiforis.checkers.DTO.RewardEnum;
 import com.katiforis.checkers.DTO.UserDto;
@@ -75,6 +76,13 @@ import info.hoang8f.widget.FButton;
 
 import static android.content.ContentValues.TAG;
 import static android.os.Looper.getMainLooper;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_1;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_2;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_3;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_4;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_5;
+import static com.katiforis.checkers.DTO.LevelEnum.LEVEL_6;
+import static com.katiforis.checkers.DTO.LevelEnum.mapPointsToLevel;
 import static com.katiforis.checkers.conf.Const.APP_AD_ID;
 import static com.katiforis.checkers.conf.Const.INTERSTITIAL_AD_ID;
 import static com.katiforis.checkers.conf.Const.REWARD_AD_ID;
@@ -96,6 +104,7 @@ public class HomeFragment extends Fragment {
     //private Button playWithFriend;
     private TextView username;
     private TextView pointsTitle;
+    private ImageView pointsImage;
     private TextView coinsTitle;
     private ProgressBar playLoading;
     private View userPanel;
@@ -188,6 +197,7 @@ public class HomeFragment extends Fragment {
         //playWithFriend = v.findViewById(R.id.play_with_friend);
         username = v.findViewById(R.id.username);
         pointsTitle = v.findViewById(R.id.pointsTitle);
+        pointsImage = v.findViewById(R.id.pointsImage);
         coinsTitle = v.findViewById(R.id.coinsTitle);
         playerImage = v.findViewById(R.id.playerImage);
 
@@ -599,6 +609,19 @@ public class HomeFragment extends Fragment {
             pieChart.animateXY(1000, 1000);
             coinsTitle.setText(String.valueOf(playerDetailsDto.getCoins() + " coins"));
             pointsTitle.setText(String.valueOf(playerDetailsDto.getElo() + " elo"));
+            LevelEnum level = mapPointsToLevel(playerDetailsDto.getElo());
+            if (level == LEVEL_1)
+                pointsImage.setImageResource(R.drawable.level1);
+            else if (level == LEVEL_2)
+                pointsImage.setImageResource(R.drawable.level2);
+            else if (level == LEVEL_3)
+                pointsImage.setImageResource(R.drawable.level3);
+            else if (level == LEVEL_4)
+                pointsImage.setImageResource(R.drawable.level4);
+            else if (level == LEVEL_5)
+                pointsImage.setImageResource(R.drawable.level5);
+            else if (level == LEVEL_6)
+                pointsImage.setImageResource(R.drawable.level6);
             Picasso.with(getActivity())
                     .load(playerDto.getPictureUrl())
                     .placeholder(getResources().getDrawable(R.drawable.user))
