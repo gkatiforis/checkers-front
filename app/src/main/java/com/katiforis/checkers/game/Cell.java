@@ -1,8 +1,5 @@
 package com.katiforis.checkers.game;
 
-import com.katiforis.checkers.activities.GameActivity;
-import com.katiforis.checkers.util.AudioPlayer;
-
 import java.io.Serializable;
 
 public class Cell implements Serializable {

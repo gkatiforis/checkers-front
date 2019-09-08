@@ -2,7 +2,7 @@ package com.katiforis.checkers.conf;
 
 public class Const {
 //	public static final String host_stomp = "ws://checkers.eu-west-2.elasticbeanstalk.com/top/websocket";
-	public static final String host_stomp = "ws://192.168.1.2:5000/top/websocket";
+	public static final String host_stomp = "ws://192.168.1.3:5000/top/websocket";
 //	public static final String host_stomp = "ws://192.168.16.116:5000/top/websocket";
 	public static final String android_web_id = "794218231402-hb2lq8lk48qf8tb755ha9dugiuvkfj3r.apps.googleusercontent.com";
 	//794218231402-kudgnejuv5agonchn70q4o5nbth2llmq.apps.googleusercontent.com

@@ -1,6 +1,7 @@
 package com.katiforis.checkers.activities;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -13,22 +14,27 @@ import android.os.Handler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.DragEvent;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,7 +96,8 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
     private static final int LIGHT_PIECE_HIGHLIGHTED = R.drawable.whitept;
     private static final int LIGHT_KING_PIECE_HIGHLIGHTED = R.drawable.whitepk;
 
-    private static final int POSSIBLE_MOVE = R.drawable.possible_moves_image;
+    private static final int POSSIBLE_MOVE = R.drawable.circle_move2;
+    private static final String LAST_MOVE_COLOR = "#55000000";
 
     private ImageView gameOptionsDialogButton;
     private ImageView playerImage;
@@ -122,7 +129,7 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
 
     private Integer gameMaxTime;
     private int[] buttons_id;
-    private Button[][] buttonBoard;
+    private ImageButton[][] buttonBoard;
     private List<Cell> highlightedCells;
     private List<Move> moves;
     private UserDto player1, player2, currentPlayer;
@@ -147,6 +154,14 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
     private AudioPlayer audioPlayer;
 
     public boolean isConnected = true;
+
+
+    private Cell lastSelected;
+    private int lastMotionEvent;
+    boolean dragStarted = false;
+    boolean toEmptyCell = false;
+    int moveCounts = 0;
+
 
     private void intentToMenuActivity() {
         Intent intent = new Intent();
@@ -281,8 +296,8 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         srcCellFixed = false;
         highlightedCells = new ArrayList<>();
         buttons_id = getButtonArray();
-        buttonBoard = new Button[8][8];
-        fillButtonBoard(listener);
+        buttonBoard = new ImageButton[8][8];
+        fillButtonBoard();
         this.moves = new ArrayList<>();
     }
 
@@ -319,9 +334,9 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         gameController.sendAnswer(LocalCache.getInstance().getString(CURRENT_GAME_ID, this), playerAnswer)
                 .subscribe(
                         () -> {
-                            if(goMainMenu){
+                            if (goMainMenu) {
                                 intentToMenuActivity();
-                            }else{
+                            } else {
                                 audioPlayer.playPopup();
                                 showGameOptionsDialog(false);
                             }
@@ -442,7 +457,7 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         }
     }
 
-    public void setEloImage(int elo, ImageView pointsImage){
+    public void setEloImage(int elo, ImageView pointsImage) {
         LevelEnum level = mapPointsToLevel(elo);
         if (level == LEVEL_1)
             pointsImage.setImageResource(R.drawable.level1);
@@ -476,6 +491,7 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
                 current = playerAnswer.getPlayers().get(0);
                 prev = playerAnswer.getPlayers().get(1);
             } else {
+                lastSelected = null;
                 current = playerAnswer.getPlayers().get(1);
                 prev = playerAnswer.getPlayers().get(0);
             }
@@ -614,14 +630,142 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
 //        audioPlayer.release();
     }
 
-    private View.OnClickListener listener = (View v) -> {
+    private View.OnTouchListener listener2 = (View view, MotionEvent motionEvent) -> {
+
+        int tag = (Integer) view.getTag();
+        int xCord = tag / 10;
+        int yCord = tag % 10;
+        Cell currentCell = cellBoard.getCell(xCord, yCord);
+
+        String userId = LocalCache.getInstance().getString(USER_ID, this);
+        if (!currentPlayer.getUserId().equals(userId) ||
+                (currentCell.getPlacedPiece() != null &&
+                        !currentPlayer.getColor().equals(currentCell.getPlacedPiece().getColor()))) {
+            return false;
+        }
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            lastMotionEvent = MotionEvent.ACTION_DOWN;
+            moveCounts = 0;
+
+            if (currentCell.getPlacedPiece() == null) {
+                toEmptyCell = true;
+            } else {
+                toEmptyCell = false;
+            }
+            if (lastSelected != null && lastSelected.equals(currentCell)) {
+                srcCell = currentCell;
+                setvisible();
+                return true;
+            } else if (lastSelected != null && !lastSelected.equals(currentCell)) {
+                if (currentCell.containsPiece()) {
+                    srcCell = null;
+                }
+                clearPossibleMoves();
+            }
+            lastSelected = currentCell;
+            playerTurn(xCord, yCord);
+            return true;
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            view.setVisibility(View.VISIBLE);
+            lastMotionEvent = MotionEvent.ACTION_UP;
+            setvisible();
+            return true;
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+            if (toEmptyCell) {
+                return true;
+            }
+            moveCounts++;
+
+            if (moveCounts < 5) {
+                return true;
+            }
+            if (lastMotionEvent != MotionEvent.ACTION_MOVE) {
+                view.setVisibility(View.INVISIBLE);
+                lastMotionEvent = MotionEvent.ACTION_MOVE;
+                return true;
+            } else {
+                lastMotionEvent = MotionEvent.ACTION_MOVE;
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
+                        view);
+                shadowBuilder.getView().setAlpha(1);
+
+                view.startDrag(data, shadowBuilder, view, 0);
+                return true;
+            }
+
+        } else {
+            return true;
+        }
+    };
+
+    private View.OnDragListener listener3 = (View v, DragEvent event) -> {
+
+        if (!currentPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
+            return false;
+        }
+
         int tag = (Integer) v.getTag();
         int xCord = tag / 10;
         int yCord = tag % 10;
-        if (currentPlayer.getUserId().equals(LocalCache.getInstance().getString(USER_ID, this))) {
-            playerTurn(xCord, yCord);
+
+        View view = (View) event.getLocalState();
+        switch (event.getAction()) {
+            case DragEvent.ACTION_DRAG_STARTED:
+                dragStarted = true;
+                break;
+            case DragEvent.ACTION_DRAG_ENTERED:
+                break;
+            case DragEvent.ACTION_DRAG_EXITED:
+                break;
+            case DragEvent.ACTION_DROP:
+                if (view instanceof ImageButton) {
+                    if (srcCell == null ||
+                            (!cellBoard.isPossibleMove(srcCell.getX(), srcCell.getY(), xCord, yCord) &&
+                                    !srcCellFixed) || (srcCell.getX() == xCord && srcCell.getY() == yCord)) {
+                        view.setVisibility(View.VISIBLE);
+                    } else {
+
+                    }
+                    playerTurn(xCord, yCord);
+                } else {
+                    view.setVisibility(View.VISIBLE);
+                }
+                setvisible();
+                break;
+            case DragEvent.ACTION_DRAG_ENDED:
+                moveCounts = 0;
+                final View droppedView = (View) event.getLocalState();
+                droppedView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dragStarted = false;
+                        setvisible();
+                        view.setVisibility(View.VISIBLE);
+                        if (view instanceof ImageButton) {
+                            srcCell = lastSelected;
+                        }
+                    }
+                });
+                break;
+            default:
+                break;
         }
+
+        return true;
     };
+
+
+    public void setvisible() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if ((i + j) % 2 == 0) {
+                    buttonBoard[i][j].setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
 
     public void playerTurn(int xCord, int yCord) {
 
@@ -655,9 +799,32 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
                 updateTurnTracker();
             } else if (!cellBoard.getCell(xCord, yCord).containsPiece() && moveExist(cellBoard.getCell(xCord, yCord)) && srcCell != null) {
                 dstCell = cellBoard.getCell(xCord, yCord);
+                buttonBoard[dstCell.getX()][dstCell.getY()].setImageResource(getImage(srcCell));
+                buttonBoard[srcCell.getX()][srcCell.getY()].setImageResource(R.drawable.blank_square);
+                buttonBoard[srcCell.getX()][srcCell.getY()].setVisibility(View.VISIBLE);
+                buttonBoard[dstCell.getX()][dstCell.getY()].setVisibility(View.VISIBLE);
                 sendMove(new Move(dstCell, srcCell, srcCell.getPlacedPiece()));
             }
         }
+    }
+
+    private int getImage(Cell cell) {
+        if (cell.getPlacedPiece() != null) {
+            if (cell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
+                if (cell.getPlacedPiece().isKing()) {
+                    return LIGHT_KING_PIECE_ICON;
+                } else {
+                    return LIGHT_PIECE_ICON;
+                }
+            } else {
+                if (cell.getPlacedPiece().isKing()) {
+                    return DARK_KING_PIECE_ICON;
+                } else {
+                    return DARK_PIECE_ICON;
+                }
+            }
+        }
+        return R.drawable.blank_square;
     }
 
     private boolean moveExist(Cell cell) {
@@ -721,37 +888,39 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         return buttons_id;
     }
 
-    public void fillButtonBoard(View.OnClickListener listener) {
+    public void fillButtonBoard() {
         int index = 0;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 //if ((i + j) % 2 == 0) {
-                buttonBoard[i][j] = (Button) findViewById(buttons_id[index]);
+                buttonBoard[i][j] = (ImageButton) findViewById(buttons_id[index]);
                 index++;
                 buttonBoard[i][j].setTag(i * 10 + j);
-                buttonBoard[i][j].setOnClickListener(listener);
+                buttonBoard[i][j].setOnTouchListener(listener2);
+                buttonBoard[i][j].setOnDragListener(listener3);
                 //}
             }
         }
     }
 
-    public void updateBoard(Button[][] buttonIndexes, Board board) {
+
+    public void updateBoard(ImageButton[][] buttonIndexes, Board board) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if ((i + j) % 2 == 0) {
                     if (!board.getCell(i, j).containsPiece()) {
-                        buttonIndexes[i][j].setBackgroundResource(R.drawable.blank_square);
+                        buttonIndexes[i][j].setImageResource(R.drawable.blank_square);
                     } else if (board.getCell(i, j).getPlacedPiece().getColor().equals(Piece.LIGHT)) {
                         if (board.getCell(i, j).getPlacedPiece().isKing()) {
-                            buttonIndexes[i][j].setBackgroundResource(LIGHT_KING_PIECE_ICON);
+                            buttonIndexes[i][j].setImageResource(LIGHT_KING_PIECE_ICON);
                         } else {
-                            buttonIndexes[i][j].setBackgroundResource(LIGHT_PIECE_ICON);
+                            buttonIndexes[i][j].setImageResource(LIGHT_PIECE_ICON);
                         }
                     } else if (board.getCell(i, j).getPlacedPiece().getColor().equals(Piece.DARK)) {
                         if (board.getCell(i, j).getPlacedPiece().isKing()) {
-                            buttonIndexes[i][j].setBackgroundResource(DARK_KING_PIECE_ICON);
+                            buttonIndexes[i][j].setImageResource(DARK_KING_PIECE_ICON);
                         } else {
-                            buttonIndexes[i][j].setBackgroundResource(DARK_PIECE_ICON);
+                            buttonIndexes[i][j].setImageResource(DARK_PIECE_ICON);
                         }
                     }
                 }
@@ -760,25 +929,20 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
     }
 
     public void updatePieces(int xCord, int yCord) {
-        Move possMoves;
-        for (int i = 0; i < moves.size(); i++) {
-            possMoves = moves.get(i);
-            buttonBoard[possMoves.getTo().getX()][possMoves.getTo().getY()].setBackgroundResource(R.drawable.blank_square);
-        }
         Cell cell = cellBoard.getCell(xCord, yCord);
 
         if (cell.getPlacedPiece() != null) {
             if (cell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
                 if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
-                    buttonBoard[xCord][yCord].setBackgroundResource(LIGHT_KING_PIECE_ICON);
+                    buttonBoard[xCord][yCord].setImageResource(LIGHT_KING_PIECE_ICON);
                 } else {
-                    buttonBoard[xCord][yCord].setBackgroundResource(LIGHT_PIECE_ICON);
+                    buttonBoard[xCord][yCord].setImageResource(LIGHT_PIECE_ICON);
                 }
             } else {
                 if (cellBoard.getCell(xCord, yCord).getPlacedPiece().isKing()) {
-                    buttonBoard[xCord][yCord].setBackgroundResource(DARK_KING_PIECE_ICON);
+                    buttonBoard[xCord][yCord].setImageResource(DARK_KING_PIECE_ICON);
                 } else {
-                    buttonBoard[xCord][yCord].setBackgroundResource(DARK_PIECE_ICON);
+                    buttonBoard[xCord][yCord].setImageResource(DARK_PIECE_ICON);
                 }
             }
         }
@@ -790,24 +954,40 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
             possibleMoves = moves.get(i);
             Cell cell = possibleMoves.getTo();
             if (!cell.containsPiece()) {
-                buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.blank_square);
+                buttonBoard[cell.getX()][cell.getY()].setImageResource(R.drawable.blank_square);
             }
         }
-
+        clearCurrentMove(cellBoard);
         for (Cell cell : changedCells) {
             if (!cell.containsPiece()) {
-                buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(R.drawable.blank_square);
+                buttonBoard[cell.getX()][cell.getY()].setImageResource(R.drawable.blank_square);
             } else if (cell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
                 if (cell.getPlacedPiece().isKing()) {
-                    buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(LIGHT_KING_PIECE_ICON);
+                    buttonBoard[cell.getX()][cell.getY()].setBackgroundColor(Color.parseColor(LAST_MOVE_COLOR));
+                    buttonBoard[cell.getX()][cell.getY()].setImageResource(LIGHT_KING_PIECE_ICON);
+//                    buttonBoard[cell.getX()][cell.getY()].setTag(LIGHT_KING_PIECE_ICON);
                 } else {
-                    buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(LIGHT_PIECE_ICON);
+                    buttonBoard[cell.getX()][cell.getY()].setBackgroundColor(Color.parseColor(LAST_MOVE_COLOR));
+                    buttonBoard[cell.getX()][cell.getY()].setImageResource(LIGHT_PIECE_ICON);
                 }
             } else if (cell.getPlacedPiece().getColor().equals(Piece.DARK)) {
                 if (cell.getPlacedPiece().isKing()) {
-                    buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(DARK_KING_PIECE_ICON);
+                    buttonBoard[cell.getX()][cell.getY()].setBackgroundColor(Color.parseColor(LAST_MOVE_COLOR));
+                    buttonBoard[cell.getX()][cell.getY()].setImageResource(DARK_KING_PIECE_ICON);
                 } else {
-                    buttonBoard[cell.getX()][cell.getY()].setBackgroundResource(DARK_PIECE_ICON);
+                    buttonBoard[cell.getX()][cell.getY()].setBackgroundColor(Color.parseColor(LAST_MOVE_COLOR));
+                    buttonBoard[cell.getX()][cell.getY()].setImageResource(DARK_PIECE_ICON);
+                }
+            }
+        }
+    }
+
+    public void clearCurrentMove(Board board) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if ((i + j) % 2 == 0) {
+                    Cell cell = board.getCell(i, j);
+                    buttonBoard[cell.getX()][cell.getY()].setBackgroundColor(Color.TRANSPARENT);
                 }
             }
         }
@@ -820,16 +1000,16 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         if (currentPlayer.getColor().equals(Piece.LIGHT) && givenCell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
 
             if (givenCell.getPlacedPiece().isKing()) {
-                buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(LIGHT_KING_PIECE_PRESSED);
+                buttonBoard[givenCell.getX()][givenCell.getY()].setImageResource(LIGHT_KING_PIECE_PRESSED);
             } else {
-                buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(LIGHT_PIECE_PRESSED);
+                buttonBoard[givenCell.getX()][givenCell.getY()].setImageResource(LIGHT_PIECE_PRESSED);
             }
         }
         if (currentPlayer.getColor().equals(Piece.DARK) && givenCell.getPlacedPiece().getColor().equals(Piece.DARK)) {
             if (cellBoard.getCell(givenCell.getX(), givenCell.getY()).getPlacedPiece().isKing()) {
-                buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(DARK_KING_PIECE_PRESSED);
+                buttonBoard[givenCell.getX()][givenCell.getY()].setImageResource(DARK_KING_PIECE_PRESSED);
             } else {
-                buttonBoard[givenCell.getX()][givenCell.getY()].setBackgroundResource(DARK_PIECE_PRESSED);
+                buttonBoard[givenCell.getX()][givenCell.getY()].setImageResource(DARK_PIECE_PRESSED);
             }
         }
     }
@@ -897,15 +1077,15 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
             highlightedCell = highlightedCells.remove(0);
             if (highlightedCell.getPlacedPiece().getColor().equals(Piece.LIGHT)) {
                 if (highlightedCell.getPlacedPiece().isKing()) {
-                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(LIGHT_KING_PIECE_ICON);
+                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setImageResource(LIGHT_KING_PIECE_ICON);
                 } else {
-                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(LIGHT_PIECE_ICON);
+                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setImageResource(LIGHT_PIECE_ICON);
                 }
             } else {
                 if (highlightedCell.getPlacedPiece().isKing()) {
-                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(DARK_KING_PIECE_ICON);
+                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setImageResource(DARK_KING_PIECE_ICON);
                 } else {
-                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setBackgroundResource(DARK_PIECE_ICON);
+                    buttonBoard[highlightedCell.getX()][highlightedCell.getY()].setImageResource(DARK_PIECE_ICON);
                 }
             }
         }
@@ -918,13 +1098,13 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
             for (Move cell : moves) {
                 if (!moves.isEmpty()) {
                     if (cell.getPiece().getColor().equals(Piece.DARK) && cell.getPiece().isKing()) {
-                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(DARK_KING_PIECE_HIGHLIGHTED);
+                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setImageResource(DARK_KING_PIECE_HIGHLIGHTED);
                     } else if (cell.getPiece().getColor().equals(Piece.DARK)) {
-                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(DARK_PIECE_HIGHLIGHTED);
+                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setImageResource(DARK_PIECE_HIGHLIGHTED);
                     } else if (cell.getPiece().getColor().equals(Piece.LIGHT) && cell.getPiece().isKing()) {
-                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(LIGHT_KING_PIECE_HIGHLIGHTED);
+                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setImageResource(LIGHT_KING_PIECE_HIGHLIGHTED);
                     } else if (cell.getPiece().getColor().equals(Piece.LIGHT)) {
-                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setBackgroundResource(LIGHT_PIECE_HIGHLIGHTED);
+                        buttonBoard[cell.getFrom().getX()][cell.getFrom().getY()].setImageResource(LIGHT_PIECE_HIGHLIGHTED);
                     }
                     highlightedCells.add(cell.getFrom());
                 }
@@ -932,12 +1112,32 @@ public class GameActivity extends AppCompatActivity implements ConnectionObserve
         }
     }
 
+    public void clearPossibleMoves() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if ((i + j) % 2 == 0) {
+                    Cell cell = cellBoard.getCell(i, j);
+                    if (!cell.containsPiece()) {
+                        buttonBoard[cell.getX()][cell.getY()].setImageResource(R.drawable.blank_square);
+                    }
+                }
+            }
+        }
+    }
 
     public void showPossibleMoves(List<Move> moves) {
+        for (int i = 0; i < moves.size(); i++) {
+            Cell cell = moves.get(i).getTo();
+            if (!cell.containsPiece()) {
+                buttonBoard[cell.getX()][cell.getY()].setImageResource(R.drawable.blank_square);
+            }
+        }
+
         for (Move cell : moves) {
             if (srcCell != null && srcCell.equals(cell.getFrom())) {
-                buttonBoard[cell.getTo().getX()][cell.getTo().getY()].setBackgroundResource(POSSIBLE_MOVE);
+                buttonBoard[cell.getTo().getX()][cell.getTo().getY()].setImageResource(POSSIBLE_MOVE);
                 srcCell = cellBoard.getCell(cell.getFrom().getX(), cell.getFrom().getY());
+
                 updatePiecePressed(srcCell);
             }
         }
